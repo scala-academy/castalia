@@ -1,6 +1,7 @@
 # Akka HTTP REST Example - Instagram Pictures Filter
 
-[![Build Status](https://travis-ci.org/pvoznenko/akka-http-rest-example.svg)](https://travis-ci.org/pvoznenko/akka-http-rest-example)
+[![Build Status](https://travis-ci.org/TimSoethout/stubserver.svg)](https://travis-ci.org/TimSoethout/stubserver)
+[![Codacy Badge](https://api.codacy.com/project/badge/06b7d35d307c44b29d20e3d9c25b1ee2)](https://www.codacy.com/app/github_10/stubserver)
 
 Main goal of this project to show an example on how to use Akka HTTP as REST service.
 
