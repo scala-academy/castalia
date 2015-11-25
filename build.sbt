@@ -14,7 +14,8 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test",
     "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test",
-    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test"
+    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test",
+    "com.twitter"       %% "finagle-http"                    % "6.30.0" % "test"
   )
 }
 
