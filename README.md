@@ -4,10 +4,7 @@
 
 Waffle issue board: https://waffle.io/scala-academy/stubserver
 
-Main goal of this project to show an example on how to use Akka HTTP as REST service.
-
-This project will hep you to load your pictures by date range from your Instagram.
-
+Goal: learn programing with Scala and Akka in a real-world scenario
 
 ## The name: Castalia
 
