@@ -4,11 +4,13 @@
 
 Waffle issue board: https://waffle.io/scala-academy/castalia
 
+[![Join the chat at https://gitter.im/scala-academy/castalia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scala-academy/castalia?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Goal: learn programing with Scala and Akka in a real-world scenario
 
 ## The name: Castalia
 
-[![Join the chat at https://gitter.im/scala-academy/castalia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scala-academy/castalia?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 
 In Greek Mythology the most powerful Oracle was the oracle of Delphi.
 People would come from all around with question, seeking answers. The
