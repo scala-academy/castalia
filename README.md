@@ -7,3 +7,11 @@ Waffle issue board: https://waffle.io/scala-academy/stubserver
 Main goal of this project to show an example on how to use Akka HTTP as REST service.
 
 This project will hep you to load your pictures by date range from your Instagram.
+
+
+## The name: Castalia
+
+In Greek Mythology the most powerful Oracle was the oracle of Delphi.
+People would come from all around with question, seeking answers. The
+oracle's source of inspiration sprang fourth from a fountain and the fountain
+was called Castalia.
