@@ -1,0 +1,7 @@
+language: scala
+
+scala: 2.11.6
+
+jdk: oraclejdk8
+
+script: sbt clean test -Dsbt.override.build.repos=true -Dsbt.repository.config=./proxy-sbt-repositories
