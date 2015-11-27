@@ -5,8 +5,8 @@ scalaVersion  := "2.11.7"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
-  val akkaStreamV      = "1.0"
-  val scalaTestV       = "3.0.0-M7"
+  val akkaStreamV      = "2.0-M1"
+  val scalaTestV       = "3.0.0-M12"
   val scalaMockV       = "3.2.2"
   Seq(
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
