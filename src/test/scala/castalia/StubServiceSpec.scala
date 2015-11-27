@@ -1,33 +1,28 @@
 package castalia
 
-import com.twitter.finagle.http.Response
-import com.twitter.finagle.{Http, http}
-import com.twitter.util.{Await, Future}
+import akka.event.NoLogging
+import akka.http.scaladsl.model.StatusCodes._
 
 /**
   * Created by Jens Kat on 25-11-2015.
   */
-class StubServiceSpec extends ServiceTestBase {
-
-  "A request to the endpoint hardcodeddummystub" when {
+class StubServiceSpec extends ServiceTestBase with StubService {
+  override val log = NoLogging
+  "A request to the endpoint /stubs/hardcodeddummystub" when {
     "I do a HTTP GET" should {
       "return HTTP status code 200" in {
-
-        val client = Http.newService("localhost:9000")
-       // val x = Http.newClient()
-        val request = http.Request(http.Method.Get, "/stubs/hardcodeddummystub")
-        request.host = "http://localhost:9000"
-        val response: Future[Response] = client(request)
-
-        response.onSuccess{
-          resp => assert(resp.getStatusCode() == 404)
-            println(resp)
+        Get("/stubs/hardcodeddummystub") ~> routes ~> check {
+          status shouldBe OK
         }
+      }
+    }
+  }
 
-        response.onFailure(
-          resp => println(resp.getCause)
-        )
-
+  "A request to a non-existing endpoint" should {
+    "result in HTTP status code 404 and handled by the rejectionhandler" in {
+      Get("/stubs/nonexistingstub") ~> routes ~> check {
+        status shouldBe NotFound
+        responseAs[String] shouldBe "Oh man, what you are looking for is long gone."
       }
     }
   }
