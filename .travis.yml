@@ -4,4 +4,7 @@ scala: 2.11.7
 
 jdk: oraclejdk8
 
-script: sbt clean test
+env:
+  - CODACY_PROJECT_TOKEN=f950576bfe5b4401950fa8b088e37dc3
+
+script: ./build.sh
