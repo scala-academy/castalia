@@ -33,7 +33,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
   "A HTTP GET request to stubs/dynamicdummystub/default?response={anyString}" should {
     "result in a HTTP 200 response from the stubserver containing a json object with property \"response\" equal to \"{anyString}\"" in {
       val randomString = Random.alphanumeric.take(Random.nextInt(10)).mkString
-      Get(s"/stubs/dynamicdummystub/default?response=$randomString") ~> routes ~> check {
+      Get(s"/stubs/dynamicdummystub/default?response=$randomString") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
         responseAs[Response] shouldBe Response(randomString)
