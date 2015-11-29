@@ -9,7 +9,7 @@ trait StubService extends BaseService {
 
   protected val serviceName = "StubService"
 
-  val routes = pathPrefix("stubs") {
+  val stubRoutes = pathPrefix("stubs") {
     handleRejections(totallyMissingHandler) {
       path("hardcodeddummystub") {
         get {

@@ -11,7 +11,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
   "A request to the endpoint /stubs/hardcodeddummystub" when {
     "I do a HTTP GET" should {
       "return HTTP status code 200" in {
-        Get("/stubs/hardcodeddummystub") ~> routes ~> check {
+        Get("/stubs/hardcodeddummystub") ~> stubRoutes ~> check {
           status shouldBe OK
         }
       }
@@ -20,7 +20,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
 
   "A request to a non-existing endpoint" should {
     "result in HTTP status code 404 and handled by the rejectionhandler" in {
-      Get("/stubs/nonexistingstub") ~> routes ~> check {
+      Get("/stubs/nonexistingstub") ~> stubRoutes ~> check {
         status shouldBe NotFound
         responseAs[String] shouldBe "Oh man, what you are looking for is long gone."
       }

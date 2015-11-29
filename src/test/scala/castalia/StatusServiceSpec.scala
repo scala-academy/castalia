@@ -11,7 +11,7 @@ class StatusServiceSpec extends ServiceTestBase with StatusService {
   override val log = NoLogging
 
   "Return no body when asking /" in {
-    Get("/") ~> routes ~> check {
+    Get("/") ~> statusRoutes ~> check {
       handled shouldBe false
     }
   }
@@ -19,7 +19,7 @@ class StatusServiceSpec extends ServiceTestBase with StatusService {
   "A request to the endpoint /status" when {
     "I do a HTTP GET" should {
       "return a non-empty http body" in {
-        Get("/status") ~> routes ~> check {
+        Get("/status") ~> statusRoutes ~> check {
           status shouldBe OK
           contentType shouldBe `application/json`
           responseAs[String].length should be > 0
