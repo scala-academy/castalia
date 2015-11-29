@@ -13,7 +13,12 @@ trait StubService extends BaseService {
     handleRejections(totallyMissingHandler) {
       path("hardcodeddummystub") {
         get {
-          complete("")
+          complete("Yay!")
+        }
+      } ~
+      path("anotherstub") {
+        get {
+          complete("Different response")
         }
       }
     }
