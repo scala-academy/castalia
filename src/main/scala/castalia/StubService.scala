@@ -20,7 +20,16 @@ trait StubService extends BaseService {
         get {
           complete("Different response")
         }
+      } ~
+      path("dynamicdummystub" / "default") {
+        parameter("response") {
+          anyString =>
+          get {
+            complete(Response(anyString))
+          }
+        }
       }
     }
   }
+
 }
