@@ -21,11 +21,19 @@ trait StubService extends BaseService {
           complete("Different response")
         }
       } ~
-      path("dynamicdummystub" / "default") {
-        parameter("response") {
-          anyString =>
-          get {
-            complete(Response(anyString))
+      pathPrefix("dynamicdummystub"){
+        path("default") {
+          parameter("response") { anyString =>
+              get {
+                complete(Response(None, anyString))
+              }
+          }
+        } ~
+        path(IntNumber){ id =>
+          parameter("response") { anyString =>
+            get {
+              complete(Response(Some(id), anyString))
+            }
           }
         }
       }

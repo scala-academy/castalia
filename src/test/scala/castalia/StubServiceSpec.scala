@@ -11,14 +11,12 @@ import scala.util.Random
   */
 class StubServiceSpec extends ServiceTestBase with StubService {
   override val log = NoLogging
-  "A request to the endpoint /stubs/hardcodeddummystub" when {
-    "I do a HTTP GET" should {
+  "A request to the endpoint /stubs/hardcodeddummystub"  should {
       "return HTTP status code 200" in {
         Get("/stubs/hardcodeddummystub") ~> stubRoutes ~> check {
           status shouldBe OK
         }
       }
-    }
   }
 
   "A request to a non-existing endpoint" should {
@@ -36,7 +34,19 @@ class StubServiceSpec extends ServiceTestBase with StubService {
       Get(s"/stubs/dynamicdummystub/default?response=$randomString") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        responseAs[Response] shouldBe Response(randomString)
+        responseAs[Response] shouldBe Response(None, randomString)
+      }
+    }
+  }
+
+  "A HTTP GET request to stubs/dynamicdummystub/{anyInteger}?response={anyString}" should {
+    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"{anyInteger}\" and property \"response\" equal to \"{anyString}\"" in {
+      val randomString = Random.alphanumeric.take(Random.nextInt(10)).mkString
+      var randomInt = Random.nextInt(1000000)
+      Get(s"/stubs/dynamicdummystub/$randomInt?response=$randomString") ~> stubRoutes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        responseAs[Response] shouldBe Response(Some(randomInt), randomString)
       }
     }
   }
