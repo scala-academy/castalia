@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 trait StatusService extends BaseService {
   protected val serviceName = "my service"
 
-  val routes: Route = pathPrefix("status") {
+  val statusRoutes: Route = pathPrefix("status") {
     handleRejections(totallyMissingHandler) {
       get {
         log.info("/status executed")

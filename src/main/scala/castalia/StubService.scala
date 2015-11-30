@@ -9,13 +9,35 @@ trait StubService extends BaseService {
 
   protected val serviceName = "StubService"
 
-  val routes = pathPrefix("stubs") {
+  val stubRoutes = pathPrefix("stubs") {
     handleRejections(totallyMissingHandler) {
       path("hardcodeddummystub") {
         get {
-          complete("")
+          complete("Yay!")
+        }
+      } ~
+      path("anotherstub") {
+        get {
+          complete("Different response")
+        }
+      } ~
+      pathPrefix("dynamicdummystub"){
+        path("default") {
+          parameter("response") { anyString =>
+              get {
+                complete(Response(None, anyString))
+              }
+          }
+        } ~
+        path(IntNumber){ id =>
+          parameter("response") { anyString =>
+            get {
+              complete(Response(Some(id), anyString))
+            }
+          }
         }
       }
     }
   }
+
 }
