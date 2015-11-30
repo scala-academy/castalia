@@ -12,12 +12,18 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
-    "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test",
-    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test",
-    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test",
-    "com.twitter"       %% "finagle-http"                    % "6.30.0" % "test"
+    "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
+    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test,it",
+    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
+    "com.twitter"       %% "finagle-http"                         % "6.30.0"         % "it"
   )
 }
+
+// Use IntegrationTest
+// (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)
+lazy val root = project.in(file("."))
+  .configs(IntegrationTest)
+  .settings( Defaults.itSettings : _* )
 
 initialCommands := """|import akka.actor._
                       |import akka.pattern._
