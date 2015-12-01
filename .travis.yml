@@ -9,4 +9,4 @@ script: sbt clean test -Dsbt.override.build.repos=true -Dsbt.repository.config=.
 notifications:
   webhooks:
     urls:
-      - https://webhooks.gitter.im/e/c94c3bbb932169a3b553
+      - https://webhooks.gitter.im/e/648ac1bd320fb1242e3e
