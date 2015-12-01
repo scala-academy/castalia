@@ -5,3 +5,8 @@ scala: 2.11.6
 jdk: oraclejdk8
 
 script: sbt clean test -Dsbt.override.build.repos=true -Dsbt.repository.config=./proxy-sbt-repositories
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/c94c3bbb932169a3b553
