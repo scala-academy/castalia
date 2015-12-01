@@ -7,8 +7,8 @@ import com.twitter.util.Await
 import org.scalatest.{Matchers, WordSpec}
 
 class StubServerTest extends WordSpec with Matchers {
-  // FIXME: make it work more nicely.
-  Main.main(null)
+  // TODO: other way than starting application using empty string array in main?
+  Main.main(Array.empty[String])
 
   val client = finagle.Http.newService(s"localhost:9000")
 
