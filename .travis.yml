@@ -5,7 +5,7 @@ scala: 2.11.7
 jdk: oraclejdk8
 
 env:
-  - CODACY_PROJECT_TOKEN=f950576bfe5b4401950fa8b088e37dc3
+  - CODACY_PROJECT_TOKEN=7bb368f5bdff4cd8b8fcc18f5192397d
 
 script: ./build.sh
 
