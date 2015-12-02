@@ -1,10 +1,13 @@
 language: scala
 
-scala: 2.11.6
+scala: 2.11.7
 
 jdk: oraclejdk8
 
-script: sbt clean test -Dsbt.override.build.repos=true -Dsbt.repository.config=./proxy-sbt-repositories
+env:
+  - CODACY_PROJECT_TOKEN=f950576bfe5b4401950fa8b088e37dc3
+
+script: ./build.sh
 
 notifications:
   webhooks:
