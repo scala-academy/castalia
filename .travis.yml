@@ -8,3 +8,8 @@ env:
   - CODACY_PROJECT_TOKEN=f950576bfe5b4401950fa8b088e37dc3
 
 script: ./build.sh
+
+notifications:
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/648ac1bd320fb1242e3e
