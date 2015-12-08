@@ -1,8 +1,10 @@
 package castalia
 
 import akka.event.NoLogging
+import akka.http.scaladsl.model.HttpResponse
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.ContentTypes.`application/json`
+import spray.json.JsString
 
 import scala.util.Random
 
@@ -11,12 +13,12 @@ import scala.util.Random
   */
 class StubServiceSpec extends ServiceTestBase with StubService {
   override val log = NoLogging
-  "A request to the endpoint /stubs/hardcodeddummystub"  should {
-      "return HTTP status code 200" in {
-        Get("/stubs/hardcodeddummystub") ~> stubRoutes ~> check {
-          status shouldBe OK
-        }
+  "A request to the endpoint /stubs/hardcodeddummystub" should {
+    "return HTTP status code 200" in {
+      Get("/stubs/hardcodeddummystub") ~> stubRoutes ~> check {
+        status shouldBe OK
       }
+    }
   }
 
   "A request to a non-existing endpoint" should {
@@ -46,9 +48,29 @@ class StubServiceSpec extends ServiceTestBase with StubService {
       Get(s"/stubs/dynamicdummystub/$randomInt?response=$randomString") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        responseAs[Response] shouldBe Response(Some(randomInt), randomString)
+        //  responseAs[Response] shouldBe Response(Some(randomInt), randomString)
       }
     }
   }
 
+  "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
+    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
+      import StubDefProtocol._
+      Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+//        responseAs[HttpResponse] shouldBe HttpResponse(200)
+      }
+    }
+  }
+
+  "A HTTP GET request to stubs/jsonconfiguredstub/2" should {
+    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
+      Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
+        status shouldBe OK
+        contentType shouldBe `application/json`
+        //        responseAs[Response] shouldBe Response(Some(1), "123123")
+      }
+    }
+  }
 }
