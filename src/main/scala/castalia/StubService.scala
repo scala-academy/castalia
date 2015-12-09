@@ -29,7 +29,7 @@ trait StubService extends BaseService with StubData {
       }
     }
 
-    Main.StubsByEndPoint.tail.foldLeft(createRoute(Main.StubsByEndPoint.head._1, Main.StubsByEndPoint.head._2))(
+    Main.StubsByEndPoint.foldLeft(reject.asInstanceOf[Route])(
       (r, stub) => r ~ createRoute(stub._1, stub._2)
     )
   }
