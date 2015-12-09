@@ -7,5 +7,5 @@ package object castalia {
   type AnyJsonObject = Option[Map[String, JsValue]]
   type StatusCode = Int
   type Endpoint = String
-  type StubResponse2 = (StatusCode, AnyJsonObject)
+  type StubResponse = (StatusCode, AnyJsonObject)
 }
