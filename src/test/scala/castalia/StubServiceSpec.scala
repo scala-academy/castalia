@@ -55,7 +55,6 @@ class StubServiceSpec extends ServiceTestBase with StubService {
 
   "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
     "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
-      import StubDefProtocol._
       Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`

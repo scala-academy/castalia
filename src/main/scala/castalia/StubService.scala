@@ -1,8 +1,10 @@
 package castalia
 
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.Route
+import akka.http.scaladsl.server.{RouteResult, RequestContext, Route}
 import spray.json.JsValue
+
+import scala.concurrent.Future
 
 /**
   * Created by Jens Kat on 27-11-2015.
@@ -12,12 +14,12 @@ trait StubService extends BaseService with StubData {
   protected val serviceName = "StubService"
 
   def DynamicStubRoutes = {
-    def createRoute(endpoint: String, responses: Map[String, (Int, Option[Map[String, JsValue]])]): Route = path(endpoint / IntNumber) { id =>
+    def createRoute(endpoint: String, responses: Map[String, (Int, AnyJsonObject)]): Route = path(endpoint / IntNumber) { id =>
       get {
-        val response: Option[(Int, Option[Map[String, JsValue]])] = responses.get(id.toString)
+        val response: Option[(Int, AnyJsonObject)] = responses.get(id.toString)
 
         response match {
-          case Some((statuscode: Int, optResponse: Option[Map[String, JsValue]])) =>
+          case Some((statuscode: Int, optResponse: AnyJsonObject)) =>
             optResponse match {
               case Some(response) => complete(statuscode, response.toJson)
               case _ => complete(statuscode, "") //
@@ -33,8 +35,8 @@ trait StubService extends BaseService with StubData {
   }
 
   val staticEndpoints = List(
-    StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
-    StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
+        StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
+        StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
 
   def StaticRoutes: Route = {
     def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
@@ -43,7 +45,7 @@ trait StubService extends BaseService with StubData {
       }
     }
 
-    staticEndpoints.tail.foldLeft(createRoute(staticEndpoints.head)) {
+    staticEndpoints.foldLeft(reject.asInstanceOf[Route]) {
       (r, stub) => r ~ createRoute(stub)
     }
   }

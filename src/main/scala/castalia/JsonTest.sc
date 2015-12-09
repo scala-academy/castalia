@@ -1,6 +1,7 @@
 val list = List("this", "maps", "string", "to", "length") map {s => (s, s.length)} toMap
 
 
+import castalia.AnyJsonObject
 import spray.json._
 import DefaultJsonProtocol._
 val x = """{
@@ -30,7 +31,7 @@ val x = """{
             ]
           }"""
 
-case class ResponseDef(id: String, httpStatusCode: Int, response: Option[Map[String, JsValue]])
+case class ResponseDef(id: String, httpStatusCode: Int, response: AnyJsonObject)
 
 case class StubDef(endpoint: String, responses: List[ResponseDef])
 object StubDefProtocol extends DefaultJsonProtocol {

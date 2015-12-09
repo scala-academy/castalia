@@ -1,10 +1,9 @@
 package castalia
 
 import spray.json._
-import StubDefProtocol._
 
+trait StubData extends Protocol {
 
-trait StubData {
   def ReadStubInfo(jsonFiles: Array[String]) = {
     // Get all files from argumentlist
     val StubDefs = for (
@@ -15,7 +14,7 @@ trait StubData {
           .parseJson // parse the string to Json objects
           .convertTo[StubEndpoint] // Convert to StubDef.
 
-    val StubsByEndPoint: Map[String, Map[String, (Int, Option[Map[String, JsValue]])]] = StubDefs.map({
+    val StubsByEndPoint: Map[Endpoint, Map[String, StubResponse2]] = StubDefs.map({
       // Create an outer map by endpoint
       s => (
         s.endpoint, // Endpoint is the outer key
