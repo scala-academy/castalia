@@ -2,7 +2,7 @@ package castalia
 
 import spray.json._
 
-trait StubData extends Protocol {
+trait StubConfigParser extends Protocol {
 
   def ReadStubInfo(jsonFiles: Array[String]) = {
     // Get all files from argumentlist
@@ -12,7 +12,7 @@ trait StubData extends Protocol {
         scala.io.Source.fromFile(getClass.getResource("/"+jsonFile).getPath) //.fromInputStream(getClass.getResourceAsStream(jsonFile)) // read File
           .mkString // make it a string
           .parseJson // parse the string to Json objects
-          .convertTo[StubEndpoint] // Convert to StubDef.
+          .convertTo[StubConfig] // Convert to StubDef.
 
     val StubsByEndPoint: Map[Endpoint, Map[String, StubResponse2]] = StubDefs.map({
       // Create an outer map by endpoint

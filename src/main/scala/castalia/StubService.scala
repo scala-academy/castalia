@@ -9,7 +9,7 @@ import scala.concurrent.Future
 /**
   * Created by Jens Kat on 27-11-2015.
   */
-trait StubService extends BaseService with StubData {
+trait StubService extends BaseService with StubConfigParser {
 
   protected val serviceName = "StubService"
 
