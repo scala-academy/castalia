@@ -1,23 +1,33 @@
 package castalia
 
+import java.io.FileNotFoundException
+import java.net.URL
+
 import spray.json._
 
 trait StubConfigParser extends Protocol {
 
-def parseStubConfig( jsonFile: String): StubConfig = {
-  scala.io.Source.fromFile(getClass.getResource("/"+jsonFile).getPath) //.fromInputStream(getClass.getResourceAsStream(jsonFile)) // read File
-    .mkString // make it a string
-    .parseJson // parse the string to Json objects
-    .convertTo[StubConfig] // Convert to StubDef.
-}
-  def ReadStubInfo(jsonFiles: Array[String]) = {
+  def parseStubConfig(jsonFile: String): StubConfig = {
+    val resource: URL = getClass.getResource("/" + jsonFile)
+    resource match {
+      case url : URL =>
+        scala.io.Source.fromFile(resource.getPath) //.fromInputStream(getClass.getResourceAsStream(jsonFile)) // read File
+          .mkString // make it a string
+          .parseJson // parse the string to Json objects
+          .convertTo[StubConfig] // Convert to StubDef.
+
+      case _ => throw new FileNotFoundException(jsonFile)
+    }
+  }
+
+  def readAndParseStubConfigFiles(jsonFiles: Array[String]): Map[Endpoint, ResponsesByRequest] = {
     // Get all files from argumentlist
-    val StubDefs = for (
+    val stubConfigs = for (
       jsonFile <- jsonFiles // iterate over all jsonFiles
     ) yield
         parseStubConfig(jsonFile)
 
-    val StubsByEndPoint: Map[Endpoint, Map[String, StubResponse2]] = StubDefs.map({
+    val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
       // Create an outer map by endpoint
       s => (
         s.endpoint, // Endpoint is the outer key
@@ -29,6 +39,6 @@ def parseStubConfig( jsonFile: String): StubConfig = {
         }).toMap // this is the outer map value (a map of id -> responses)
         )
     }).toMap // this is the map of all stubs (a map of endpoint -> (a map of id -> responses) )
-    StubsByEndPoint
+    stubsConfigsByEndpoint
   }
 }

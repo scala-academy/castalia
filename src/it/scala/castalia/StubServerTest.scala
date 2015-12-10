@@ -40,9 +40,8 @@ class StubServerTest extends IntegrationTestBase {
       //assert(Await.result(response).toString == "{response stub1}")
 
       //assert(server.configuration.get === Array("stub1.json", "jsonconfiguredstub.json"))
-      assert(server.StubsByEndPoint.head === Array("stub1.json", "jsonconfiguredstub.json"))
-//      Map[Endpoint, Map[String, (StatusCode, AnyJsonObject)]]
-
+      assert(server.stubsByEndPoint.contains("Stub1Endpoint"))
+      assert(server.stubsByEndPoint.contains("jsonconfiguredstub"))
     }
   }
 

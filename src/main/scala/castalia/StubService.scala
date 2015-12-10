@@ -1,59 +1,57 @@
 package castalia
 
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RouteResult, RequestContext, Route}
-import spray.json.JsValue
+import akka.http.scaladsl.server.Route
 
-import scala.concurrent.Future
-
-/**
-  * Created by Jens Kat on 27-11-2015.
-  */
 trait StubService extends BaseService with StubConfigParser {
 
   protected val serviceName = "StubService"
 
-  def DynamicStubRoutes = {
-    def createRoute(endpoint: String, responses: Map[String, (Int, AnyJsonObject)]): Route = path(endpoint / IntNumber) { id =>
+  def dynamicStubRoutes : Route = {
+    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = path(endpoint / IntNumber) { id =>
       get {
-        val response: Option[(Int, AnyJsonObject)] = responses.get(id.toString)
+        val response: Option[(StatusCode, AnyJsonObject)] = responses.get(id.toString)
 
         response match {
-          case Some((statuscode: Int, optResponse: AnyJsonObject)) =>
+          case Some((statuscode: StatusCode, optResponse: AnyJsonObject)) =>
             optResponse match {
-              case Some(response) => complete(statuscode, response.toJson)
-              case _ => complete(statuscode, "") //
+              case Some(content) => complete(statuscode, content.toJson)
+              case _ => complete(statuscode, "")
             }
-          case _ => complete(501, "Unknown response")
+          case _ => complete(/*akka.http.scaladsl.model.StatusCodes.ServerError*/501, "Unknown response")
         }
       }
     }
 
-    Main.StubsByEndPoint.foldLeft(reject.asInstanceOf[Route])(
-      (r, stub) => r ~ createRoute(stub._1, stub._2)
-    )
+    if (Main.stubsByEndPoint.isEmpty) {
+      reject
+    } else {
+      Main.stubsByEndPoint map { case (e, r) => createRoute(e, r) } reduceLeft(_ ~ _)
+    }
   }
 
   val staticEndpoints = List(
         StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
         StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
 
-  def StaticRoutes: Route = {
+  def staticRoutes: Route = {
     def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
       get {
         complete(ep.response.status, ep.response.content)
       }
     }
 
-    staticEndpoints.foldLeft(reject.asInstanceOf[Route]) {
-      (r, stub) => r ~ createRoute(stub)
+    if (staticEndpoints.isEmpty) {
+      reject
+    } else {
+      staticEndpoints map { case (e) => createRoute(e) } reduceLeft(_ ~ _)
     }
   }
 
   val stubRoutes = pathPrefix("stubs") {
     handleRejections(totallyMissingHandler) {
-      StaticRoutes ~
-        DynamicStubRoutes ~
+      staticRoutes ~
+        dynamicStubRoutes ~
         pathPrefix("dynamicdummystub") {
           path("default") {
             parameter("response") { anyString =>
