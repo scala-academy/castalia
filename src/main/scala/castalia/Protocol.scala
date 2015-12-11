@@ -1,20 +1,16 @@
 package castalia
 
+import castalia.model.{ResponseConfig, StubConfig}
 import spray.json.DefaultJsonProtocol
 
-case class Status(uptime: String)
-case class Response(id: Option[Int], response: String)
-
-case class ResponseConfig(id:String, httpStatusCode:StatusCode, response:AnyJsonObject)
-case class StubConfig(endpoint: String, responses: List[ResponseConfig])
+case class CastaliaStatusResponse(uptime: Long)
 
 case class StaticEndpoint(endpoint: String, response: StaticResponse)
-case class StaticResponse(status: Int, content: String)
+case class StaticResponse(status: StatusCode, content: String)
 
 trait Protocol extends DefaultJsonProtocol {
-  implicit val statusFormatter = jsonFormat1(Status.apply)
-  implicit val responseFormatter = jsonFormat2(Response.apply)
-  implicit val ResponseConfigFormat = jsonFormat3(ResponseConfig)
-  implicit val StubConfigFormat = jsonFormat2(StubConfig)
+  implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaStatusResponse)
+  implicit val responseConfigFormat = jsonFormat3(ResponseConfig)
+  implicit val stubConfigFormat = jsonFormat2(StubConfig)
 
 }

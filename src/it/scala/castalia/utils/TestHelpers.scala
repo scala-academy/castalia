@@ -1,20 +1,20 @@
 package castalia.utils
 
-import castalia.Main
 import com.twitter.finagle
 import com.twitter.finagle.ChannelWriteException
-import com.twitter.finagle.http.{Response, Method, Request}
-import com.twitter.util.{Duration, Future, Await}
+import com.twitter.finagle.http.{Method, Request, Response, Status}
+import com.twitter.util.{Await, Future}
+
 /**
- * Created by jens on 06-12-15.
- */
+  * Created by jens on 06-12-15.
+  */
 object TestHelpers {
 
   /**
-   * Check if we can make a call to the server.
-   * @param serverAddress the server to respond
-   * @return if the server is running or not
-   */
+    * Check if we can make a call to the server.
+    * @param serverAddress the server to respond
+    * @return if the server is running or not
+    */
   def isServerRunningFuture(serverAddress: String): Future[Response] = {
     val client = finagle.Http.newService(serverAddress)
     val request = Request(Method.Get, "/")
@@ -24,14 +24,11 @@ object TestHelpers {
 
   def isServerRunning(serverAddress: String): Boolean = {
     try {
-      val response = isServerRunningFuture(serverAddress)
-      val r = Await.result(response)
-      r.statusCode != 404
-    }
-    catch {
-      case ex: ChannelWriteException => println("ChannelWriteException: not running")
-        false
+      val eventualResponse = isServerRunningFuture(serverAddress)
+      val response = Await.result(eventualResponse)
+      response.status != Status.NotFound
+    } catch {
+      case e : ChannelWriteException => false
     }
   }
-
 }

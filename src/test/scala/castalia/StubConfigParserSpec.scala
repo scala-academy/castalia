@@ -2,6 +2,8 @@ package castalia
 
 import java.io.FileNotFoundException
 
+import castalia.model.{CastaliaConfig, ResponseConfig}
+
 //import castalia.model.{StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 import spray.json.{JsString, JsValue}
@@ -18,21 +20,24 @@ class StubConfigParserSpec extends WordSpec with Matchers with StubConfigParser 
         val stub = parseStubConfig("jsonconfiguredstub.json")
 
         stub.endpoint shouldBe "jsonconfiguredstub"
-        val responses = stub.responses
+        val responses: List[ResponseConfig] = stub.responses
         responses.length === 3
 
-        responses.head.id === "1"
-        responses.head.httpStatusCode === 200
-        responses.head.response === Map[String, JsValue]("id" -> JsString("een"), "someValue" -> JsString("123123"))
+        val req1Response = responses.find(r => r.id == "1").get
+        req1Response.id === "1"
+        req1Response.httpStatusCode === 200
+        req1Response.response === Map[String, JsValue]("id" -> JsString("een"), "someValue" -> JsString("123123"))
 
-        responses(1).id === "2"
-        responses(1).httpStatusCode === 200
-        responses(1).response === Map[String, JsValue]("id" -> JsString("twee"),
+        val req2Response = responses.find(r => r.id == "2").get
+        req2Response.id === "2"
+        req2Response.httpStatusCode === 200
+        req2Response.response === Map[String, JsValue]("id" -> JsString("twee"),
           "someValue" -> JsString("123123"), "someAdditionalValue" -> JsString("345345"))
 
-        responses(2).id === "0"
-        responses(2).httpStatusCode === 404
-        responses(2).response === None
+        val req0Response = responses.find(r => r.id == "0").get
+        req0Response.id === "0"
+        req0Response.httpStatusCode === 404
+        req0Response.response === None
 
       }
     }
@@ -44,11 +49,11 @@ class StubConfigParserSpec extends WordSpec with Matchers with StubConfigParser 
         }
     }
 
-    /*"json file \"castalia.json\" exists on classpath" should {
+    "json file \"castalia.json\" exists on classpath" should {
       "return a CastaliaConfig object" in {
-        val config = StubConfigParser.toCastaliaConfig("castalia.json")
+        val config = CastaliaConfig.parse("castalia.json")
         config.httpPort === 9000
       }
-    }*/
+    }
   }
 }

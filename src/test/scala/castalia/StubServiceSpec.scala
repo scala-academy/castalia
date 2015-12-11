@@ -1,12 +1,9 @@
 package castalia
 
 import akka.event.NoLogging
-import akka.http.scaladsl.model.HttpResponse
-import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.ContentTypes.`application/json`
-import spray.json.JsString
-
-import scala.util.Random
+import akka.http.scaladsl.model.StatusCodes._
+import spray.json._
 
 /**
   * Created by Jens Kat on 25-11-2015.
@@ -30,45 +27,25 @@ class StubServiceSpec extends ServiceTestBase with StubService {
     }
   }
 
-  "A HTTP GET request to stubs/dynamicdummystub/default?response={anyString}" should {
-    "result in a HTTP 200 response from the stubserver containing a json object with property \"response\" equal to \"{anyString}\"" in {
-      val randomString = Random.alphanumeric.take(Random.nextInt(10)).mkString
-      Get(s"/stubs/dynamicdummystub/default?response=$randomString") ~> stubRoutes ~> check {
-        status shouldBe OK
-        contentType shouldBe `application/json`
-        responseAs[Response] shouldBe Response(None, randomString)
-      }
-    }
-  }
-
-  "A HTTP GET request to stubs/dynamicdummystub/{anyInteger}?response={anyString}" should {
-    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"{anyInteger}\" and property \"response\" equal to \"{anyString}\"" in {
-      val randomString = Random.alphanumeric.take(Random.nextInt(10)).mkString
-      var randomInt = Random.nextInt(1000000)
-      Get(s"/stubs/dynamicdummystub/$randomInt?response=$randomString") ~> stubRoutes ~> check {
-        status shouldBe OK
-        contentType shouldBe `application/json`
-        //  responseAs[Response] shouldBe Response(Some(randomInt), randomString)
-      }
-    }
-  }
-
   "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
     "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
       Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-//        responseAs[HttpResponse] shouldBe HttpResponse(200)
+        responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> JsString("een"),
+                                                                                "someValue" -> JsString("123123")))
       }
     }
   }
 
   "A HTTP GET request to stubs/jsonconfiguredstub/2" should {
-    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
-      Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
+    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"twee\" and property \"someValue\" equal to \"{123123}\" and property someAdditionalValue\" equal to \"345345" in {
+      Get(s"/stubs/jsonconfiguredstub/2") ~> stubRoutes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-        //        responseAs[Response] shouldBe Response(Some(1), "123123")
+//        responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> "twee",
+//                                                                                "someValue" -> "123123",
+//                                                                                "someAdditionalValue" -> "345345"))
       }
     }
   }

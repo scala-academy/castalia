@@ -3,6 +3,7 @@ package castalia
 import java.io.FileNotFoundException
 import java.net.URL
 
+import castalia.model.StubConfig
 import spray.json._
 
 trait StubConfigParser extends Protocol {

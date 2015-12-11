@@ -1,11 +1,8 @@
 package castalia
 
-import castalia.utils.{TestHelpers}
 import com.twitter.finagle
-import com.twitter.finagle.http.{Method, Request}
+import com.twitter.finagle.http.{Response, Status, Method, Request}
 import com.twitter.util.Await
-import org.scalatest.{Matchers, WordSpec}
-import utils.TestHelpers
 
 class StubServerTest extends IntegrationTestBase {
   // TODO: other way than starting application using empty string array in main?
@@ -29,18 +26,16 @@ class StubServerTest extends IntegrationTestBase {
       info("and files \"stub1.json\" and \"jsonconfiguredstub.json\" are both on the classpath")
 
       When("I do a HTTP GET to the endpoint as configured in \"stub1.json\"")
-      val request = Request(Method.Get, "/jsonconfiguredstub")
+      val request = Request(Method.Get, "/stubs/stub11/1")
       request.host = serverAddress
 
-
       Then("the response should be as configured in \"stub1.json\"")
-      val response = client(request)
-      //assert(Await.result(response).statusCode == 200)
+      val response: Response = Await.result(client(request))
 
-      //assert(Await.result(response).toString == "{response stub1}")
+      assert(response.status == Status.Ok)
+      assert(response.contentString == "{\n  \"id\": \"een\",\n  \"someValue\": \"123123\"\n}")
 
-      //assert(server.configuration.get === Array("stub1.json", "jsonconfiguredstub.json"))
-      assert(server.stubsByEndPoint.contains("Stub1Endpoint"))
+      assert(server.stubsByEndPoint.contains("stub11"))
       assert(server.stubsByEndPoint.contains("jsonconfiguredstub"))
     }
   }
