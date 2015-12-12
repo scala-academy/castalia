@@ -8,11 +8,13 @@ import spray.json._
 /**
   * Created by Jens Kat on 25-11-2015.
   */
-class StubServiceSpec extends ServiceTestBase with StubService {
-  override val log = NoLogging
+class StubServiceSpec extends ServiceTestBase with Protocol{
+//  override val log = NoLogging
+  val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("jsonconfiguredstub.json"))
+  val service = new StubService(stubsByEndpoints)
   "A request to the endpoint /stubs/hardcodeddummystub" should {
     "return HTTP status code 200" in {
-      Get("/stubs/hardcodeddummystub") ~> stubRoutes ~> check {
+      Get("/stubs/hardcodeddummystub") ~> service.routes ~> check {
         status shouldBe OK
       }
     }
@@ -20,7 +22,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
 
   "A request to a non-existing endpoint" should {
     "result in HTTP status code 404 and handled by the rejectionhandler" in {
-      Get("/stubs/nonexistingstub") ~> stubRoutes ~> check {
+      Get("/stubs/nonexistingstub") ~> service.routes ~> check {
         status shouldBe NotFound
         responseAs[String] shouldBe "Oh man, what you are looking for is long gone."
       }
@@ -29,7 +31,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
 
   "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
     "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
-      Get(s"/stubs/jsonconfiguredstub/1") ~> stubRoutes ~> check {
+      Get(s"/stubs/jsonconfiguredstub/1") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
         responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> JsString("een"),
@@ -40,7 +42,7 @@ class StubServiceSpec extends ServiceTestBase with StubService {
 
   "A HTTP GET request to stubs/jsonconfiguredstub/2" should {
     "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"twee\" and property \"someValue\" equal to \"{123123}\" and property someAdditionalValue\" equal to \"345345" in {
-      Get(s"/stubs/jsonconfiguredstub/2") ~> stubRoutes ~> check {
+      Get(s"/stubs/jsonconfiguredstub/2") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
 //        responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> "twee",

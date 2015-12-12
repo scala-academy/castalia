@@ -1,15 +1,15 @@
 package castalia
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
-import castalia.model.ResponseConfig
-import spray.json.JsString
 
-trait StubService extends BaseService with StubConfigParser {
+class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
+  protected val serviceName = "StubRoutes"
 
-  protected val serviceName = "StubService"
+  protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
 
-  def dynamicStubRoutes: Route = {
+  protected lazy val dynamicStubRoutes = {
     def createRoute(endpoint: String, responses: ResponsesByRequest): Route = path(endpoint / Segment) { id =>
       get {
         val response: Option[StubResponse] = responses.get(id)
@@ -25,18 +25,20 @@ trait StubService extends BaseService with StubConfigParser {
       }
     }
 
-    if (Main.stubsByEndPoint.isEmpty) {
+    if (stubsByEndpoints.isEmpty) {
+      log.info(s"No StubConfigs given")
       reject
     } else {
-      Main.stubsByEndPoint map { case (e, r) => createRoute(e, r) } reduceLeft (_ ~ _)
+      log.info(s"${stubsByEndpoints.size} StubConfigs given")
+      stubsByEndpoints map { case (e, r) => createRoute(e, r) } reduceLeft (_ ~ _)
     }
   }
 
-  val staticEndpoints = List(
+  protected val staticEndpoints = List(
     StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
     StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
 
-  def staticRoutes: Route = {
+  protected lazy val staticRoutes: Route = {
     def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
       get {
         complete(ep.response.status, ep.response.content)
@@ -44,15 +46,19 @@ trait StubService extends BaseService with StubConfigParser {
     }
 
     if (staticEndpoints.isEmpty) {
+      log.info(s"No staticEndpoints given")
       reject
     } else {
+      log.info(s"${staticEndpoints.size} staticEndpoints given")
       staticEndpoints map { case (e) => createRoute(e) } reduceLeft (_ ~ _)
     }
   }
 
-  val stubRoutes = pathPrefix("stubs") {
-    handleRejections(totallyMissingHandler) {
-      staticRoutes ~ dynamicStubRoutes
+  override def routes: Route = {
+    pathPrefix("stubs") {
+      handleRejections(totallyMissingHandler) {
+        staticRoutes ~ dynamicStubRoutes
+      }
     }
   }
 }

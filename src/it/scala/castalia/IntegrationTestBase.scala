@@ -12,7 +12,7 @@ trait IntegrationTestBase extends FunSpec with GivenWhenThen with Matchers with 
   val serverAddress = "localhost:9000"
   val server = Main
 
-  override def beforeAll() = {
+  override def beforeAll(): Unit = {
     if (!TestHelpers.isServerRunning(serverAddress)) {
       println("server is not running... spinning up.")
       server.main(Array("stub1.json", "jsonconfiguredstub.json"))

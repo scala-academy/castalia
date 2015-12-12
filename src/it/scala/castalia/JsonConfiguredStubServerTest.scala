@@ -3,7 +3,6 @@ package castalia
 import com.twitter.finagle
 import com.twitter.finagle.http.{Method, Request}
 import com.twitter.util.Await
-import org.scalatest.{FunSpec, GivenWhenThen, Matchers}
 
 /**
   * Created by rezolya on 05/12/2015.

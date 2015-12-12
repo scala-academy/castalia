@@ -11,13 +11,13 @@ import spray.json.{JsString, JsValue}
 /**
   * Created by mihaelaoprea on 02/12/15.
   */
-class StubConfigParserSpec extends WordSpec with Matchers with StubConfigParser {
+class StubConfigParserSpec extends WordSpec with Matchers {
 
   "A StubConfigParser" when {
     "json file \"jsonconfiguredstub.json\" exists on classpath" should {
       "return a StubConfig object" in {
 
-        val stub = parseStubConfig("jsonconfiguredstub.json")
+        val stub = StubConfigParser.parseStubConfig("jsonconfiguredstub.json")
 
         stub.endpoint shouldBe "jsonconfiguredstub"
         val responses: List[ResponseConfig] = stub.responses
@@ -45,7 +45,7 @@ class StubConfigParserSpec extends WordSpec with Matchers with StubConfigParser 
     "json file does not exist on classpath" should {
       "result in a StubConfigException thrown" in
         intercept[FileNotFoundException] {
-          parseStubConfig("doesNotExistFile.json")
+          StubConfigParser.parseStubConfig("doesNotExistFile.json")
         }
     }
 

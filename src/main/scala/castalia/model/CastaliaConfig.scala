@@ -2,7 +2,6 @@ package castalia.model
 
 import java.net.URL
 
-import spray.json.DefaultJsonProtocol
 import spray.json._
 
 /**
@@ -13,8 +12,8 @@ case class CastaliaConfig(httpPort: Int)
 object CastaliaConfig extends DefaultJsonProtocol {
   implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaConfig.apply)
 
-  def parse(config:String) : CastaliaConfig = {
-    val url = getClass.getResource("/"+config)
+  def parse(config: String): CastaliaConfig = {
+    val url = getClass.getResource("/" + config)
     url match {
       case url: URL =>
         scala.io.Source.fromURL(url)

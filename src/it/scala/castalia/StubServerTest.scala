@@ -19,7 +19,6 @@ class StubServerTest extends IntegrationTestBase {
       assert(Await.result(response).statusCode == 200)
     }
 
-
     it("should parse the command line arguments") {
       Given("that the stubserver is started with command line argument \"stub1.json jsonconfiguredstub.json\"")
 

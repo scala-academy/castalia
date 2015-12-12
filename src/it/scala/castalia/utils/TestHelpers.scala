@@ -29,6 +29,7 @@ object TestHelpers {
       response.status != Status.NotFound
     } catch {
       case e : ChannelWriteException => false
+      case e : Throwable => throw e
     }
   }
 }

@@ -6,7 +6,7 @@ import java.net.URL
 import castalia.model.StubConfig
 import spray.json._
 
-trait StubConfigParser extends Protocol {
+object StubConfigParser extends Protocol {
 
   def parseStubConfig(jsonFile: String): StubConfig = {
     val resource: URL = getClass.getResource("/" + jsonFile)

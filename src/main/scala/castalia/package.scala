@@ -9,4 +9,5 @@ package object castalia {
   type Endpoint = String
   type StubResponse = (StatusCode, AnyJsonObject)
   type ResponsesByRequest = Map[String, StubResponse]
+  type StubConfigsByEndpoint = Map[Endpoint, ResponsesByRequest]
 }
