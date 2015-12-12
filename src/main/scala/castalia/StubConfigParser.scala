@@ -21,10 +21,24 @@ object StubConfigParser extends Protocol {
     }
   }
 
-  def readAndParseStubConfigFiles(jsonFiles: Array[String]): Map[Endpoint, ResponsesByRequest] = {
-    // Get all files from argumentlist
+  def parseConfigFile(configFile: String): Array[String] = {
+    Array("example.json", "example2.json")
+    val resource: URL = getClass.getResource("/" + configFile)
+    resource match {
+      case url: URL =>
+        scala.io.Source.fromFile(resource.getPath) // read File
+          .mkString // make it a string
+          .parseJson // parse the string to Json objects
+          .convertTo[JsonFilesConfig].stubs // Convert to JsonFilesConfig and then use the stubs
+
+      case _ => throw new FileNotFoundException(configFile)
+    }
+  }
+
+  def readAndParseStubConfigFiles(args: Array[String]): Map[Endpoint, ResponsesByRequest] = {
+    // Get all json files from the config file
     val stubConfigs = for (
-      jsonFile <- jsonFiles // iterate over all jsonFiles
+      jsonFile <- parseConfigFile(args(0)) // iterate over all jsonFiles
     ) yield
         parseStubConfig(jsonFile)
 
@@ -40,6 +54,11 @@ object StubConfigParser extends Protocol {
         }).toMap // this is the outer map value (a map of id -> responses)
         )
     }).toMap // this is the map of all stubs (a map of endpoint -> (a map of id -> responses) )
-    stubsConfigsByEndpoint
+
+    if (stubConfigs.size == stubsConfigsByEndpoint.size)
+      stubsConfigsByEndpoint
+    else
+      throw new IllegalArgumentException("Duplicate endpoints have been defined")
+
   }
 }

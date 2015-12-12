@@ -14,7 +14,12 @@ object Main extends App with Config {
 
   val castaliaConfig = CastaliaConfig.parse("castalia.json")
 
-  val stubsByEndPoint: StubConfigsByEndpoint = StubConfigParser.readAndParseStubConfigFiles(args)
+  //val stubsByEndPoint: StubConfigsByEndpoint = StubConfigParser.readAndParseStubConfigFiles(args)
+  val stubsByEndPoint = {
+    if (args.length > 0)
+      StubConfigParser.readAndParseStubConfigFiles(args)
+    else throw new IllegalArgumentException("Please specify a config file as first argument")
+  }
 
   val services = List(
     new StatusService,
