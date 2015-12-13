@@ -1,46 +1,23 @@
 package castalia
 
-import java.io.FileNotFoundException
-import java.net.URL
-
 import castalia.model.StubConfig
-import spray.json._
+
 
 object StubConfigParser extends Protocol {
 
   def parseStubConfig(jsonFile: String): StubConfig = {
-    val resource: URL = getClass.getResource("/" + jsonFile)
-    resource match {
-      case url : URL =>
-        scala.io.Source.fromFile(resource.getPath) //.fromInputStream(getClass.getResourceAsStream(jsonFile)) // read File
-          .mkString // make it a string
-          .parseJson // parse the string to Json objects
-          .convertTo[StubConfig] // Convert to StubDef.
-
-      case _ => throw new FileNotFoundException(jsonFile)
-    }
+   JsonConverter.parseJson[StubConfig](jsonFile)
   }
 
-  def parseConfigFile(configFile: String): Array[String] = {
-    //Array("example.json", "example2.json")
-    val resource: URL = getClass.getResource("/" + configFile)
-    resource match {
-      case url: URL =>
-        scala.io.Source.fromFile(resource.getPath) // read File
-          .mkString // make it a string
-          .parseJson // parse the string to Json objects
-          .convertTo[JsonFilesConfig].stubs // Convert to JsonFilesConfig and then use the stubs
-
-      case _ => throw new FileNotFoundException(configFile)
-    }
+  def parseConfigFile(configFile: String): JsonFilesConfig = {
+    JsonConverter.parseJson[JsonFilesConfig](configFile)
   }
 
   def readAndParseStubConfigFiles(args: Array[String]): Map[Endpoint, ResponsesByRequest] = {
     // Get all json files from the config file
-    val stubConfigs = for (
-      jsonFile <- parseConfigFile(args(0)) // iterate over all jsonFiles
-    ) yield
-        parseStubConfig(jsonFile)
+    val stubConfigs: Array[StubConfig] = for (
+      stubs <- parseConfigFile(args(0)).stubs // iterate over all jsonFiles
+    ) yield parseStubConfig(stubs)
 
     val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
       // Create an outer map by endpoint
@@ -55,10 +32,12 @@ object StubConfigParser extends Protocol {
         )
     }).toMap // this is the map of all stubs (a map of endpoint -> (a map of id -> responses) )
 
-    if (stubConfigs.size == stubsConfigsByEndpoint.size)
+    if (stubConfigs.length == stubsConfigsByEndpoint.size) {
       stubsConfigsByEndpoint
-    else
+    }
+    else {
       throw new IllegalArgumentException("Duplicate endpoints have been defined")
+    }
 
   }
 }
