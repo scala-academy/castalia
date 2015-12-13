@@ -10,7 +10,7 @@ import spray.json._
   */
 class StubServiceSpec extends ServiceTestBase with Protocol{
 //  override val log = NoLogging
-  val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("jsonconfiguredstub.json"))
+  val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("castalia.json"))
   val service = new StubService(stubsByEndpoints)
   "A request to the endpoint /stubs/hardcodeddummystub" should {
     "return HTTP status code 200" in {

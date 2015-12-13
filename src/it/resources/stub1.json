@@ -1,0 +1,26 @@
+{
+  "endpoint": "stub11",
+  "responses": [
+    {
+      "id": "1",
+      "httpStatusCode": 200,
+      "response": {
+        "id": "een",
+        "someValue": "123123"
+      }
+    },
+    {
+      "id": "2",
+      "httpStatusCode": 200,
+      "response": {
+        "id": "twee",
+        "someValue": "123123",
+        "someAdditionalValue": "345345"
+      }
+    },
+    {
+      "id": "0",
+      "httpStatusCode": 404
+    }
+  ]
+}

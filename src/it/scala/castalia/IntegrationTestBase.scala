@@ -15,7 +15,8 @@ trait IntegrationTestBase extends FunSpec with GivenWhenThen with Matchers with 
   override def beforeAll(): Unit = {
     if (!TestHelpers.isServerRunning(serverAddress)) {
       println("server is not running... spinning up.")
-      server.main(Array("stub1.json", "jsonconfiguredstub.json"))
+      //server.main(Array("stub1.json", "jsonconfiguredstub.json"))
+      server.main(Array("castalia.json"))
     }
   }
 }

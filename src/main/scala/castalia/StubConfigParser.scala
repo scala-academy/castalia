@@ -22,7 +22,7 @@ object StubConfigParser extends Protocol {
   }
 
   def parseConfigFile(configFile: String): Array[String] = {
-    Array("example.json", "example2.json")
+    //Array("example.json", "example2.json")
     val resource: URL = getClass.getResource("/" + configFile)
     resource match {
       case url: URL =>
