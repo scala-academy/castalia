@@ -64,6 +64,15 @@ class StubServiceSpec extends ServiceTestBase with Protocol {
     }
   }
 
+  "A HTTP GET request to a non-described endpoint in stubs/jsonconfiguredstub/?" should {
+    "result in a HTTP 501 response from the stubserver" in {
+      Get("/stubs/jsonconfiguredstub/idontexist") ~> service.routes ~> check {
+        status shouldBe NotImplemented
+        responseAs[String] shouldBe "Unknown response"
+      }
+    }
+  }
+
   "An empty list of static responses and map of dynamic responses" should {
     implicit val system = ActorSystem("StubServiceSpecSystem", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]"""))
 
