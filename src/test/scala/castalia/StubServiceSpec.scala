@@ -1,6 +1,5 @@
 package castalia
 
-import akka.event.NoLogging
 import akka.http.scaladsl.model.ContentTypes.`application/json`
 import akka.http.scaladsl.model.StatusCodes._
 import spray.json._
@@ -9,7 +8,7 @@ import spray.json._
   * Created by Jens Kat on 25-11-2015.
   */
 class StubServiceSpec extends ServiceTestBase with Protocol{
-//  override val log = NoLogging
+
   val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("castalia.json"))
   val service = new StubService(stubsByEndpoints)
   "A request to the endpoint /stubs/hardcodeddummystub" should {
@@ -29,8 +28,19 @@ class StubServiceSpec extends ServiceTestBase with Protocol{
     }
   }
 
+  "A HTTP GET request to stubs/jsonconfiguredstub/0" should {
+    "result in a HTTP 404 response from the stubserver" in {
+      Get(s"/stubs/jsonconfiguredstub/0") ~> service.routes ~> check {
+        status shouldBe NotFound
+        responseAs[String] shouldBe empty
+      }
+    }
+  }
+
   "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
-    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"een\" and property \"someValue\" equal to \"{123123}\"" in {
+    "result in a HTTP 200 response from the stubserver containing a json " +
+      "object with property \"id\" equal to \"een\" and property \"someValue\" " +
+      "equal to \"{123123}\"" in {
       Get(s"/stubs/jsonconfiguredstub/1") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
@@ -41,13 +51,12 @@ class StubServiceSpec extends ServiceTestBase with Protocol{
   }
 
   "A HTTP GET request to stubs/jsonconfiguredstub/2" should {
-    "result in a HTTP 200 response from the stubserver containing a json object with property \"id\" equal to \"twee\" and property \"someValue\" equal to \"{123123}\" and property someAdditionalValue\" equal to \"345345" in {
+    "result in a HTTP 200 response from the stubserver containing a json object" +
+      " with property \"id\" equal to \"twee\" and property \"someValue\" equal to " +
+      "\"{123123}\" and property someAdditionalValue\" equal to \"345345" in {
       Get(s"/stubs/jsonconfiguredstub/2") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
-//        responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> "twee",
-//                                                                                "someValue" -> "123123",
-//                                                                                "someAdditionalValue" -> "345345"))
       }
     }
   }

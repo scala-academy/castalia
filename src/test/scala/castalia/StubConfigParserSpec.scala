@@ -49,5 +49,15 @@ class StubConfigParserSpec extends WordSpec with Matchers {
         }
     }
 
+    "duplicate endpoints exist in stubconfig" should {
+      "result in a IllegalArgumentException" in {
+        intercept[IllegalArgumentException] {
+          StubConfigParser.readAndParseStubConfigFiles(
+            Array("multiple-same-endpoints-config.json")
+          )
+        }
+      }
+    }
+
   }
 }
