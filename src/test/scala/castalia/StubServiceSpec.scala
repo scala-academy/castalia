@@ -1,13 +1,16 @@
 package castalia
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ContentTypes.`application/json`
 import akka.http.scaladsl.model.StatusCodes._
+import akka.testkit.EventFilter
+import com.typesafe.config.ConfigFactory
 import spray.json._
 
 /**
   * Created by Jens Kat on 25-11-2015.
   */
-class StubServiceSpec extends ServiceTestBase with Protocol{
+class StubServiceSpec extends ServiceTestBase with Protocol {
 
   val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("castalia.json"))
   val service = new StubService(stubsByEndpoints)
@@ -57,6 +60,36 @@ class StubServiceSpec extends ServiceTestBase with Protocol{
       Get(s"/stubs/jsonconfiguredstub/2") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
+      }
+    }
+  }
+
+  "An empty list of static responses and map of dynamic responses" should {
+    implicit val system = ActorSystem("StubServiceSpecSystem", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]"""))
+
+
+    "result in a log message at info of \"No stubConfigs given\"" in {
+      val stubService = new StubService(Map.empty)
+
+      EventFilter.info(message = "No StubConfigs given", occurrences = 1) intercept {
+        Get("/stubs/static") ~> stubService.routes ~> check {
+          handled shouldBe true
+          status shouldBe NotFound
+        }
+      }
+
+    }
+
+    "result in a log message at info of \"No staticEndpoints given\"" in {
+      val stubService = new StubService(Map.empty) {
+        override protected val staticEndpoints = List.empty
+      }
+
+      EventFilter.info(message = "No staticEndpoints given", occurrences = 1) intercept {
+        Get("/stubs/doesntmatter") ~> stubService.routes ~> check {
+          handled shouldBe true
+          status shouldBe NotFound
+        }
       }
     }
   }

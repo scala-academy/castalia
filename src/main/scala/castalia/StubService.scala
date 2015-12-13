@@ -26,7 +26,7 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
     }
 
     if (stubsByEndpoints.isEmpty) {
-      log.info(s"No StubConfigs given")
+      log.info("No StubConfigs given")
       reject
     } else {
       log.info(s"${stubsByEndpoints.size} StubConfigs given")
@@ -46,7 +46,7 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
     }
 
     if (staticEndpoints.isEmpty) {
-      log.info(s"No staticEndpoints given")
+      log.info("No staticEndpoints given")
       reject
     } else {
       log.info(s"${staticEndpoints.size} staticEndpoints given")
