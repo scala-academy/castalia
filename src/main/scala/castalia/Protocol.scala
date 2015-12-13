@@ -13,5 +13,5 @@ trait Protocol extends DefaultJsonProtocol {
   implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaStatusResponse)
   implicit val responseConfigFormat = jsonFormat3(ResponseConfig)
   implicit val stubConfigFormat = jsonFormat2(StubConfig)
-  implicit val JsonFilesConfigFormat = jsonFormat1(JsonFilesConfig)
+  implicit val jsonFilesConfigFormat = jsonFormat1(JsonFilesConfig)
 }
