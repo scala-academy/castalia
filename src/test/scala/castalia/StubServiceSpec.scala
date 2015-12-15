@@ -14,15 +14,8 @@ class StubServiceSpec extends ServiceTestBase with Protocol {
 
   val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(List("jsonconfiguredstub.json"))
   val service = new StubService(stubsByEndpoints)
-  "A request to the endpoint /stubs/hardcodeddummystub" should {
-    "return HTTP status code 200" in {
-      Get("/stubs/hardcodeddummystub") ~> service.routes ~> check {
-        status shouldBe OK
-      }
-    }
-  }
 
-  "A request to a non-existing endpoint" should {
+    "A request to a non-existing endpoint" should {
     "result in HTTP status code 404 and handled by the rejectionhandler" in {
       Get("/stubs/nonexistingstub") ~> service.routes ~> check {
         status shouldBe NotFound
@@ -87,19 +80,6 @@ class StubServiceSpec extends ServiceTestBase with Protocol {
         }
       }
 
-    }
-
-    "result in a log message at info of \"No staticEndpoints given\"" in {
-      val stubService = new StubService(Map.empty) {
-        override protected val staticEndpoints = List.empty
-      }
-
-      EventFilter.info(message = "No staticEndpoints given", occurrences = 1) intercept {
-        Get("/stubs/doesntmatter") ~> stubService.routes ~> check {
-          handled shouldBe true
-          status shouldBe NotFound
-        }
-      }
     }
   }
 }

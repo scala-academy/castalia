@@ -34,30 +34,10 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
     }
   }
 
-  protected val staticEndpoints = List(
-    StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
-    StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
-
-  protected lazy val staticRoutes: Route = {
-    def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
-      get {
-        complete(ep.response.status, ep.response.content)
-      }
-    }
-
-    if (staticEndpoints.isEmpty) {
-      log.info("No staticEndpoints given")
-      reject
-    } else {
-      log.info(s"${staticEndpoints.size} staticEndpoints given")
-      staticEndpoints map { case (e) => createRoute(e) } reduceLeft (_ ~ _)
-    }
-  }
-
   override def routes: Route = {
     pathPrefix("stubs") {
       handleRejections(totallyMissingHandler) {
-        staticRoutes ~ dynamicStubRoutes
+        dynamicStubRoutes
       }
     }
   }
