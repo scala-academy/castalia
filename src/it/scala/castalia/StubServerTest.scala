@@ -25,6 +25,10 @@ class StubServerTest extends IntegrationTestBase {
       info("and files \"stub1.json\" and \"jsonconfiguredstub.json\" are both on the classpath")
 
       When("I do a HTTP GET to the endpoint as configured in \"stub1.json\"")
+
+      assert(server.stubsByEndPoint.contains("stub11"))
+      assert(server.stubsByEndPoint.contains("jsonconfiguredstub"))
+
       val request = Request(Method.Get, "/stubs/stub11/1")
       request.host = serverAddress
 
@@ -34,8 +38,6 @@ class StubServerTest extends IntegrationTestBase {
       assert(response.status == Status.Ok)
       assert(response.contentString == "{\n  \"id\": \"een\",\n  \"someValue\": \"123123\"\n}")
 
-      assert(server.stubsByEndPoint.contains("stub11"))
-      assert(server.stubsByEndPoint.contains("jsonconfiguredstub"))
     }
   }
 

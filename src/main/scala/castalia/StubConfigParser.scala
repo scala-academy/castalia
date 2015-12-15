@@ -1,6 +1,6 @@
 package castalia
 
-import castalia.model.StubConfig
+import castalia.model.{CastaliaConfig, StubConfig}
 
 
 object StubConfigParser extends Protocol {
@@ -13,11 +13,11 @@ object StubConfigParser extends Protocol {
     JsonConverter.parseJson[JsonFilesConfig](configFile)
   }
 
-  def readAndParseStubConfigFiles(args: Array[String]): Map[Endpoint, ResponsesByRequest] = {
+  def readAndParseStubConfigFiles(stubs : List[String]): Map[Endpoint, ResponsesByRequest] = {
     // Get all json files from the config file
-    val stubConfigs: Array[StubConfig] = for (
-      stubs <- parseConfigFile(args(0)).stubs // iterate over all jsonFiles
-    ) yield parseStubConfig(stubs)
+    val stubConfigs: List[StubConfig] = for (
+      stub <- stubs // iterate over all jsonFiles
+    ) yield parseStubConfig(stub)
 
     val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
       // Create an outer map by endpoint
