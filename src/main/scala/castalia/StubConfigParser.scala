@@ -9,15 +9,14 @@ object StubConfigParser extends Protocol {
    JsonConverter.parseJson[StubConfig](jsonFile)
   }
 
+  //TODO: is this method ever used?
   def parseConfigFile(configFile: String): JsonFilesConfig = {
     JsonConverter.parseJson[JsonFilesConfig](configFile)
   }
 
   def readAndParseStubConfigFiles(stubs : List[String]): Map[Endpoint, ResponsesByRequest] = {
     // Get all json files from the config file
-    val stubConfigs: List[StubConfig] = for (
-      stub <- stubs // iterate over all jsonFiles
-    ) yield parseStubConfig(stub)
+    val stubConfigs: List[StubConfig] = stubs.map(parseStubConfig(_))
 
     val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
       // Create an outer map by endpoint
@@ -38,6 +37,5 @@ object StubConfigParser extends Protocol {
     else {
       throw new IllegalArgumentException("Duplicate endpoints have been defined")
     }
-
   }
 }
