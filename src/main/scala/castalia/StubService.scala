@@ -17,8 +17,7 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
               entity(as[ResponseConfig]) {
                 responseConfig =>
                   responses(responseConfig.id) = (responseConfig.httpStatusCode, responseConfig.response)
-
-                  complete("Posted!")
+                  complete("")
               }
             }
       } ~
