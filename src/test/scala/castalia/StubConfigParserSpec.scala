@@ -13,11 +13,13 @@ import spray.json.{JsString, JsValue}
   */
 class StubConfigParserSpec extends WordSpec with Matchers {
 
+  val parser = StubConfigParser()
+
   "A StubConfigParser" when {
     "json file \"jsonconfiguredstub.json\" exists on classpath" should {
       "return a StubConfig object" in {
 
-        val stub = StubConfigParser.parseStubConfig("jsonconfiguredstub.json")
+        val stub = parser.parseStubConfig("jsonconfiguredstub.json")
 
         stub.endpoint shouldBe "jsonconfiguredstub"
         val responses: List[ResponseConfig] = stub.responses
@@ -45,14 +47,14 @@ class StubConfigParserSpec extends WordSpec with Matchers {
     "json file does not exist on classpath" should {
       "result in a StubConfigException thrown" in
         intercept[FileNotFoundException] {
-          StubConfigParser.parseStubConfig("doesNotExistFile.json")
+          parser.parseStubConfig("doesNotExistFile.json")
         }
     }
 
     "duplicate endpoints exist in stubconfig" should {
       "result in a IllegalArgumentException" in {
         intercept[IllegalArgumentException] {
-          StubConfigParser.readAndParseStubConfigFiles(
+          parser.readAndParseStubConfigFiles(
             Array("multiple-same-endpoints-config.json")
           )
         }

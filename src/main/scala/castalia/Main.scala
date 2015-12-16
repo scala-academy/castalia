@@ -17,7 +17,7 @@ object Main extends App with Config {
   //val stubsByEndPoint: StubConfigsByEndpoint = StubConfigParser.readAndParseStubConfigFiles(args)
   val stubsByEndPoint = {
     if (args.length > 0)
-      StubConfigParser.readAndParseStubConfigFiles(args)
+      StubConfigParser().readAndParseStubConfigFiles(args)
     else throw new IllegalArgumentException("Please specify a config file as first argument")
   }
 

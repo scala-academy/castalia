@@ -10,7 +10,7 @@ import scala.util.Try
 /**
   * Created by jens on 13-12-15.
   */
-object JsonConverter {
+case class JsonConverter() {
   def parseJson[T: JsonReader](filename: String): T = {
     val resource: URL = getClass.getResource("/" + filename)
     resource match {

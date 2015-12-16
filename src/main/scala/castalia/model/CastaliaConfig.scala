@@ -15,7 +15,7 @@ object CastaliaConfig extends DefaultJsonProtocol {
   val defaultPort = 9000
   def parse(config: String): CastaliaConfig = {
     Try{
-      JsonConverter.parseJson[CastaliaConfig](config)
+      JsonConverter().parseJson[CastaliaConfig](config)
     } getOrElse CastaliaConfig(defaultPort)
   }
 }

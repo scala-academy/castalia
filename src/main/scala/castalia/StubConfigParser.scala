@@ -3,14 +3,15 @@ package castalia
 import castalia.model.StubConfig
 
 
-object StubConfigParser extends Protocol {
+case class StubConfigParser() extends Protocol {
+  val converter = JsonConverter()
 
   def parseStubConfig(jsonFile: String): StubConfig = {
-   JsonConverter.parseJson[StubConfig](jsonFile)
+    converter.parseJson[StubConfig](jsonFile)
   }
 
   def parseConfigFile(configFile: String): JsonFilesConfig = {
-    JsonConverter.parseJson[JsonFilesConfig](configFile)
+    converter.parseJson[JsonFilesConfig](configFile)
   }
 
   def readAndParseStubConfigFiles(args: Array[String]): Map[Endpoint, ResponsesByRequest] = {
