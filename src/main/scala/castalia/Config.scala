@@ -1,4 +1,4 @@
-package com.github.pvoznenko.utils
+package castalia
 
 import com.typesafe.config.ConfigFactory
 

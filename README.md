@@ -1,14 +1,15 @@
-# Akka HTTP REST Example - Instagram Pictures Filter
 
-[![Build Status](https://travis-ci.org/TimSoethout/stubserver.svg)](https://travis-ci.org/TimSoethout/stubserver)
+[![Build Status](https://travis-ci.org/scala-academy/castalia.svg?branch=master)](https://travis-ci.org/scala-academy/castalia)
 [![Codacy Badge](https://api.codacy.com/project/badge/06b7d35d307c44b29d20e3d9c25b1ee2)](https://www.codacy.com/app/github_10/stubserver)
 
-Main goal of this project to show an example on how to use Akka HTTP as REST service.
+Waffle issue board: https://waffle.io/scala-academy/castalia
 
-This project will hep you to load your pictures by date range from your Instagram.
+[![Join the chat at https://gitter.im/scala-academy/castalia](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/scala-academy/castalia?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-# Copyright
+Goal: learn programing with Scala and Akka in a real-world scenario
 
-Copyright (C) 2015 Pavlo Voznenko.
-
-Distributed under the MIT License.
+## The name: Castalia
+In Greek Mythology the most powerful Oracle was the oracle of Delphi.
+People would come from all around with question, seeking answers. The
+oracle's source of inspiration sprang fourth from a fountain and the fountain
+was called Castalia.
