@@ -3,6 +3,10 @@
   "responses": [
     {
       "id": "1",
+      "delay": {
+        "distribution": "constant",
+        "mean": "100 ms"
+      },
       "httpStatusCode": 200,
       "response": {
         "id": "een",
@@ -20,6 +24,10 @@
     },
     {
       "id": "0",
+      "delay": {
+        "distribution": "constant",
+        "mean": "2 s"
+      },
       "httpStatusCode": 404
     }
   ]

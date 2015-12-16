@@ -3,6 +3,7 @@ package castalia
 import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
+import castalia.model.ResponseConfig
 
 class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
   protected val serviceName = "StubRoutes"
@@ -10,17 +11,28 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
   protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
 
   protected lazy val dynamicStubRoutes = {
-    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = path(endpoint / Segment) { id =>
-      get {
-        val response: Option[StubResponse] = responses.get(id)
-
-        response match {
-          case Some((statusCode: StatusCode, optResponse: AnyJsonObject)) =>
-            optResponse match {
-              case Some(content) => complete(statusCode, content.toJson)
-              case _ => complete(statusCode, "")
+    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = pathPrefix(endpoint) {
+      post {
+            path("responses") {
+              entity(as[ResponseConfig]) {
+                responseConfig =>
+                  responses(responseConfig.id) = (responseConfig.httpStatusCode, responseConfig.response)
+                  complete("")
+              }
             }
-          case _ => complete(501, "Unknown response")
+      } ~
+      get {
+        path(Segment) { id =>
+          val response: Option[StubResponse] = responses.get(id)
+
+          response match {
+            case Some((statusCode: StatusCode, optResponse: AnyJsonObject)) =>
+              optResponse match {
+                case Some(content) => complete(statusCode, content.toJson)
+                case _ => complete(statusCode, "")
+              }
+            case _ => complete(501, "Unknown response")
+          }
         }
       }
     }
@@ -34,30 +46,10 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
     }
   }
 
-  protected val staticEndpoints = List(
-    StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
-    StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
-
-  protected lazy val staticRoutes: Route = {
-    def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
-      get {
-        complete(ep.response.status, ep.response.content)
-      }
-    }
-
-    if (staticEndpoints.isEmpty) {
-      log.info("No staticEndpoints given")
-      reject
-    } else {
-      log.info(s"${staticEndpoints.size} staticEndpoints given")
-      staticEndpoints map { case (e) => createRoute(e) } reduceLeft (_ ~ _)
-    }
-  }
-
   override def routes: Route = {
     pathPrefix("stubs") {
       handleRejections(totallyMissingHandler) {
-        staticRoutes ~ dynamicStubRoutes
+        dynamicStubRoutes
       }
     }
   }

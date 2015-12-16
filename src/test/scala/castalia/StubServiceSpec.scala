@@ -4,23 +4,18 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ContentTypes.`application/json`
 import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.EventFilter
+import castalia.model.ResponseConfig
 import com.typesafe.config.ConfigFactory
 import spray.json._
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 
 /**
   * Created by Jens Kat on 25-11-2015.
   */
-class StubServiceSpec extends ServiceTestBase with Protocol {
+class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSupport {
 
-  val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(Array("castalia.json"))
+  val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(List("jsonconfiguredstub.json"))
   val service = new StubService(stubsByEndpoints)
-  "A request to the endpoint /stubs/hardcodeddummystub" should {
-    "return HTTP status code 200" in {
-      Get("/stubs/hardcodeddummystub") ~> service.routes ~> check {
-        status shouldBe OK
-      }
-    }
-  }
 
   "A request to a non-existing endpoint" should {
     "result in HTTP status code 404 and handled by the rejectionhandler" in {
@@ -88,17 +83,12 @@ class StubServiceSpec extends ServiceTestBase with Protocol {
       }
 
     }
+  }
 
-    "result in a log message at info of \"No staticEndpoints given\"" in {
-      val stubService = new StubService(Map.empty) {
-        override protected val staticEndpoints = List.empty
-      }
-
-      EventFilter.info(message = "No staticEndpoints given", occurrences = 1) intercept {
-        Get("/stubs/doesntmatter") ~> stubService.routes ~> check {
-          handled shouldBe true
-          status shouldBe NotFound
-        }
+  "A HTTP POST request to a endpoint described in /responses" should {
+    "result in a HTTP 200 response from the stubserver" in {
+      Post("/stubs/jsonconfiguredstub/responses", ResponseConfig("1", None, 200, None)) ~> service.routes ~> check {
+        status shouldBe OK
       }
     }
   }
