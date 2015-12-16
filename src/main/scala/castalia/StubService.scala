@@ -10,17 +10,29 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
   protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
 
   protected lazy val dynamicStubRoutes = {
-    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = path(endpoint / Segment) { id =>
-      get {
-        val response: Option[StubResponse] = responses.get(id)
-
-        response match {
-          case Some((statusCode: StatusCode, optResponse: AnyJsonObject)) =>
-            optResponse match {
-              case Some(content) => complete(statusCode, content.toJson)
-              case _ => complete(statusCode, "")
+    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = pathPrefix(endpoint) {
+      println(s"endpoint: ${}")
+      post {
+           println(s"POST")
+            path("responses") {
+              entity(as[String]) {
+                payload =>
+                  complete(s"Payload: ${payload}")
+              }
             }
-          case _ => complete(501, "Unknown response")
+      } ~
+      get {
+        path(Segment) { id =>
+          val response: Option[StubResponse] = responses.get(id)
+
+          response match {
+            case Some((statusCode: StatusCode, optResponse: AnyJsonObject)) =>
+              optResponse match {
+                case Some(content) => complete(statusCode, content.toJson)
+                case _ => complete(statusCode, "")
+              }
+            case _ => complete(501, "Unknown response")
+          }
         }
       }
     }

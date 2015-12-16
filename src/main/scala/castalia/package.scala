@@ -8,6 +8,6 @@ package object castalia {
   type StatusCode = Int
   type Endpoint = String
   type StubResponse = (StatusCode, AnyJsonObject)
-  type ResponsesByRequest = Map[String, StubResponse]
+  type ResponsesByRequest = collection.mutable.Map[String, StubResponse]
   type StubConfigsByEndpoint = Map[Endpoint, ResponsesByRequest]
 }
