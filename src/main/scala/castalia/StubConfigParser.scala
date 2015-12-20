@@ -1,6 +1,6 @@
 package castalia
 
-import castalia.model.{CastaliaConfig, StubConfig}
+import castalia.model.StubConfig
 
 
 object StubConfigParser extends Protocol {
@@ -22,13 +22,12 @@ object StubConfigParser extends Protocol {
       // Create an outer map by endpoint
       s => (
         s.endpoint, // Endpoint is the outer key
-        collection.mutable.Map[String, StubResponse]() ++ (s.responses.map({
+        collection.mutable.Map[String, StubResponse]() ++ s.responses.map({
           // Create an inner map by repsonse id
           r => (
             r.id, // Id is the inner key
-            (r.httpStatusCode, r.response))
-        }).toMap
-        ) // this is the outer map value (a map of id -> responses)
+            (r.delay, r.httpStatusCode, r.response))
+        }).toMap // this is the outer map value (a map of id -> responses)
         )
     }).toMap // this is the map of all stubs (a map of endpoint -> (a map of id -> responses) )
 

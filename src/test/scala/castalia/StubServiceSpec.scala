@@ -3,16 +3,22 @@ package castalia
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.ContentTypes.`application/json`
 import akka.http.scaladsl.model.StatusCodes._
+import akka.http.scaladsl.testkit.RouteTestTimeout
 import akka.testkit.EventFilter
 import castalia.model.ResponseConfig
 import com.typesafe.config.ConfigFactory
 import spray.json._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 
+import scala.concurrent.duration._
 /**
   * Created by Jens Kat on 25-11-2015.
   */
 class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSupport {
+
+  // We need to increase the timeout (1 sec). Because some endpoints
+  // have delays > 1s.
+  implicit val defaultTimeout = RouteTestTimeout(5.seconds)
 
   val stubsByEndpoints = StubConfigParser.readAndParseStubConfigFiles(List("jsonconfiguredstub.json"))
   val service = new StubService(stubsByEndpoints)
@@ -27,10 +33,13 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
   }
 
   "A HTTP GET request to stubs/jsonconfiguredstub/0" should {
-    "result in a HTTP 404 response from the stubserver" in {
-      Get(s"/stubs/jsonconfiguredstub/0") ~> service.routes ~> check {
+    "result in a HTTP 404 response from the stubserver after 2 seconds" in {
+      val t1 = System.currentTimeMillis
+      Get("/stubs/jsonconfiguredstub/0") ~> service.routes ~> check {
         status shouldBe NotFound
+        val t2 = System.currentTimeMillis
         responseAs[String] shouldBe empty
+        assert((t2 - t1) > 2000)
       }
     }
   }

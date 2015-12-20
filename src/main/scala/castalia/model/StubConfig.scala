@@ -1,17 +1,27 @@
 package castalia.model
 
-import castalia.{StatusCode, AnyJsonObject}
+import castalia.{AnyJsonObject, StatusCode}
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
 /**
-  * Created by M07H817 on 11-12-2015.
+  * Define all case classes for JSON responses.
   */
 
 case class LatencyConfig(distribution:String, mean:String) {
-  def duration = Duration(mean)
+  val time = mean.split(" ")(0).toInt
+  val unit = mean.split(" ")(1) match {
+    case "s" => SECONDS
+    case "ms" => MILLISECONDS
+  }
+
+  def duration: FiniteDuration = FiniteDuration(time, unit)
+
 }
 
-case class ResponseConfig(id:String,  delay:Option[LatencyConfig], httpStatusCode:StatusCode, response:AnyJsonObject)
+case class ResponseConfig(id:String,
+                          delay:Option[LatencyConfig],
+                          httpStatusCode:StatusCode,
+                          response:AnyJsonObject)
 
 case class StubConfig(endpoint: String, responses: List[ResponseConfig])
