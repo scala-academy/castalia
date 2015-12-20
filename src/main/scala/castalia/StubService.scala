@@ -10,10 +10,8 @@ import castalia.model.ResponseConfig
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
+class StubService(stubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
   protected val serviceName = "StubRoutes"
-
-  protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
 
   protected lazy val dynamicStubRoutes = {
     def createRoute(endpoint: String, responses: ResponsesByRequest): Route =
