@@ -1,17 +1,14 @@
 package castalia
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RequestContext, RouteResult, Route, StandardRoute}
-import castalia.model.{LatencyConfig, ResponseConfig}
-import spray.json.JsValue
-
+import akka.http.scaladsl.server.Route
 import akka.pattern.after
-
+import castalia.model.ResponseConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 
 class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
   protected val serviceName = "StubRoutes"
@@ -50,7 +47,7 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
                   case _ => complete(statusCode, "")
                 }
 
-              case _ => complete(501, "Unknown response")
+              case _ => complete(NotImplemented, "Unknown response")
             }
           }
         }
