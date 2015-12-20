@@ -1,6 +1,7 @@
 package castalia
 
 import castalia.utils.TestHelpers
+import com.twitter.util.Try
 import org.scalatest.{BeforeAndAfterAll, FunSpec, GivenWhenThen, Matchers}
 
 
@@ -13,9 +14,9 @@ trait IntegrationTestBase extends FunSpec with GivenWhenThen with Matchers with 
   val server = Main
 
   override def beforeAll(): Unit = {
-    if (!TestHelpers.isServerRunning(serverAddress)) {
+    val tryServer: Try[Boolean] = TestHelpers.isServerRunning(serverAddress)
+    if (!tryServer.getOrElse(false)) {
       println("server is not running... spinning up.")
-      //server.main(Array("stub1.json", "jsonconfiguredstub.json"))
       server.main(Array("castaliaT.json"))
     }
   }
