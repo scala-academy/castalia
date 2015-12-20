@@ -16,7 +16,7 @@ object StubConfigParser extends Protocol {
 
   def readAndParseStubConfigFiles(stubs : List[String]): Map[Endpoint, ResponsesByRequest] = {
     // Get all json files from the config file
-    val stubConfigs: List[StubConfig] = stubs.map(parseStubConfig(_))
+    val stubConfigs: List[StubConfig] = stubs.map(parseStubConfig)
 
     val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
       // Create an outer map by endpoint
