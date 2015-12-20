@@ -5,9 +5,8 @@ import java.util.concurrent.TimeUnit
 
 import castalia.model.{LatencyConfig, CastaliaConfig, ResponseConfig}
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
-//import castalia.model.{StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 import spray.json.{JsString, JsValue}
 
@@ -24,28 +23,28 @@ class StubConfigParserSpec extends WordSpec with Matchers {
 
         stub.endpoint shouldBe "jsonconfiguredstub"
         val responses: List[ResponseConfig] = stub.responses
-        responses.length === 3
+        assert(responses.length === 3)
 
         val req1Response = responses.find(r => r.id == "1").get
-        req1Response.id.shouldBe("1")
-        req1Response.httpStatusCode.shouldBe(200)
-        req1Response.delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
-        req1Response.delay.get.duration.shouldBe(Duration(100, TimeUnit.MILLISECONDS))
-        req1Response.response.shouldBe(Some(Map[String, JsValue]("id" -> JsString("een"), "someValue" -> JsString("123123"))))
+        req1Response.id shouldBe "1"
+        req1Response.httpStatusCode shouldBe 200
+        req1Response.delay shouldBe Some(LatencyConfig("constant", "100 ms"))
+        req1Response.delay.get.duration shouldBe 100.millis
+        req1Response.response shouldBe Some(Map[String, JsValue]("id" -> JsString("een"), "someValue" -> JsString("123123")))
 
         val req2Response = responses.find(r => r.id == "2").get
-        req2Response.id.shouldBe("2")
-        req2Response.httpStatusCode.shouldBe(200)
-        req2Response.delay.shouldBe(None)
-        req2Response.response.shouldBe(Some(Map[String, JsValue]("id" -> JsString("twee"),
-          "someValue" -> JsString("123123"), "someAdditionalValue" -> JsString("345345"))))
+        req2Response.id shouldBe "2"
+        req2Response.httpStatusCode shouldBe 200
+        req2Response.delay shouldBe None
+        req2Response.response shouldBe Some(Map[String, JsValue]("id" -> JsString("twee"),
+          "someValue" -> JsString("123123"), "someAdditionalValue" -> JsString("345345")))
 
         val req0Response = responses.find(r => r.id == "0").get
-        req0Response.id.shouldBe("0")
-        req0Response.delay.shouldBe(Some(LatencyConfig("constant", "2 s")))
-        req0Response.delay.get.duration.shouldBe(Duration(2, TimeUnit.SECONDS))
-        req0Response.httpStatusCode.shouldBe(404)
-        req0Response.response.shouldBe(None)
+        req0Response.id shouldBe "0"
+        req0Response.delay shouldBe Some(LatencyConfig("constant", "2 s"))
+        req0Response.delay.get.duration shouldBe 2.seconds
+        req0Response.httpStatusCode shouldBe 404
+        req0Response.response shouldBe None
 
       }
     }

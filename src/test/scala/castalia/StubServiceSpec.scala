@@ -48,7 +48,7 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
     "result in a HTTP 200 response from the stubserver containing a json " +
       "object with property \"id\" equal to \"een\" and property \"someValue\" " +
       "equal to \"{123123}\"" in {
-      Get(s"/stubs/jsonconfiguredstub/1") ~> service.routes ~> check {
+      Get("/stubs/jsonconfiguredstub/1") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
         responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe Some(Map("id" -> JsString("een"),
@@ -96,7 +96,7 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
 
   "A HTTP POST request to a endpoint described in /responses" should {
     "result in a HTTP 200 response from the stubserver" in {
-      Post("/stubs/jsonconfiguredstub/responses", ResponseConfig("1", None, 200, None)) ~> service.routes ~> check {
+      Post("/stubs/jsonconfiguredstub/responses", ResponseConfig("1", None, OK.intValue, None)) ~> service.routes ~> check {
         status shouldBe OK
       }
     }
