@@ -1,13 +1,14 @@
+import castalia.model.LatencyConfig
 import spray.json.JsValue
 
 /**
-  * Created by m07h817 on 9-12-2015.
+  * Custom types
   */
 package object castalia {
   type AnyJsonObject = Option[Map[String, JsValue]]
   type StatusCode = Int
   type Endpoint = String
-  type StubResponse = (StatusCode, AnyJsonObject)
+  type StubResponse = (Option[LatencyConfig], StatusCode, AnyJsonObject)
   type ResponsesByRequest = collection.mutable.Map[String, StubResponse]
   type StubConfigsByEndpoint = Map[Endpoint, ResponsesByRequest]
 }

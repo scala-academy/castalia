@@ -5,8 +5,8 @@ scalaVersion  := "2.11.7"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
-  val akkaStreamV      = "2.0-M1"
-  val scalaTestV       = "3.0.0-M12"
+  val akkaStreamV      = "2.0-M2"
+  val scalaTestV       = "3.0.0-M14"
   val scalaMockV       = "3.2.2"
   Seq(
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
@@ -15,7 +15,7 @@ libraryDependencies ++= {
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
     "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test,it",
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
-    "com.twitter"       %% "finagle-http"                         % "6.30.0"         % "it"
+    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it"
   )
 }
 

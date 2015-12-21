@@ -12,11 +12,11 @@ import scala.util.Try
   */
 object JsonConverter {
   def parseJson[T: JsonReader](filename: String): T = {
-    val resource: URL = getClass.getResource("/" + filename)
+    val resource: Option[URL] = Option(getClass.getResource("/" + filename))
     resource match {
-      case url : URL => unmarshalJsonToClass[T](url) getOrElse
-        (throw new UnmarshalException(s"Type could not be unmarshelled from $url"))
-      case _ => throw new FileNotFoundException(filename)
+      case Some(url) => unmarshalJsonToClass[T](url) getOrElse
+        (throw new UnmarshalException(s"Type could not be unmarshalled from $url"))
+      case None => throw new FileNotFoundException(filename)
     }
   }
 

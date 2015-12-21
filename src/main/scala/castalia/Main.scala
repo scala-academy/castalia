@@ -26,7 +26,7 @@ object Main extends App with Config {
     new StubService(stubsByEndPoint)
   )
 
-  val routes = services.map(f => f.routes).reduceLeft(_ ~ _)
+  val routes = services.map(_.routes).reduceLeft(_ ~ _)
 
   Http().bindAndHandle(routes, httpInterface, castaliaConfig.httpPort)
 }
