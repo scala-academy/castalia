@@ -20,11 +20,11 @@ class StubServerTest extends IntegrationTestBase {
     }
 
     it("should parse the command line arguments") {
-      Given("that the stubserver is started with command line argument \"stub1.json jsonconfiguredstub.json\"")
+      Given("""that the stubserver is started with command line argument "stub1.json jsonconfiguredstub.json" """)
 
-      info("and files \"stub1.json\" and \"jsonconfiguredstub.json\" are both on the classpath")
+      info("""and files "stub1.json" and "jsonconfiguredstub.json" are both on the classpath""")
 
-      When("I do a HTTP GET to the endpoint as configured in \"stub1.json\"")
+      When("""I do a HTTP GET to the endpoint as configured in "stub1.json"""")
 
       assert(server.stubsByEndPoint.contains("stub11"))
       assert(server.stubsByEndPoint.contains("jsonconfiguredstub"))
@@ -32,22 +32,26 @@ class StubServerTest extends IntegrationTestBase {
       val request = Request(Method.Get, "/stubs/stub11/1")
       request.host = serverAddress
 
-      Then("the response should be as configured in \"stub1.json\"")
+      Then("""the response should be as configured in "stub1.json"""")
       val response: Response = Await.result(client(request))
 
       assert(response.status == Status.Ok)
-      assert(response.contentString == "{\n  \"id\": \"een\",\n  \"someValue\": \"123123\"\n}")
+      assert(response.contentString ==
+        """{
+          |  "id": "een",
+          |  "someValue": "123123"
+          |}""".stripMargin)
 
     }
 
     it("Should allow the user can configure endpoint name in json file") {
 
       info("background:")
-      info("given that the stubserver is started and configured to use a stub called \"jsonconfiguredstub\"")
-      info("and that a stub config file with name \"jsonconfiguredstub.json\" is on the classpath")
+      info("""given that the stubserver is started and configured to use a stub called "jsonconfiguredstub"""")
+      info("""and that a stub config file with name "jsonconfiguredstub.json" is on the classpath""")
       //[Note: for now i use hardcoded StubConfig object in Routes]
 
-      Given("jsonconfiguredstub.json contains a property \"endpoint\" equal to \"jsonconfiguredstub\"")
+      Given("""jsonconfiguredstub.json contains a property "endpoint" equal to "jsonconfiguredstub"""")
 
       val client = finagle.Http.newService(serverAddress)
       //TODO: make here a jsonconfiguredstub.json file and put it to classpath

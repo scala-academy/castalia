@@ -16,7 +16,7 @@ import spray.json.{JsString, JsValue}
 class StubConfigParserSpec extends WordSpec with Matchers {
 
   "A StubConfigParser" when {
-    "json file \"jsonconfiguredstub.json\" exists on classpath" should {
+    """json file "jsonconfiguredstub.json" exists on classpath""" should {
       "return a StubConfig object" in {
 
         val stub = StubConfigParser.parseStubConfig("jsonconfiguredstub.json")

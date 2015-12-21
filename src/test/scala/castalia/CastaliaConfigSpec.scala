@@ -17,7 +17,7 @@ class CastaliaConfigSpec extends WordSpec with Matchers {
       }
     }
 
-    "json file \"castalia.json\" exists on classpath" should {
+    """json file "castalia.json" exists on classpath""" should {
       "return a CastaliaConfig object" in {
         val config = CastaliaConfig.parse("castalia.json")
         config.httpPort shouldBe 9000

@@ -45,9 +45,9 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
   }
 
   "A HTTP GET request to stubs/jsonconfiguredstub/1" should {
-    "result in a HTTP 200 response from the stubserver containing a json " +
-      "object with property \"id\" equal to \"een\" and property \"someValue\" " +
-      "equal to \"{123123}\"" in {
+    "result in a HTTP 200 response from the stubserver containing a json" +
+      """object with property "id" equal to "een" and property "someValue" """ +
+      """equal to "{123123}" """ in {
       Get("/stubs/jsonconfiguredstub/1") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
@@ -59,8 +59,8 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
 
   "A HTTP GET request to stubs/jsonconfiguredstub/2" should {
     "result in a HTTP 200 response from the stubserver containing a json object" +
-      " with property \"id\" equal to \"twee\" and property \"someValue\" equal to " +
-      "\"{123123}\" and property someAdditionalValue\" equal to \"345345" in {
+      """with property "id" equal to "twee" and property "someValue" equal to""" +
+      """ "{123123}" and property "someAdditionalValue" equal to "345345" """ in {
       Get(s"/stubs/jsonconfiguredstub/2") ~> service.routes ~> check {
         status shouldBe OK
         contentType shouldBe `application/json`
@@ -81,7 +81,7 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
     implicit val system = ActorSystem("StubServiceSpecSystem", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]"""))
 
 
-    "result in a log message at info of \"No stubConfigs given\"" in {
+    """result in a log message at info of "No stubConfigs given"""" in {
       val stubService = new StubService(Map.empty)
 
       EventFilter.info(message = "No StubConfigs given", occurrences = 1) intercept {
