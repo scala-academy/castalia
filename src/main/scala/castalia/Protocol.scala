@@ -16,3 +16,4 @@ trait Protocol extends DefaultJsonProtocol {
   implicit val stubConfigFormat = jsonFormat2(StubConfig)
   implicit val jsonFilesConfigFormat = jsonFormat1(JsonFilesConfig)
 }
+

@@ -12,6 +12,8 @@ import akka.http.scaladsl.server.{RejectionHandler, Route}
   */
 trait Routes extends Protocol with SprayJsonSupport {
   def routes:Route
+
+
   protected def system: ActorSystem
   protected def serviceName: String
   protected def log: LoggingAdapter = Logging(system, serviceName)

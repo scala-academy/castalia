@@ -5,12 +5,13 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import castalia.model.ResponseConfig
 
+
 class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
   protected val serviceName = "StubRoutes"
 
   protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
 
-  protected lazy val dynamicStubRoutes = {
+  protected lazy val dynamicStubRoutes: Route = {
     def createRoute(endpoint: String, responses: ResponsesByRequest): Route = pathPrefix(endpoint) {
       post {
             path("responses") {
@@ -53,4 +54,5 @@ class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val syste
       }
     }
   }
+
 }

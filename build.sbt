@@ -19,6 +19,7 @@ libraryDependencies ++= {
   )
 }
 
+
 // Use IntegrationTest
 // (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)
 lazy val root = project.in(file("."))
