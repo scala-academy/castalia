@@ -3,7 +3,9 @@ package castalia
 import com.twitter.finagle
 import com.twitter.finagle.http.{Response, Status, Method, Request}
 import com.twitter.util.Await
+import org.scalatest.DoNotDiscover
 
+@DoNotDiscover
 class StubServerTest extends IntegrationTestBase {
   // TODO: other way than starting application using empty string array in main?
 
