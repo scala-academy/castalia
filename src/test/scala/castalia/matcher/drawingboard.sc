@@ -1,8 +1,9 @@
 
 import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.server.{PathMatcher0, PathMatcher}
 import castalia.matcher._
 
-val uri = "/sample/path/with/12/id?p1=foo&p2=bar"
+val uri = "sample/path/with/12/id?p1=foo&p2=bar"
 
 val uriParser = new UriParser()
 
@@ -16,3 +17,7 @@ uri2.queryString()
 
 
 val parseResult = uriParser.parse(uri)
+
+val matcher: PathMatcher0 = "sample"
+
+matcher.apply(parseResult.path)
