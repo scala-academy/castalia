@@ -25,3 +25,23 @@ val matcher2: PathMatcher0 = "path"
 (Slash ~ matcher ~ Slash ~ matcher2).apply(parseResult.path)
 
 val m2 = matcher
+
+/*
+Plans:
+
+Matcher object has Segments (List[String])
+
+ do a map over the list
+  if segment is fixed string (foobar)
+    attempt to match uri path
+      if success -> proceed else -> fail
+  if segment is param string ({param})
+    match always, place actual segment value in pathParm map (key = param, value = actual segment value)
+    -> proceed
+  if no more elements -> success (return collected data as RequestMatch object)
+
+ The endpoint matcher asks each Matcher for a result and returns
+ the first (only?) one that reports a match
+ (potential concurrency here, but first impl. can be a map over the list
+ that shortcircuits as soon as one Matcher reports success)
+ */
