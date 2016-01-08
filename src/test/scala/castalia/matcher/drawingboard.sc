@@ -24,6 +24,8 @@ val matcher2: PathMatcher0 = "path"
 
 (Slash ~ matcher ~ Slash ~ matcher2).apply(parseResult.path)
 
+(Slash ~ "sample" ~ Slash ~ "path").apply(parseResult.path)
+
 val m2 = matcher
 
 /*
