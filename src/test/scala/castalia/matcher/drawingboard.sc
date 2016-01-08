@@ -8,8 +8,6 @@ val uri = "http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar"
 
 val uriParser = new UriParser()
 
-val result = uriParser.test(uri)
-
 val uri2: Uri = uri
 
 uri2.authority
