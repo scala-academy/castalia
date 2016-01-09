@@ -1,36 +1,30 @@
-
+import akka.actor.Actor
+import akka.actor.Actor.Receive
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.server.PathMatchers.Slash
 import akka.http.scaladsl.server.{PathMatcher0, PathMatcher}
 import castalia.matcher._
-
 val uri = "http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar"
-
 val uriParser = new UriParser()
-
-val uri2: Uri = uri
-
-uri2.authority
-uri2.path
-uri2.queryString()
-
-
 val parseResult = uriParser.parse(uri)
-
-val matcher: PathMatcher0 = "sample"
-val matcher2: PathMatcher0 = "path"
-
-(Slash ~ matcher ~ Slash ~ matcher2).apply(parseResult.path)
-
 (Slash ~ "sample" ~ Slash ~ "path").apply(parseResult.path)
 
-val m2 = matcher
+val s1: List[String] = List("sample", "path")
+val s2 = List("another", "path")
+
+val m1 = new Matcher(s1, "a1")
+val m2 = new Matcher(s2, "a2")
+
+val matchers = List(m1, m2)
+
+val uriMatcher = new RequestMatcher(matchers)
+
+uriMatcher.matchRequest(uri)
+
 
 /*
 Plans:
-
 Matcher object has Segments (List[String])
-
  do a map over the list
   if segment is fixed string (foobar)
     attempt to match uri path

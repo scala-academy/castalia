@@ -14,9 +14,9 @@ package object types{
   * Holds an endpoint matching structure and an ActorRef that can process the request
   *
   * @param segments containing the path segment matches and path parameters
-  * @param handler ActorRef of the actor that can process this request
+  * @param handler String containing the name of the actor that can process this request
   */
-case class Matcher(segments: Segments, handler: ActorRef)
+case class Matcher(segments: Segments, handler: String)
 
 /**
   * Result of a successful match of a request uri by a Matcher
