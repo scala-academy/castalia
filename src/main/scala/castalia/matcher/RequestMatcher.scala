@@ -16,8 +16,11 @@ class RequestMatcher(myMatchers: List[Matcher]) {
 
     def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] = {
       if (matchers.isEmpty) return None
+
       val result = matchers.head.matchPath(segments)
       if (result.isDefined) return Some(new RequestMatch(uriString, parsedUri.path, result.get, parsedUri.queryParams, matchers.head.handler))
+
+      // no match yet, look at the rest of the matchers
       return findMatch(segments, matchers.tail)
     }
 
