@@ -28,7 +28,7 @@ class AdminService()(implicit val system: ActorSystem) extends Routes {
       handleRejections(totallyMissingHandler) {
         path("deployConfig") {
           parameter("configfile") {
-            aConfigFile =>
+            (aConfigFile: Endpoint) =>
             if ((Await.result(adminActorRef ? AdminActor.UpdateConfig(aConfigFile), timeout.duration).asInstanceOf[Boolean])) {
               complete(200, "Updating configuration successfully")
             } else {

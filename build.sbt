@@ -12,12 +12,16 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
+    "io.spray"          %% "spray-routing"                        % "1.3.1",
+    "io.spray"          %% "spray-can"                            % "1.3.1",
+    "io.spray"          %% "spray-util"                           % "1.3.1",
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
     "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test,it",
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
     "com.twitter"       %% "finagle-http"                         % "6.30.0"         % "it"
   )
 }
+//libraryDependencies += "io.spray" % "spray-routing" % "1.3.1"
 
 
 // Use IntegrationTest
