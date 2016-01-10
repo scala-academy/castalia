@@ -8,9 +8,10 @@ import akka.http.scaladsl.model.Uri
   * Created by Jean-Marc van Leerdam on 2016-01-09
   */
 class RequestMatcher(myMatchers: List[Matcher]) {
+  val uriParser = new UriParser()
 
   def matchRequest(uriString: String): Option[Matcher] = {
-    val uri: Uri = uriString
+    val parsedUri = uriParser.parse(uriString)
 
     Some(myMatchers.head)
     //None

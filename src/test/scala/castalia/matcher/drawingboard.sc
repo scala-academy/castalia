@@ -1,12 +1,13 @@
 import akka.actor.Actor
 import akka.actor.Actor.Receive
 import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.server.PathMatchers.Slash
 import akka.http.scaladsl.server.{PathMatcher0, PathMatcher}
 import castalia.matcher._
-val uri = "http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar"
+val uriString = "http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar"
 val uriParser = new UriParser()
-val parseResult = uriParser.parse(uri)
+val parseResult = uriParser.parse(uriString)
 (Slash ~ "sample" ~ Slash ~ "path").apply(parseResult.path)
 
 val s1: List[String] = List("sample", "path")
@@ -19,8 +20,25 @@ val matchers = List(m1, m2)
 
 val uriMatcher = new RequestMatcher(matchers)
 
-uriMatcher.matchRequest(uri)
+uriMatcher.matchRequest(uriString)
 
+parseResult.path
+
+parseResult.path.tail.head
+
+val realUri: Uri = uriString
+
+def pathList(path:Path): List[String] = {
+  if (path.isEmpty) return List[String]()
+  if (path.startsWithSlash) return pathList(path.tail)
+  path.head.toString :: pathList(path.tail)
+}
+
+pathList(realUri.path)
+
+pathList(parseResult.path)
+
+parseResult.pathList
 
 /*
 Plans:
