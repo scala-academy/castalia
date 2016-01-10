@@ -10,7 +10,7 @@ val uriParser = new UriParser()
 val parseResult = uriParser.parse(uriString)
 (Slash ~ "sample" ~ Slash ~ "path").apply(parseResult.path)
 
-val s1: List[String] = List("sample", "path")
+val s1: List[String] = List("sample", "path", "with", "{aa}", "{id}")
 val s2 = List("another", "path")
 
 val m1 = new Matcher(s1, "a1")
@@ -28,17 +28,9 @@ parseResult.path.tail.head
 
 val realUri: Uri = uriString
 
-def pathList(path:Path): List[String] = {
-  if (path.isEmpty) return List[String]()
-  if (path.startsWithSlash) return pathList(path.tail)
-  path.head.toString :: pathList(path.tail)
-}
-
-pathList(realUri.path)
-
-pathList(parseResult.path)
-
 parseResult.pathList
+
+m1.matchAndReturnParams(parseResult.pathList)
 
 /*
 Plans:

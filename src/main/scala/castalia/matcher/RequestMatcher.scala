@@ -13,7 +13,7 @@ class RequestMatcher(myMatchers: List[Matcher]) {
   def matchRequest(uriString: String): Option[Matcher] = {
     val parsedUri = uriParser.parse(uriString)
 
-    Some(myMatchers.head)
-    //None
+
+    None
   }
 }

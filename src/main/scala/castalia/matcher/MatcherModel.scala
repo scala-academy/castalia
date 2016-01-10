@@ -16,7 +16,28 @@ package object types{
   * @param segments containing the path segment matches and path parameters
   * @param handler String containing the name of the actor that can process this request
   */
-case class Matcher(segments: Segments, handler: String)
+case class Matcher(segments: Segments, handler: String) {
+  /**
+    * Compare the segments, matching the literals and collecting the parameters on the fly
+    * @param requestSegments
+    */
+  def matchAndReturnParams(requestSegments: Segments): Option[Params] = {
+    def isParam(segment: String): Boolean = {
+      return (segment.startsWith("{") && segment.endsWith("}"))
+    }
+    def paramName( segment: String): String = {
+      return (segment.substring(1, segment.length - 1))
+    }
+    def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] = {
+      if (requestSeg.isEmpty && matchSeg.isEmpty) return Some(params)
+      if (requestSeg.isEmpty || matchSeg.isEmpty) return None
+      if (isParam(matchSeg.head)) return marp(requestSeg.tail, matchSeg.tail, (paramName(matchSeg.head), requestSeg.head)::params)
+      if (requestSeg.head.equals(matchSeg.head)) return marp(requestSeg.tail, matchSeg.tail, params)
+      return None
+    }
+    return marp( requestSegments, segments, List[(String, String)]())
+  }
+}
 
 /**
   * Result of a successful match of a request uri by a Matcher
@@ -35,7 +56,7 @@ case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams
   */
 case class ParsedUri(uri: String, path: Path, queryParams: Params) {
   def pathList = {
-    def myPathList(p: Path): List[String] = {
+    def myPathList(p: Path): Segments = {
       if (p.isEmpty) return List[String]()
       if (p.startsWithSlash) return myPathList(p.tail)
       p.head.toString :: myPathList(p.tail)
