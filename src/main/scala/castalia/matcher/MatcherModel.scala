@@ -21,7 +21,7 @@ case class Matcher(segments: Segments, handler: String) {
     * Compare the segments, matching the literals and collecting the parameters on the fly
     * @param requestSegments
     */
-  def matchAndReturnParams(requestSegments: Segments): Option[Params] = {
+  def matchPath(requestSegments: Segments): Option[Params] = {
     def isParam(segment: String): Boolean = {
       return (segment.startsWith("{") && segment.endsWith("}"))
     }
@@ -37,6 +37,7 @@ case class Matcher(segments: Segments, handler: String) {
     }
     return marp( requestSegments, segments, List[(String, String)]())
   }
+
 }
 
 /**
@@ -45,8 +46,9 @@ case class Matcher(segments: Segments, handler: String) {
   * @param path the path that was extracted from the uri
   * @param pathParams the path parameters that were extracted from the uri
   * @param queryParams the query parameters that were extracted from the uri
+  * @param handler the name of the handler actor that should process the request
   */
-case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params)
+case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
 
 /**
   * Parsed uri, where the path has been split into segments and the query parameters have been converted into a Params object

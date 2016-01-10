@@ -11,13 +11,13 @@ import castalia.matcher.types.Segments
 class RequestMatcher(myMatchers: List[Matcher]) {
   val uriParser = new UriParser()
 
-  def matchRequest(uriString: String): Option[Matcher] = {
+  def matchRequest(uriString: String): Option[RequestMatch] = {
     val parsedUri = uriParser.parse(uriString)
 
-    def findMatch( segments: Segments, matchers: List[Matcher]): Option[Matcher] = {
+    def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] = {
       if (matchers.isEmpty) return None
-      val result = matchers.head.matchAndReturnParams(segments)
-      if (result.isDefined) return Some(matchers.head)
+      val result = matchers.head.matchPath(segments)
+      if (result.isDefined) return Some(new RequestMatch(uriString, parsedUri.path, result.get, parsedUri.queryParams, matchers.head.handler))
       return findMatch(segments, matchers.tail)
     }
 

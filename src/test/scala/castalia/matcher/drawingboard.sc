@@ -20,7 +20,10 @@ val matchers = List(m1, m2)
 
 val uriMatcher = new RequestMatcher(matchers)
 
-uriMatcher.matchRequest(uriString)
+val result = uriMatcher.matchRequest(uriString)
+
+result.get
+
 
 parseResult.path
 
@@ -30,7 +33,7 @@ val realUri: Uri = uriString
 
 parseResult.pathList
 
-m1.matchAndReturnParams(parseResult.pathList)
+m1.matchPath(parseResult.pathList)
 
 /*
 Plans:
