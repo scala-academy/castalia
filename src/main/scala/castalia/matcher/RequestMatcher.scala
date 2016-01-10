@@ -1,6 +1,7 @@
 package castalia.matcher
 
 import akka.http.scaladsl.model.Uri
+import castalia.matcher.types.Segments
 
 /**
   * Takes a list of endpoint matchers and determines which one matches.
@@ -13,7 +14,13 @@ class RequestMatcher(myMatchers: List[Matcher]) {
   def matchRequest(uriString: String): Option[Matcher] = {
     val parsedUri = uriParser.parse(uriString)
 
+    def findMatch( segments: Segments, matchers: List[Matcher]): Option[Matcher] = {
+      if (matchers.isEmpty) return None
+      val result = matchers.head.matchAndReturnParams(segments)
+      if (result.isDefined) return Some(matchers.head)
+      return findMatch(segments, matchers.tail)
+    }
 
-    None
+    return findMatch(parsedUri.pathList, myMatchers)
   }
 }

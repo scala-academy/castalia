@@ -10,8 +10,8 @@ class RequestMatcherTest extends WordSpec with Matchers with BeforeAndAfterEach{
   private var uriMatcher: RequestMatcher = _
 
   override def beforeEach() {
-    val s1 = List("sample", "path")
-    val s2 = List("another", "path")
+    val s1 = List("sample", "path", "with", "{partyId}", "id")
+    val s2 = List("another", "path", "without", "id")
 
     val m1 = new Matcher(s1, "a1")
     val m2 = new Matcher(s2, "a2")
@@ -36,7 +36,7 @@ class RequestMatcherTest extends WordSpec with Matchers with BeforeAndAfterEach{
     }
 
     "find a match for another correct Request" in {
-      val r1 = uriMatcher.matchRequest("http://localhost:1234/another/path/with/12/id?p1=foo&p2=bar")
+      val r1 = uriMatcher.matchRequest("http://localhost:1234/another/path/without/id?p1=foo&p2=bar")
       r1.get.handler.shouldBe("a2")
     }
   }
