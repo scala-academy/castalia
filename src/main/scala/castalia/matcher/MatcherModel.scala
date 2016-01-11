@@ -23,10 +23,12 @@ case class Matcher(segments: Segments, handler: String) {
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
     def isParam(segment: String): Boolean = {
-      return (segment.startsWith("{") && segment.endsWith("}"))
+      return ((segment.startsWith("{") && segment.endsWith("}")) || segment.startsWith("$"))
     }
     def paramName( segment: String): String = {
-      return (segment.substring(1, segment.length - 1))
+      if (segment.startsWith("{")) return (segment.substring(1, segment.length - 1))
+      if (segment.startsWith("$")) return (segment.substring(1, segment.length))
+      return segment
     }
     def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] = {
       if (requestSeg.isEmpty && matchSeg.isEmpty) return Some(params)
