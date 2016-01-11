@@ -19,26 +19,31 @@ package object types{
 case class Matcher(segments: Segments, handler: String) {
   /**
     * Compare the segments, matching the literals and collecting the parameters on the fly
-    * @param requestSegments
+    * @param requestSegments containing the path segments from the request
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
-    def isParam(segment: String): Boolean = {
-      return ((segment.startsWith("{") && segment.endsWith("}")) || segment.startsWith("$"))
+    def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] =
+      (requestSeg, matchSeg) match {
+        case (rSeg, mSeg) if (rSeg.isEmpty && mSeg.isEmpty) => Some(params)
+        case (rSeg, mSeg) if (rSeg.isEmpty || mSeg.isEmpty) => None
+        case (rSeg, mSeg) if (isParam(mSeg.head)) => marp(requestSeg.tail, matchSeg.tail, (paramName(matchSeg.head), requestSeg.head)::params)
+        case (rSeg, mSeg) if (rSeg.head.equals(mSeg.head)) => marp(requestSeg.tail, matchSeg.tail, params)
+        case (_, _) => None
     }
-    def paramName( segment: String): String = {
-      if (segment.startsWith("{")) return (segment.substring(1, segment.length - 1))
-      if (segment.startsWith("$")) return (segment.substring(1, segment.length))
-      return segment
-    }
-    def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] = {
-      if (requestSeg.isEmpty && matchSeg.isEmpty) return Some(params)
-      if (requestSeg.isEmpty || matchSeg.isEmpty) return None
-      if (isParam(matchSeg.head)) return marp(requestSeg.tail, matchSeg.tail, (paramName(matchSeg.head), requestSeg.head)::params)
-      if (requestSeg.head.equals(matchSeg.head)) return marp(requestSeg.tail, matchSeg.tail, params)
-      return None
-    }
-    return marp( requestSegments, segments, List[(String, String)]())
+
+    marp( requestSegments, segments, List[(String, String)]())
   }
+
+  private def isParam(segment: String): Boolean = {
+    segment.startsWith("{") && segment.endsWith("}") || segment.startsWith("$")
+  }
+
+  private def paramName( segment: String): String = segment match {
+    case seg if(seg.startsWith("{")) => seg.substring(1, segment.length - 1)
+    case seg if (seg.startsWith("$")) => seg.substring(1, segment.length)
+    case seg => seg
+  }
+
 
 }
 
