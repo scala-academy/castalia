@@ -23,10 +23,7 @@ val uriMatcher = new RequestMatcher(matchers)
 val result = uriMatcher.matchRequest(uriString)
 
 result.get
-
-
 parseResult.path
-
 parseResult.path.tail.head
 
 val realUri: Uri = uriString

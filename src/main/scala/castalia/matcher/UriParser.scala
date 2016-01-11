@@ -1,10 +1,8 @@
 package castalia.matcher
 
-import java.net.URLDecoder
+// import java.net.URLDecoder
 
 import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.Uri.Query
-import castalia.matcher.types.{Params, Segments}
 
 
 /**
