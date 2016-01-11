@@ -35,6 +35,13 @@ parseResult.pathList
 
 m1.matchPath(parseResult.pathList)
 
+val u3: Uri = "/aa?par1=12&par2=13&p3&p4=p4"
+
+u3.query().toList
+
+val r2 = uriMatcher.matchRequest("http://localhost:9000/sample/path/with/{id}/{p}?d=e;f=g")
+
+uriMatcher.matchRequest("another/path?a=1&bla='some%20quoted+string';second=12")
 /*
 Plans:
 Matcher object has Segments (List[String])
@@ -46,7 +53,6 @@ Matcher object has Segments (List[String])
     match always, place actual segment value in pathParm map (key = param, value = actual segment value)
     -> proceed
   if no more elements -> success (return collected data as RequestMatch object)
-
  The endpoint matcher asks each Matcher for a result and returns
  the first (only?) one that reports a match
  (potential concurrency here, but first impl. can be a map over the list

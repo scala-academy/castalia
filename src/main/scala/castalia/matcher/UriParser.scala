@@ -1,7 +1,10 @@
 package castalia.matcher
 
+import java.net.URLDecoder
+
 import akka.http.scaladsl.model.Uri
-import castalia.matcher.types.Segments
+import akka.http.scaladsl.model.Uri.Query
+import castalia.matcher.types.{Params, Segments}
 
 
 /**
@@ -11,8 +14,22 @@ import castalia.matcher.types.Segments
   */
 class UriParser {
 
+  /**
+    * Preprocesses the request string, to ensure query part is using ampersand as parameter separator
+    * @param input uri string
+    * @return string with correct query param separators
+    */
+  def preprocess( input: String): String = {
+    // val decoded = URLDecoder.decode(input, "UTF-8")
+    val decoded = input
+    if (decoded.contains(';')){
+      return decoded.replace(';', '&')
+    }
+    return decoded
+  }
+
   def parse( uriString: String): ParsedUri = {
-    val uri: Uri = uriString
+    val uri: Uri = preprocess(uriString)
 
     val result = new ParsedUri( uriString, uri.path, uri.query().toList)
 
