@@ -63,12 +63,14 @@ case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams
   * @param queryParams the query parameters that were extracted from the uri
   */
 case class ParsedUri(uri: String, path: Path, queryParams: Params) {
-  def pathList = {
-    def myPathList(p: Path, segments: Segments): Segments = {
-      if (p.isEmpty) return segments
-      if (p.startsWithSlash) return myPathList(p.tail, segments)
-      return myPathList(p.tail, p.head.toString :: segments)
+  def pathList: Segments = {
+    def myPathList(path: Path, segments: Segments): Segments =
+      (path, path.isEmpty, path.startsWithSlash) match {
+        case (p, true, _) => segments
+        case (p, _, true) => myPathList(p.tail, segments)
+        case (p, _, _) => myPathList(p.tail, p.head.toString :: segments)
     }
+
     myPathList(path, List[String]()).reverse
   }
 }
