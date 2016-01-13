@@ -1,30 +1,20 @@
 package castalia
 
-import akka.http.scaladsl.server.{RequestContext, StandardRoute}
-
-import scala.concurrent.Future
-import scala.util.{Failure, Success}
-import akka.actor.Actor.Receive
 import akka.actor._
 import akka.http.scaladsl.server.Directives._
-import akka.util.Timeout
+import akka.http.scaladsl.server.RequestContext
 import akka.pattern.ask
-import akka.pattern.pipe
+import akka.util.Timeout
+import castalia.model.Messages.{Done, UpsertEndpoint}
+
 import scala.concurrent.duration._
 
 object Receptionist {
-  case class UpSertEndpoint(stubConfigJSON: String)
-  case object CreateEndPointActor
-
   def props: Props = Props[Receptionist]
 }
 
 class Receptionist extends Actor with ActorLogging {
-
-  import  Receptionist._
-
   implicit val timeout = Timeout(5.seconds)
-
   val endpointActor = createEndPointActor()
 
   def createEndPointActor(): ActorRef = {
@@ -32,18 +22,19 @@ class Receptionist extends Actor with ActorLogging {
   }
 
   override def receive: Receive = {
-    case UpSertEndpoint(stubConfigJSON: String) =>
+    case UpsertEndpoint(stubConfig) =>
       log.info(s"UpSertEndpoint.")
-    case CreateEndPointActor =>
-      log.info(s"CreateEndPointActor.")
-    case requestContext : RequestContext   =>
+      // TODO update config
+      sender() ! Done(stubConfig.endpoint)
+    // Real request
+    case requestContext: RequestContext =>
       log.info(s"stubsRoute.")
       // TODO wrap in correct case class
       endpointActor.forward(requestContext)
   }
 
 
-  def getActor(path : String) : ActorRef = {
+  def getActor(path: String): ActorRef = {
     val uriSegments = path.split("/")
 
     val actor = if (uriSegments.isEmpty) {

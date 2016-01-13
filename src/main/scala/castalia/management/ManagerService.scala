@@ -1,23 +1,29 @@
-package castalia
+package castalia.management
 
 import akka.actor.{ActorRef, ActorSystem}
+import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import castalia.Manager.Done
-import castalia.model.StubConfig
+import castalia.Routes
+import castalia.model.Messages.Done
+import castalia.model.Model
+import castalia.model.Model._
+import castalia.model.Model.StubConfig
+
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class ManagerService(managerActor: ActorRef)(implicit val system: ActorSystem) extends Routes {
+trait ManagerService {
 
-  override protected def serviceName: String = "manager"
+  protected def managerActor: ActorRef
+  protected implicit val system: ActorSystem
 
-  implicit val timeout = Timeout(2 second)
-  import scala.concurrent.ExecutionContext.Implicits.global
+  private implicit val timeout = Timeout(2 second)
+  import system.dispatcher
 
-  override def routes: Route =
+  val managementRoute: Route =
     path("castalia" / "manager" / "endpoints") {
       post {
         entity(as[StubConfig]) {

@@ -2,14 +2,15 @@ package castalia
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.StatusCodes._
-import akka.testkit.{TestProbe, ImplicitSender, TestActors, TestKit}
+import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import akka.util.Timeout
-import castalia.Manager.{UpsertEndpoint, Done}
-import castalia.model.{ResponseConfig, StubConfig}
+import castalia.management.Manager
+import castalia.model.Messages.{Done, UpsertEndpoint}
+import castalia.model.Model.{ResponseConfig, StubConfig}
 import org.scalatest._
-import akka.pattern.ask
-import scala.language.postfixOps
+
 import scala.concurrent.duration._
+import scala.language.postfixOps
 
 class ManagerSpec(_system: ActorSystem) extends TestKit(_system)
   with ImplicitSender
@@ -28,13 +29,13 @@ class ManagerSpec(_system: ActorSystem) extends TestKit(_system)
   "Manager actor" must {
 
     val receptionistProbe = TestProbe()
-    val actor = system.actorOf(Manager.props(receptionistProbe.ref))
+    val manager = system.actorOf(Manager.props(receptionistProbe.ref))
     val stubConfig = StubConfig("my/endpoint", List(ResponseConfig(None, None, OK.intValue, None)))
 
     "ask receptionist and send back Done message" in {
-      actor ! stubConfig
+      manager ! stubConfig
       receptionistProbe.expectMsg(UpsertEndpoint(stubConfig))
-      receptionistProbe.reply(stubConfig.endpoint)
+      receptionistProbe.reply(Done(stubConfig.endpoint))
       expectMsg(Done(stubConfig.endpoint))
     }
 

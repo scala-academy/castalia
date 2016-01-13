@@ -13,6 +13,7 @@ class CastaliaConfigSpec extends WordSpec with Matchers  {
       "result in default port 9000 being configured" in {
         val config = CastaliaConfig.parse("nonExistingFile.json")
         config.httpPort.shouldBe(9000)
+        config.managementPort.shouldBe(9090)
         config.stubs.shouldBe(Nil)
       }
     }
@@ -21,6 +22,7 @@ class CastaliaConfigSpec extends WordSpec with Matchers  {
       "return a CastaliaConfig object" in {
         val config = CastaliaConfig.parse("castalia.json")
         config.httpPort.shouldBe(9000)
+        config.managementPort.shouldBe(9090)
         config.stubs.shouldBe(List("jsonconfiguredstub.json"))
       }
     }

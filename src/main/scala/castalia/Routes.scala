@@ -10,7 +10,7 @@ import akka.http.scaladsl.server.{RejectionHandler, Route}
 /**
   * Created by jml on 11/29/15.
   */
-trait Routes extends Protocol with SprayJsonSupport {
+trait Routes extends SprayJsonSupport {
   def routes:Route
 
 

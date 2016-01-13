@@ -2,14 +2,14 @@ package castalia
 
 import java.io.FileNotFoundException
 
-import castalia.model.{ResponseConfig, StubConfig}
+import castalia.model.Model.{ResponseConfig, StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 
 /**
   * Created by jens on 13-12-15.
   *
   */
-class JsonConverterSpec extends WordSpec with Matchers with Protocol {
+class JsonConverterSpec extends WordSpec with Matchers {
   // we have to supply the Protocol trait, since the jsonreaders are defined there.
 
   "A JSON file" should {
