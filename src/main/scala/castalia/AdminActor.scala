@@ -49,7 +49,7 @@ class AdminActor extends Actor with Config with ActorLogging {
       log.info(s"UpdateConfig message received with parameter: $configFile")
 
       val castaliaConfig = CastaliaConfig.parse(configFile)
-      val stubsByEndPoint = StubConfigParser.readAndParseStubConfigFiles(castaliaConfig.stubs)
+      val stubsByEndPoint = StubConfigParser.parseStubConfigs(castaliaConfig.stubs)
       val services = List(
         //new StatusService,
         new StubService(stubsByEndPoint)
