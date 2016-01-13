@@ -1,6 +1,6 @@
 package castalia
 
-import akka.http.scaladsl.server.StandardRoute
+import akka.http.scaladsl.server.{RequestContext, StandardRoute}
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
@@ -10,47 +10,46 @@ import akka.http.scaladsl.server.Directives._
 import akka.util.Timeout
 import akka.pattern.ask
 import akka.pattern.pipe
-import spray.http.Uri.{Query, Path}
 import scala.concurrent.duration._
-import spray.routing.{RequestContext, HttpService}
 
 object Receptionist {
   case class UpSertEndpoint(stubConfigJSON: String)
-  case class CreateEndPointActor()
+  case object CreateEndPointActor
 
-//  def props(x: ActorRef): Props = Props(new Receptionist(x))
+  def props: Props = Props[Receptionist]
 }
 
-
-class Receptionist extends Actor with HttpService with ActorLogging {
+class Receptionist extends Actor with ActorLogging {
 
   import  Receptionist._
 
-  implicit def executionContext = actorRefFactory.dispatcher
   implicit val timeout = Timeout(5.seconds)
 
-  val endpointActor = actorRefFactory.actorOf(EndpointActor.props, "default")
+  val endpointActor = createEndPointActor()
 
-  def actorRefFactory = context
+  def createEndPointActor(): ActorRef = {
+    context.actorOf(EndpointActor.props, "default")
+  }
 
   override def receive: Receive = {
     case UpSertEndpoint(stubConfigJSON: String) =>
       log.info(s"UpSertEndpoint.")
-    case CreateEndPointActor() =>
+    case CreateEndPointActor =>
       log.info(s"CreateEndPointActor.")
-    case _   =>
+    case requestContext : RequestContext   =>
       log.info(s"stubsRoute.")
-      runRoute(stubsRoute)
+      // TODO wrap in correct case class
+      endpointActor.forward(requestContext)
   }
 
 
   def getActor(path : String) : ActorRef = {
     val uriSegments = path.split("/")
 
-    val actor = if (uriSegments.length ==0) {
+    val actor = if (uriSegments.isEmpty) {
       endpointActor
     } else {
-      println("eerste path" + uriSegments(1))
+      log.debug("eerste path" + uriSegments(1))
       endpointActor // some work here
     }
     actor
@@ -59,7 +58,7 @@ class Receptionist extends Actor with HttpService with ActorLogging {
   val stubsRoute = {
     get {
       extract(_.request) { request =>
-        val eventualResponse = (getActor(request.uri.path.toString()) ? request)
+        val eventualResponse = getActor(request.uri.path.toString()) ? request
         onSuccess(eventualResponse) {
           response => {
             complete(response.asInstanceOf[String])
