@@ -5,6 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import castalia.model.CastaliaConfig
+import StubConfigParser._
 
 
 object Main extends App with Config {
@@ -14,16 +15,15 @@ object Main extends App with Config {
 
   val castaliaConfig = if (args.length > 0) {
     CastaliaConfig.parse(args(0))
-  }
-  else {
+  } else {
     throw new IllegalArgumentException("Please specify a config file as first argument")
   }
 
-  val stubsByEndPoint = StubConfigParser.readAndParseStubConfigFiles(castaliaConfig.stubs)
+  val stubConfigs = parseStubConfigs(castaliaConfig.stubs)
 
   val services = List(
     new StatusService,
-    new StubService(stubsByEndPoint)
+    new StubService(stubConfigs)
   )
 
   val routes = services.map(f => f.routes).reduceLeft(_ ~ _)
