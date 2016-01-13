@@ -1,4 +1,3 @@
-import castalia.model.ResponseConfig
 import spray.json.JsValue
 
 /**

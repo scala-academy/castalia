@@ -1,32 +1,54 @@
 package castalia
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.server.Directives._
-import akka.stream.ActorMaterializer
+import akka.http.scaladsl.Http.ServerBinding
+import castalia.management.{Manager, ManagerService}
 import castalia.model.CastaliaConfig
-import StubConfigParser._
+import castalia.model.Messages.UpsertEndpoint
 
+//import akka.http.scaladsl.Http
+//import akka.http.scaladsl.Http.ServerBinding
+//import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server._
+import akka.pattern.ask
+import akka.stream.ActorMaterializer
+import akka.util.Timeout
 
-object Main extends App with Config {
-  protected val serviceName = "Main"
-  protected implicit val system: ActorSystem = ActorSystem()
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.duration._
+
+object Main extends App with Config with ManagerService {
+  //  protected val serviceName = "Main"
+  implicit val system: ActorSystem = ActorSystem()
   protected implicit val materializer: ActorMaterializer = ActorMaterializer()
 
-  val castaliaConfig = if (args.length > 0) {
-    CastaliaConfig.parse(args(0))
-  } else {
-    throw new IllegalArgumentException("Please specify a config file as first argument")
+  val receptionist: ActorRef = system.actorOf(Receptionist.props, "stubsApi")
+  override val managerActor : ActorRef = system.actorOf(Manager.props(receptionist), "manager")
+
+  val castaliaConfig: CastaliaConfig = {
+    if (args.length > 0) {
+      CastaliaConfig.parse(args(0))
+    } else {
+      CastaliaConfig()
+    }
   }
 
-  val stubConfigs = parseStubConfigs(castaliaConfig.stubs)
+  castaliaConfig.stubs foreach {
+    stub =>
+      val stubConfig = StubConfigParser.parseStubConfig(stub)
+      managerActor ! stubConfig
+  }
 
-  val services = List(
-    new StatusService,
-    new StubService(stubConfigs)
-  )
+  val route: Route = {
+    context => (receptionist ? context).mapTo[RouteResult]
+  }
 
-  val routes = services.map(f => f.routes).reduceLeft(_ ~ _)
+  val managerService =
+    Http().bindAndHandle(managementRoute, managementHttpInterface, managementHttpPort)
 
-  Http().bindAndHandle(routes, httpInterface, castaliaConfig.httpPort)
+  implicit val timeout = Timeout(2.seconds)
+  val stubServer: Future[ServerBinding] =
+    Http().bindAndHandle(route, httpInterface, httpPort)
 }

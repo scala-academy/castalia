@@ -18,6 +18,8 @@ libraryDependencies ++= {
     "com.twitter"       %% "finagle-http"                         % "6.30.0"         % "it"
   )
 }
+//libraryDependencies += "io.spray" % "spray-routing" % "1.3.1"
+
 
 // Use IntegrationTest
 // (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)
