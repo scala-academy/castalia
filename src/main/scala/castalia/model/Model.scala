@@ -7,10 +7,24 @@ import spray.json.DefaultJsonProtocol
 import scala.concurrent.duration.{FiniteDuration, Duration}
 
 object Model extends DefaultJsonProtocol  {
+  case class StubConfig(endpoint: String, responses: List[ResponseConfig])
+
+  case class ResponseConfig(
+      ids:EndpointIds,
+      delay:Option[LatencyConfig],
+      httpStatusCode:StatusCode,
+      response:AnyJsonObject)
+
+  case class LatencyConfig(distribution:String, mean:String) {
+    def duration: Duration = Duration(mean)
+  }
+
   case class CastaliaStatusResponse(uptime: Long)
 
   case class StaticEndpoint(endpoint: String, response: StaticResponse)
+
   case class StaticResponse(status: StatusCode, content: String)
+
   case class JsonFilesConfig(stubs: Array[String])
   case class StubResponse( status: StatusCode, body: String)
   case class DelayedResponse( destination: ActorRef, response: StubResponse, delay: LatencyConfig)
