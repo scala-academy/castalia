@@ -18,21 +18,21 @@ class Receptionist extends Actor with ActorLogging {
   val endpointActor = createEndPointActor()
 
   def createEndPointActor(): ActorRef = {
-    context.actorOf(EndpointActor.props, "default")
+    context.actorOf(EndpointActor.props(), "default")
   }
 
   override def receive: Receive = {
+    // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"UpSertEndpoint.")
       // TODO update config
       sender() ! Done(stubConfig.endpoint)
-    // Real request
+    // Real request to the stub
     case requestContext: RequestContext =>
       log.info(s"stubsRoute.")
       // TODO wrap in correct case class
       endpointActor.forward(requestContext)
   }
-
 
   def getActor(path: String): ActorRef = {
     val uriSegments = path.split("/")
@@ -46,6 +46,7 @@ class Receptionist extends Actor with ActorLogging {
     actor
   }
 
+  //TODO: find out it this still used
   val stubsRoute = {
     get {
       extract(_.request) { request =>

@@ -21,6 +21,7 @@ import scala.concurrent.duration._
 
 object Main extends App with Config with ManagerService {
   //  protected val serviceName = "Main"
+  implicit val timeout = Timeout(2.seconds)
   implicit val system: ActorSystem = ActorSystem()
   protected implicit val materializer: ActorMaterializer = ActorMaterializer()
 
@@ -41,14 +42,13 @@ object Main extends App with Config with ManagerService {
       managerActor ! stubConfig
   }
 
-  val route: Route = {
+  val stubRoute: Route = {
     context => (receptionist ? context).mapTo[RouteResult]
   }
 
+  val stubServer: Future[ServerBinding] =
+    Http().bindAndHandle(stubRoute, httpInterface, httpPort)
+
   val managerService =
     Http().bindAndHandle(managementRoute, managementHttpInterface, managementHttpPort)
-
-  implicit val timeout = Timeout(2.seconds)
-  val stubServer: Future[ServerBinding] =
-    Http().bindAndHandle(route, httpInterface, httpPort)
 }
