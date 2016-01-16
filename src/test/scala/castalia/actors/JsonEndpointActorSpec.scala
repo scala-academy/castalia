@@ -1,31 +1,14 @@
 package castalia.actors
 
-import akka.actor.{Props, ActorSystem}
+import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.Uri
-import akka.testkit.{ImplicitSender, TestKit}
-import akka.util.Timeout
-import castalia.matcher.RequestMatch
-import castalia.model.Messages.Done
-import castalia.model.Model.StubResponse
-import org.scalatest._
 import castalia.StubConfigParser._
+import castalia.matcher.RequestMatch
+import castalia.model.Model.StubResponse
 
-import scala.concurrent.duration.FiniteDuration
-import java.util.concurrent.TimeUnit
-
-class JsonEndpointActorSpec(_system: ActorSystem) extends TestKit(_system)
-with ImplicitSender
-with WordSpecLike
-with Matchers
-with BeforeAndAfterAll {
+class JsonEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("StubServerSystem"))
-
-  override def afterAll {
-    TestKit.shutdownActorSystem(system)
-  }
-
-  private implicit val timeout = Timeout(2, TimeUnit.SECONDS)
 
   "JsonEndpointActorTest" should {
 
