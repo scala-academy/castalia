@@ -1,12 +1,8 @@
 package castalia
 
-import akka.event.NoLogging
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.ContentTypes._
 
-/**
-  * Created by Jens Kat on 27-11-2015.
-  */
 class StatusServiceSpec extends ServiceTestBase {
   val service = new StatusService()
 

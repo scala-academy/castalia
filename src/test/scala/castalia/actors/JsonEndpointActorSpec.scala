@@ -13,10 +13,7 @@ import castalia.StubConfigParser._
 import scala.concurrent.duration.FiniteDuration
 import java.util.concurrent.TimeUnit
 
-/**
-  * Created by Jean-Marc van Leerdam on 2016-01-16
-  */
-class JsonEndpointActorTest(_system: ActorSystem) extends TestKit(_system)
+class JsonEndpointActorSpec(_system: ActorSystem) extends TestKit(_system)
 with ImplicitSender
 with WordSpecLike
 with Matchers

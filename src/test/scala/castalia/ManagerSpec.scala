@@ -38,6 +38,5 @@ class ManagerSpec(_system: ActorSystem) extends TestKit(_system)
       receptionistProbe.reply(Done(stubConfig.endpoint))
       expectMsg(Done(stubConfig.endpoint))
     }
-
   }
 }
