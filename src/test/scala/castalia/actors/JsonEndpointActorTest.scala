@@ -53,6 +53,12 @@ with BeforeAndAfterAll {
       assert(System.currentTimeMillis() > 100 + t2)
       assert(System.currentTimeMillis() < 200 + t2)
 
+      val t3 = System.currentTimeMillis()
+      jsonEndpoint ! new RequestMatch( uriString, uri.path, List(("$1", "3")), Nil, "bar" )
+
+      expectMsg(StubResponse(200, """{"id":"drie","someValue":"123123"}"""))
+      assert(System.currentTimeMillis() < 50 + t3)
+
     }
 
   }
