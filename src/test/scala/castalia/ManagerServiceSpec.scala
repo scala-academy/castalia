@@ -12,7 +12,6 @@ class ManagerServiceSpec extends ServiceTestBase with SprayJsonSupport {
   val actor = system.actorOf(Manager.props(TestProbe().ref))
   val service = new ManagerService {
     override protected def managerActor: ActorRef = actor
-
     override protected implicit val system: ActorSystem = system
   }
 
