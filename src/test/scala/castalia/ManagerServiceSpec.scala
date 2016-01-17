@@ -7,7 +7,7 @@ import akka.testkit.TestProbe
 import castalia.management.{Manager, ManagerService}
 import castalia.model.Model.{ResponseConfig, StubConfig}
 
-class ManagerServiceSpec extends ServiceTestBase with SprayJsonSupport {
+class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
 
   val actor = system.actorOf(Manager.props(TestProbe().ref))
   val service = new ManagerService {

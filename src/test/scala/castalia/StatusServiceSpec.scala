@@ -3,7 +3,7 @@ package castalia
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.ContentTypes._
 
-class StatusServiceSpec extends ServiceTestBase {
+class StatusServiceSpec extends ServiceSpecBase {
   val service = new StatusService()
 
   "A request to the endpoint /" when {
