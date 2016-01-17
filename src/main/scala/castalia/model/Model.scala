@@ -2,6 +2,8 @@ package castalia.model
 
 import akka.actor.ActorRef
 import castalia._
+import castalia.matcher.UriParser
+import castalia.matcher.types.Segments
 import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.duration.{FiniteDuration, Duration}
@@ -22,7 +24,13 @@ object Model extends DefaultJsonProtocol  {
   case class ResponseConfig(ids:EndpointIds, delay:Option[LatencyConfig],
                             httpStatusCode:StatusCode, response:AnyJsonObject)
 
-  case class StubConfig(endpoint: String, responses: List[ResponseConfig])
+  case class StubConfig(endpoint: String, responses: List[ResponseConfig]) {
+    def segments: Segments = stringToSegments( endpoint)
+
+    private def stringToSegments( input: String): Segments = {
+      new UriParser().parse(input).pathList
+    }
+  }
 
   implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaStatusResponse)
   implicit val latencyConfigFormat = jsonFormat2(LatencyConfig)
