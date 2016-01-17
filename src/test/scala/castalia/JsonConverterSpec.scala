@@ -5,7 +5,7 @@ import java.io.FileNotFoundException
 import castalia.model.Model.{LatencyConfig, ResponseConfig, StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 
-class JsonConverterSpec extends WordSpec with Matchers {
+class JsonConverterSpec extends UnitSpecBase {
 
   "A JsonConverter object" when {
 

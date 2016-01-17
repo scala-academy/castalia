@@ -1,9 +1,8 @@
 package castalia
 
 import castalia.model.CastaliaConfig
-import org.scalatest.{Matchers, WordSpec}
 
-class CastaliaConfigSpec extends WordSpec with Matchers {
+class CastaliaConfigSpec extends UnitSpecBase {
 
   "A CastaliaConfig object" when {
 
