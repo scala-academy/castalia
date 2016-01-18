@@ -2,12 +2,15 @@ package castalia.matcher
 
 import akka.actor.{Actor, ActorSystem}
 import akka.testkit.{TestActorRef, TestActor, TestKit}
+import castalia.actors.ActorSpecBase
 import org.scalatest.{WordSpecLike, BeforeAndAfterEach, Matchers, WordSpec}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-09
   */
-class RequestMatcherTest extends TestKit(ActorSystem("testSystem")) with WordSpecLike with Matchers with BeforeAndAfterEach{
+class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) with BeforeAndAfterEach {
+
+  def this() = this(ActorSystem("RequestMatcherTest"))
 
   private var uriMatcher: RequestMatcher = _
   private var a1 = TestActorRef[Actor]
