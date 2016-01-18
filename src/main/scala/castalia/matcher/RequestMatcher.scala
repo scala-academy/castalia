@@ -21,9 +21,14 @@ class RequestMatcher(myMatchers: List[Matcher]) {
       if (result.isDefined) return Some(new RequestMatch(uriString, parsedUri.path, result.get, parsedUri.queryParams, matchers.head.handler))
 
       // no match yet, look at the rest of the matchers
-      return findMatch(segments, matchers.tail)
+      findMatch(segments, matchers.tail)
     }
 
-    return findMatch(parsedUri.pathList, myMatchers)
+    println( "looking for [" + parsedUri.pathList + "] in [" + myMatchers + "]")
+    findMatch(parsedUri.pathList, myMatchers)
+  }
+
+  def addOrReplaceMatcher(newMatcher: Matcher): RequestMatcher = {
+    new RequestMatcher( newMatcher :: myMatchers.filterNot(_.segments == newMatcher.segments))
   }
 }

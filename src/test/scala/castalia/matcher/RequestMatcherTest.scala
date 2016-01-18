@@ -1,20 +1,24 @@
 package castalia.matcher
 
-import org.scalatest.{BeforeAndAfterEach, Matchers, WordSpec}
+import akka.actor.{Actor, ActorSystem}
+import akka.testkit.{TestActorRef, TestActor, TestKit}
+import org.scalatest.{WordSpecLike, BeforeAndAfterEach, Matchers, WordSpec}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-09
   */
-class RequestMatcherTest extends WordSpec with Matchers with BeforeAndAfterEach{
+class RequestMatcherTest extends TestKit(ActorSystem("testSystem")) with WordSpecLike with Matchers with BeforeAndAfterEach{
 
   private var uriMatcher: RequestMatcher = _
+  private var a1 = TestActorRef[Actor]
+  private var a2 = TestActorRef[Actor]
 
   override def beforeEach() {
     val s1 = List("sample", "path", "with", "{partyId}", "id")
     val s2 = List("another", "path", "without", "id")
 
-    val m1 = new Matcher(s1, "a1")
-    val m2 = new Matcher(s2, "a2")
+    val m1 = new Matcher(s1, a1)
+    val m2 = new Matcher(s2, a2)
 
     val matchers = List(m1, m2)
 
@@ -32,7 +36,7 @@ class RequestMatcherTest extends WordSpec with Matchers with BeforeAndAfterEach{
 
     "find a match for a correct Request" in {
       val r1 = uriMatcher.matchRequest("http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar")
-      r1.get.handler.shouldBe("a1")
+      r1.get.handler.shouldBe(a1)
 
       val pathParms = r1.get.pathParams
 
@@ -43,7 +47,7 @@ class RequestMatcherTest extends WordSpec with Matchers with BeforeAndAfterEach{
 
     "find a match for another correct Request" in {
       val r1 = uriMatcher.matchRequest("http://localhost:1234/another/path/without/id?p1=foo&p2=bar")
-      r1.get.handler.shouldBe("a2")
+      r1.get.handler.shouldBe(a2)
       val pathParms = r1.get.pathParams
       pathParms.isEmpty.shouldBe(true)
     }

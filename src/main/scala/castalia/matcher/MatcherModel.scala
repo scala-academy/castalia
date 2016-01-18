@@ -14,9 +14,9 @@ package object types{
   * Holds an endpoint matching structure and an ActorRef that can process the request
   *
   * @param segments containing the path segment matches and path parameters
-  * @param handler String containing the name of the actor that can process this request
+  * @param handler ActorRef containing the name of the actor that can process this request
   */
-case class Matcher(segments: Segments, handler: String) {
+case class Matcher(segments: Segments, handler: ActorRef) {
   /**
     * Compare the segments, matching the literals and collecting the parameters on the fly
     * @param requestSegments containing the path segments from the request
@@ -53,9 +53,9 @@ case class Matcher(segments: Segments, handler: String) {
   * @param path the path that was extracted from the uri
   * @param pathParams the path parameters that were extracted from the uri
   * @param queryParams the query parameters that were extracted from the uri
-  * @param handler the name of the handler actor that should process the request
+  * @param handler the ActorRef of the handler actor that should process the request
   */
-case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
+case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: ActorRef)
 
 /**
   * Parsed uri, where the path has been split into segments and the query parameters have been converted into a Params object

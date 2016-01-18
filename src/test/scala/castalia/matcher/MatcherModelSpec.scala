@@ -1,17 +1,15 @@
 package castalia.matcher
 
+import akka.actor.{Actor, ActorSystem, ActorRef}
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.Uri.Path
-import org.scalatest.{BeforeAndAfterEach, WordSpec}
+import akka.testkit.{TestActorRef, TestKit}
+import org.scalatest.{BeforeAndAfterEach, WordSpecLike}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-10
   */
-class MatcherModelSpec extends WordSpec with BeforeAndAfterEach {
-
-  override def beforeEach() {
-
-  }
+class MatcherModelSpec extends TestKit(ActorSystem("testSystem")) with WordSpecLike with BeforeAndAfterEach {
 
   "MatcherModel PathUri class" should {
 
@@ -28,7 +26,8 @@ class MatcherModelSpec extends WordSpec with BeforeAndAfterEach {
 
   "MatcherModel Matcher class" should {
     "support {} as path parameter indication" in {
-      val matcher = new Matcher(List("a", "{bparm}", "c"), "foo")
+      val actRef = TestActorRef[Actor]
+      val matcher = new Matcher(List("a", "{bparm}", "c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "c"))
 
@@ -37,7 +36,8 @@ class MatcherModelSpec extends WordSpec with BeforeAndAfterEach {
     }
 
     "support $ as path parameter indication" in {
-      val matcher = new Matcher(List("a", "b", "$c"), "foo")
+      val actRef = TestActorRef[Actor]
+      val matcher = new Matcher(List("a", "b", "$c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "cval"))
 
@@ -46,7 +46,8 @@ class MatcherModelSpec extends WordSpec with BeforeAndAfterEach {
 
     }
     "support mixing {} and $ as path parameter" in {
-      val matcher = new Matcher(List("a", "{bparm}", "$c"), "foo")
+      val actRef = TestActorRef[Actor]
+      val matcher = new Matcher(List("a", "{bparm}", "$c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "cval"))
 
