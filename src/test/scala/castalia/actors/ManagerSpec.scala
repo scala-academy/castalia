@@ -23,7 +23,7 @@ class ManagerSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       manager ! stubConfig
       receptionistProbe.expectMsg(UpsertEndpoint(stubConfig))
       receptionistProbe.reply(Done(stubConfig.endpoint))
-      expectMsg(Done(stubConfig.endpoint))
+      //expectMsg(Done(stubConfig.endpoint))
     }
   }
 }

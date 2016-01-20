@@ -36,7 +36,7 @@ class Receptionist extends Actor with ActorLogging {
 
     // Real request
     case request: HttpRequest =>
-      log.info(s"receptionist received RequestContext message [" + request.uri.toString() + "]")
+      log.info(s"receptionist received message [" + request.uri.toString() + "]")
       val requestMatchOption = endpointMatcher.matchRequest(request.uri.toString())
       log.info(s"receptionist attempted to match, result = " + requestMatchOption)
       requestMatchOption match {

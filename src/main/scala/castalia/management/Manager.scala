@@ -25,7 +25,7 @@ class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
       receptionist ! UpsertEndpoint(config)
     case done: Done =>
       log.debug(s"received confirmation that endpoint '${done.endpoint}' was added")
-      context.parent ! Done(done.endpoint)
+      //context.parent ! Done(done.endpoint)
     case x => log.debug("Unexpected message received: " + x.toString)
   }
 }
