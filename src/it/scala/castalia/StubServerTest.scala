@@ -7,29 +7,18 @@ import org.scalatest.DoNotDiscover
 
 @DoNotDiscover
 class StubServerTest extends IntegrationTestBase {
-  // TODO: other way than starting application using empty string array in main?
 
   val client = finagle.Http.newService(s"$serverAddress")
 
-  describe("starting up stubserver with 'jsonconfiguredstub_2.json' and 'jsonconfiguredstub.json' are both on the classpath") {
+  describe("starting up stubserver with 'castaliaT.json'") {
 
-    it("should result in a server responding to requests") {
-      Given("the server main is running and has an endpoint /status")
-      val request = Request(Method.Get, "/status")
-      request.host = serverAddress
-      When("A request is made to the endpoint")
-      val response = client(request)
-      Then("The responsecode should be HTTP.OK (200)")
-      assert(Await.result(response).statusCode == 200)
-    }
-
-    it("should responde as configured in 'jsonconfiguredstub_2.json' file") {
+    it("should handle endpoint with one path parameter") {
       When("I do a HTTP GET to '/stubs/stub11/1'")
       val url = "/stubs/stub11/1"
       val request = Request(Method.Get, url)
       request.host = serverAddress
 
-      Then("the response should be as configured with http status code 200")
+      Then("the response should be as configured in 'jsonconfiguredstub_2.json' file")
       val response: Response = Await.result(client(request))
 
       assert(response.status == Status.Ok)
