@@ -5,8 +5,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import castalia.model.CastaliaConfig
-import StubConfigParser._
-
 
 object Main extends App with Config {
   protected val serviceName = "Main"
@@ -19,7 +17,7 @@ object Main extends App with Config {
     throw new IllegalArgumentException("Please specify a config file as first argument")
   }
 
-  val stubConfigs = parseStubConfigs(castaliaConfig.stubs)
+  val stubConfigs = StubConfigParser().parseStubConfigs(castaliaConfig.stubs)
 
   val services = List(
     new StatusService,

@@ -5,7 +5,6 @@ import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
 import akka.http.scaladsl.model.ContentTypes.`application/json`
 import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.EventFilter
-import castalia.StubConfigParser._
 import castalia.model.CastaliaConfig._
 import castalia.model.ResponseConfig
 import com.typesafe.config.ConfigFactory
@@ -16,7 +15,7 @@ import spray.json._
   */
 class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSupport {
 
-  val responseByEndpoint = parseStubConfigs(List("jsonconfiguredstub.json"))
+  val responseByEndpoint = new StubConfigParser().parseStubConfigs(List("jsonconfiguredstub.json"))
   val service = new StubService(responseByEndpoint)
 
   "A request to a non-existing endpoint" should {
@@ -75,7 +74,7 @@ class StubServiceSpec extends ServiceTestBase with Protocol with SprayJsonSuppor
   }
 
   "Duplicated endpoints configured" should {
-    val duplicatedStubConfigs = parseStubConfigs(parse("multiple-same-endpoints-config.json").stubs)
+    val duplicatedStubConfigs = new StubConfigParser().parseStubConfigs(parse("multiple-same-endpoints-config.json").stubs)
     "result in an IllegalArgumentException" in {
       intercept[IllegalArgumentException] {
         new StubService(duplicatedStubConfigs)
