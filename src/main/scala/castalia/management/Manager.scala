@@ -22,10 +22,7 @@ class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
   override def receive: Receive = {
     case config: StubConfig =>
       log.debug(s"received message to adjust configuration for '${config.endpoint}'")
-      receptionist ! UpsertEndpoint(config)
-    case done: Done =>
-      log.debug(s"received confirmation that endpoint '${done.endpoint}' was added")
-      //context.parent ! Done(done.endpoint)
+      receptionist forward UpsertEndpoint(config)
     case x => log.debug("Unexpected message received: " + x.toString)
   }
 }
