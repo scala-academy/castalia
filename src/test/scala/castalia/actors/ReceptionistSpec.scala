@@ -3,12 +3,16 @@ package castalia.actors
 //
 //import akka.actor.ActorSystem
 import akka.actor.ActorSystem
+import akka.event.LoggingAdapter
 import akka.http.impl.server.RequestContextImpl
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
+import akka.http.scaladsl.marshalling.ToResponseMarshallable
 import akka.http.scaladsl.model.ContentTypes.`application/json`
-import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import akka.http.scaladsl.model.Uri.Path
+import akka.http.scaladsl.model.{HttpResponse, HttpMethods, HttpRequest}
 import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.RequestContext
+import akka.http.scaladsl.server.{Rejection, RoutingSettings, RouteResult, RequestContext}
+import akka.stream.Materializer
 import akka.testkit.EventFilter
 import castalia.StubConfigParser._
 import castalia._
@@ -16,6 +20,8 @@ import castalia.model.CastaliaConfig._
 import castalia.model.Messages.{Done, UpsertEndpoint}
 import castalia.model.Model.StubResponse
 import com.typesafe.config.ConfigFactory
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system)  {
 
@@ -35,14 +41,9 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system)  {
 
     "receives a request to a non-existing endpoint" should {
       "return HTTP status code 404" in {
-        //val r = HttpRequest(HttpMethods.GET, "/stubs/nonexistingstub" )
-        //receptionist ! RequestContext(
-        //  request = r,
-        //  responder = receptionist,
-        //  unmatchedPath = request.path
-        //)
-        //TODO send RequestContext to "/stubs/nonexistingstub")
-        //expectMsg(StubResponse(404, "From receptionist " + NotFound.reason))
+        val r = HttpRequest(HttpMethods.GET, "/stubs/nonexistingstub" )
+        receptionist ! r
+        expectMsg(StubResponse(NotFound.intValue, "From receptionist " + NotFound.reason))
       }
     }
 

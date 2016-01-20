@@ -50,7 +50,7 @@ object Main extends App with Config with ManagerService {
 
   val stubRoute: Route = {
           requestContext => {
-            val futureResponse: Future[StubResponse] = (receptionist ? requestContext).mapTo[StubResponse]
+            val futureResponse: Future[StubResponse] = (receptionist ? requestContext.request).mapTo[StubResponse]
             futureResponse map { stubReponse =>
               RouteResult.Complete(HttpResponse(status = stubReponse.status, entity = stubReponse.body))
             }

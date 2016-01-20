@@ -1,6 +1,7 @@
 package castalia
 
 import akka.actor._
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.{RouteResult, RequestContext, Route}
@@ -34,11 +35,11 @@ class Receptionist extends Actor with ActorLogging {
       sender ! Done(stubConfig.endpoint)
 
     // Real request
-    case requestContext: RequestContext =>
-      log.info(s"receptionist received RequestContext message [" + requestContext.request.uri.toString() + "]")
-      val requestMatchOption = endpointMatcher.matchRequest(requestContext.request.uri.toString())
+    case request: HttpRequest =>
+      log.info(s"receptionist received RequestContext message [" + request.uri.toString() + "]")
+      val requestMatchOption = endpointMatcher.matchRequest(request.uri.toString())
       log.info(s"receptionist attempted to match, result = " + requestMatchOption)
-      (requestMatchOption) match {
+      requestMatchOption match {
         case Some(requestMatch) => requestMatch.handler forward requestMatch
         case _ => sender ! StubResponse(NotFound.intValue, "From receptionist " + NotFound.reason)
       }
