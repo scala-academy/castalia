@@ -7,6 +7,7 @@ import akka.http.scaladsl.model.HttpResponse
 import castalia.management.{Manager, ManagerService}
 import castalia.model.CastaliaConfig
 import castalia.model.Messages.UpsertEndpoint
+import castalia.model.Model.StubResponse
 
 //import akka.http.scaladsl.Http
 //import akka.http.scaladsl.Http.ServerBinding
@@ -49,9 +50,10 @@ object Main extends App with Config with ManagerService {
 
   val stubRoute: Route = {
           requestContext => {
-            val theResponse = receptionist ? requestContext
-
-            theResponse.mapTo[RouteResult]
+            val futureResponse: Future[StubResponse] = (receptionist ? requestContext).mapTo[StubResponse]
+            futureResponse map { stubReponse =>
+              RouteResult.Complete(HttpResponse(status = stubReponse.status, entity = stubReponse.body))
+            }
           }
         }
 
