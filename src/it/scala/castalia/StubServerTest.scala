@@ -12,13 +12,13 @@ class StubServerTest extends IntegrationTestBase {
 
   describe("starting up stubserver with 'castaliaT.json'") {
 
-    it("should responde as configured in 'jsonconfiguredstub_2.json' file") {
+    it("should handle endpoint with one path parameter") {
       When("I do a HTTP GET to '/stubs/stub11/1'")
       val url = "/stubs/stub11/1"
       val request = Request(Method.Get, url)
       request.host = serverAddress
 
-      Then("the response should be as configured with http status code 200")
+      Then("the response should be as configured in 'jsonconfiguredstub_2.json' file")
       val response: Response = Await.result(client(request))
 
       assert(response.status == Status.Ok)
