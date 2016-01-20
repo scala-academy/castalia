@@ -5,9 +5,6 @@ import com.twitter.finagle.http.{Method, Request}
 import com.twitter.util.Await
 import org.scalatest.DoNotDiscover
 
-/**
-  * Created by rezolya on 05/12/2015.
-  */
 @DoNotDiscover
 class JsonConfiguredStubServerTest extends IntegrationTestBase {
   // TODO: other way than starting application using empty string array in main?
