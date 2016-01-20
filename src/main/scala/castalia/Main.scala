@@ -1,17 +1,13 @@
 package castalia
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.model.HttpResponse
+import akka.http.scaladsl.model._
 import castalia.management.{Manager, ManagerService}
 import castalia.model.CastaliaConfig
-import castalia.model.Messages.UpsertEndpoint
 import castalia.model.Model.StubResponse
 
-//import akka.http.scaladsl.Http
-//import akka.http.scaladsl.Http.ServerBinding
-import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
@@ -51,8 +47,9 @@ object Main extends App with Config with ManagerService {
   val stubRoute: Route = {
           requestContext => {
             val futureResponse: Future[StubResponse] = (receptionist ? requestContext.request).mapTo[StubResponse]
-            futureResponse map { stubReponse =>
-              RouteResult.Complete(HttpResponse(status = stubReponse.status, entity = stubReponse.body))
+            futureResponse map { stubResponse =>
+              RouteResult.Complete(HttpResponse(status = stubResponse.status,
+                entity = HttpEntity(ContentTypes.`application/json`, stubResponse.body)))
             }
           }
         }

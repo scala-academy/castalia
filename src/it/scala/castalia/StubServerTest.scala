@@ -14,7 +14,7 @@ class StubServerTest extends IntegrationTestBase {
 
     it("should handle endpoint with one path parameter") {
       When("I do a HTTP GET to '/stubs/stub11/1'")
-      val url = "/stubs/stub11/1"
+      val url = "/stub11/1"
       val request = Request(Method.Get, url)
       request.host = serverAddress
 
@@ -22,11 +22,12 @@ class StubServerTest extends IntegrationTestBase {
       val response: Response = Await.result(client(request))
 
       assert(response.status == Status.Ok)
-      assert(response.contentString == "{\n  \"id\": \"een\",\n  \"someValue\": \"123123\"\n}")
+      assert(response.contentType.get == "application/json")
+      assert(response.contentString == """{"id":"een","someValue":"123123"}""")
     }
 
     it("should responde as configured in 'jsonconfiguredstub_1.json' file") {
-      val url = "/stubs/doublepathparam/0/responsedata/internalerror"
+      val url = "/doublepathparam/0/responsedata/internalerror"
       When(s"I do a HTTP GET to '$url'")
 
       val request = Request(Method.Get, url)
@@ -40,7 +41,7 @@ class StubServerTest extends IntegrationTestBase {
     }
 
     it("should return 404") {
-      val url = "/stubs/doesnotexist"
+      val url = "/doesnotexist"
       When(s"I do a HTTP GET to '$url'")
 
       val request = Request(Method.Get, url)

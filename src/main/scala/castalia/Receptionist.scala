@@ -41,7 +41,7 @@ class Receptionist extends Actor with ActorLogging {
       log.info(s"receptionist attempted to match, result = " + requestMatchOption)
       requestMatchOption match {
         case Some(requestMatch) => requestMatch.handler forward requestMatch
-        case _ => sender ! StubResponse(NotFound.intValue, "From receptionist " + NotFound.reason)
+        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
       }
 
       // unexpected messages

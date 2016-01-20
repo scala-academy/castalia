@@ -43,8 +43,8 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
                 log.debug("make a delayed response without body")
                 self ! new DelayedResponse(sender, new StubResponse( response.httpStatusCode, ""), delay)
               case (_, _) =>
-                log.debug("make an immediate not-found response")
-                sender ! new StubResponse( NotFound.intValue, NotFound.reason)
+                log.debug("make an immediate empty response")
+                sender ! new StubResponse(response.httpStatusCode, "")
             }
           case _ =>
             log.debug("found no response")
@@ -71,7 +71,6 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
         case (pathParams, first :: rest) => if (paramMatch(pathParams, first.ids)) Some(first) else findResponseRecurse( pathParams, rest)
         case (_, _) => None
       }
-
     findResponseRecurse(pathParams, myStubConfig.responses)
   }
 
