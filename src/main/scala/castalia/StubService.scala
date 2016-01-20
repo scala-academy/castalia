@@ -1,63 +1,76 @@
 package castalia
 
 import akka.actor.ActorSystem
+import akka.http.scaladsl.model.StatusCodes.NotFound
 import akka.http.scaladsl.server.Directives._
+import akka.http.scaladsl.server.PathMatcher._
 import akka.http.scaladsl.server.Route
+import castalia.model.{StubConfig, ResponseConfig}
+import spray.json._
 
-class StubService(theStubsByEndpoints: StubConfigsByEndpoint)(implicit val system: ActorSystem) extends Routes {
+class StubService(stubConfigs: List[StubConfig])(implicit val system: ActorSystem) extends Routes {
   protected val serviceName = "StubRoutes"
 
-  protected def stubsByEndpoints: StubConfigsByEndpoint = theStubsByEndpoints
+  private var responseByEndpoint = (for {
+    stubConfig <- stubConfigs
+    response <- stubConfig.responses
+  } yield resolveEndpoint(stubConfig.endpoint, response.ids) -> response).toMap
+
+  if (responseByEndpoint.size != stubConfigs.map(_.responses.size).sum) {
+    throw new IllegalArgumentException("Duplicate endpoints have been defined")
+  }
 
   protected lazy val dynamicStubRoutes = {
-    def createRoute(endpoint: String, responses: ResponsesByRequest): Route = path(endpoint / Segment) { id =>
+    def createRoute: Route =
       get {
-        val response: Option[StubResponse] = responses.get(id)
-
-        response match {
-          case Some((statusCode: StatusCode, optResponse: AnyJsonObject)) =>
-            optResponse match {
-              case Some(content) => complete(statusCode, content.toJson)
-              case _ => complete(statusCode, "")
+        path(Rest) {
+          path =>
+            responseByEndpoint.get(path) match {
+              case Some(responseConfig) =>
+                responseConfig.response match {
+                  case Some(content) => complete(responseConfig.httpStatusCode, content.toJson)
+                  case _ => complete(responseConfig.httpStatusCode, "")
+                }
+              case None => complete(NotFound, NotFound.reason)
             }
-          case _ => complete(501, "Unknown response")
         }
-      }
-    }
+      } ~
+        post {
+          pathSuffix("responses") {
+            extractUnmatchedPath { path =>
+              entity(as[ResponseConfig]) {
+                rc =>
+                  responseByEndpoint += (path.toString() -> rc)
+                  complete("")
+              }
+            }
 
-    if (stubsByEndpoints.isEmpty) {
+          }
+        }
+
+    if (responseByEndpoint.isEmpty) {
       log.info("No StubConfigs given")
       reject
     } else {
-      log.info(s"${stubsByEndpoints.size} StubConfigs given")
-      stubsByEndpoints map { case (e, r) => createRoute(e, r) } reduceLeft (_ ~ _)
+      createRoute
     }
+
   }
 
-  protected val staticEndpoints = List(
-    StaticEndpoint("hardcodeddummystub", StaticResponse(200, "Yay!")),
-    StaticEndpoint("anotherstub", StaticResponse(200, "Different response")))
-
-  protected lazy val staticRoutes: Route = {
-    def createRoute(ep: StaticEndpoint): Route = path(ep.endpoint) {
-      get {
-        complete(ep.response.status, ep.response.content)
-      }
-    }
-
-    if (staticEndpoints.isEmpty) {
-      log.info("No staticEndpoints given")
-      reject
-    } else {
-      log.info(s"${staticEndpoints.size} staticEndpoints given")
-      staticEndpoints map { case (e) => createRoute(e) } reduceLeft (_ ~ _)
+  def resolveEndpoint(endpoint: String, ids: EndpointIds): String = {
+    ids match {
+      case Some(vars) =>
+        vars.foldLeft(endpoint) {
+          (result, tuple: (String, String)) => result.replaceAll(s"\\${tuple._1}", tuple._2)
+        }
+      case _ => endpoint
     }
   }
 
   override def routes: Route = {
     pathPrefix("stubs") {
       handleRejections(totallyMissingHandler) {
-        staticRoutes ~ dynamicStubRoutes
+        dynamicStubRoutes
       }
     }
   }

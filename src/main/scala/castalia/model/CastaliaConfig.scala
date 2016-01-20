@@ -8,14 +8,14 @@ import scala.util.Try
 /**
   * Created by M07H817 on 11-12-2015.
   */
-case class CastaliaConfig(httpPort: Int)
+case class CastaliaConfig(httpPort: Int, stubs:List[String])
 
 object CastaliaConfig extends DefaultJsonProtocol {
-  implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaConfig.apply)
+  implicit val castaliaStatusResponseFormatter = jsonFormat2(CastaliaConfig.apply)
   val defaultPort = 9000
   def parse(config: String): CastaliaConfig = {
     Try{
       JsonConverter().parseJson[CastaliaConfig](config)
-    } getOrElse CastaliaConfig(defaultPort)
+    } getOrElse CastaliaConfig(defaultPort, Nil)
   }
 }

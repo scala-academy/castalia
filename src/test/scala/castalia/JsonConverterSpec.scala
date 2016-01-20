@@ -18,18 +18,18 @@ class JsonConverterSpec extends WordSpec with Matchers with Protocol {
     "be parsed" when {
       "calling parseJson of type T for Stubconfig" in {
         val stubconfig = converter.parseJson[StubConfig]("jsonconfiguredstub.json")
-        assert(stubconfig.endpoint === "jsonconfiguredstub")
+        assert(stubconfig.endpoint === "doublepathparam/$1/responsedata/$2")
       }
     }
     "not be parsed" when {
       "calling parsejson for a non-existing file" in {
         intercept[FileNotFoundException] {
-          val stubconfig = converter.parseJson[StubConfig]("none-existing.json")
+          converter.parseJson[StubConfig]("none-existing.json")
         }
       }
       "unmarshalling an invalid Json" in {
         intercept[UnmarshalException] {
-          val stubconfig = converter.parseJson[ResponseConfig]("jsonconfiguredstub.json")
+          converter.parseJson[ResponseConfig]("jsonconfiguredstub.json")
         }
       }
     }

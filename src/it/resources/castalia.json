@@ -1,4 +1,0 @@
-{
-  "httpPort": 9000,
-  "stubs": ["jsonconfiguredstub.json", "stub1.json"]
-}

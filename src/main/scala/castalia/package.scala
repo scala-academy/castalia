@@ -1,3 +1,4 @@
+import castalia.model.ResponseConfig
 import spray.json.JsValue
 
 /**
@@ -7,7 +8,5 @@ package object castalia {
   type AnyJsonObject = Option[Map[String, JsValue]]
   type StatusCode = Int
   type Endpoint = String
-  type StubResponse = (StatusCode, AnyJsonObject)
-  type ResponsesByRequest = Map[String, StubResponse]
-  type StubConfigsByEndpoint = Map[Endpoint, ResponsesByRequest]
+  type EndpointIds = Option[Map[String, String]]
 }
