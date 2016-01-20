@@ -14,7 +14,7 @@ class JsonConverterSpec extends UnitSpecBase {
         val stubconfig = JsonConverter.parseJson[StubConfig]("jsonconfiguredstub.json")
         stubconfig.endpoint.shouldBe("doublepathparam/$1/responsedata/$2")
         stubconfig.responses.size.shouldBe(4)
-        stubconfig.responses(0).ids.shouldBe(Some(Map("$1" -> "1", "$2" -> "id1")))
+        stubconfig.responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
         stubconfig.responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
         stubconfig.responses(0).httpStatusCode.shouldBe(200)
       }
