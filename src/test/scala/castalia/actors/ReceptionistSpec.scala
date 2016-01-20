@@ -48,10 +48,20 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system)  {
     }
 
     "receives a request to an existing endpoint " should {
-      "forward the request to the endpoint" in {
+      "forward the request to the endpoint and get a 404" in {
+        val r = HttpRequest(HttpMethods.GET, "/stubs/doublepathparam/0/responsedata/notfound" )
+        receptionist ! r
+        expectMsg(StubResponse(NotFound.intValue, ""))
       }
     }
 
+    "receives a request to an existing endpoint " should {
+      "forward the request to the endpoint and get a 200 response" in {
+        val r = HttpRequest(HttpMethods.GET, "/stubs/doublepathparam/1/responsedata/id2" )
+        receptionist ! r
+        expectMsg(StubResponse(NotFound.intValue, ""))
+      }
+    }
   }
 
 
