@@ -3,7 +3,7 @@ package castalia.matcher
 import akka.actor.{Actor, ActorSystem, ActorRef}
 import akka.http.scaladsl.model.Uri
 import akka.http.scaladsl.model.Uri.Path
-import akka.testkit.{TestActorRef, TestKit}
+import akka.testkit.{TestProbe, TestActorRef, TestKit}
 import castalia.actors.ActorSpecBase
 import org.scalatest.{BeforeAndAfterEach, WordSpecLike}
 
@@ -29,7 +29,7 @@ class MatcherModelSpec (_system: ActorSystem) extends ActorSpecBase(_system) {
   "MatcherModel Matcher class" should {
 
     "support {} as path parameter indication" in {
-      val actRef = TestActorRef[Actor]
+      val actRef = TestProbe().ref
       val matcher = new Matcher(List("a", "{bparm}", "c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "c"))
@@ -38,7 +38,7 @@ class MatcherModelSpec (_system: ActorSystem) extends ActorSpecBase(_system) {
     }
 
     "support $ as path parameter indication" in {
-      val actRef = TestActorRef[Actor]
+      val actRef = TestProbe().ref
       val matcher = new Matcher(List("a", "b", "$c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "cval"))
@@ -47,7 +47,7 @@ class MatcherModelSpec (_system: ActorSystem) extends ActorSpecBase(_system) {
     }
 
     "support mixing {} and $ as path parameter" in {
-      val actRef = TestActorRef[Actor]
+      val actRef = TestProbe().ref
       val matcher = new Matcher(List("a", "{bparm}", "$c"), actRef)
 
       val result = matcher.matchPath(List("a", "b", "cval"))
