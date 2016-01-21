@@ -42,6 +42,7 @@ class JsonConverterSpec extends UnitSpecBase {
 
         stubConfig.endpoint.shouldBe("somestub/$parm")
         stubConfig.default.shouldBe(Some(DefaultResponseConfig(Some(LatencyConfig("constant", "100 ms")), None, None)))
+        stubConfig.responses.head.ids.shouldBe(Some(Map(("parm", "1"))))
       }
     }
   }
