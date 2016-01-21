@@ -1,8 +1,10 @@
 {
   "endpoint": "somestub/$parm",
-  "delay": {
-    "distribution": "constant",
-    "mean": "100 ms"
+  "default": {
+    "delay": {
+      "distribution": "constant",
+      "mean": "100 ms"
+    }
   },
   "responses": [
     {
