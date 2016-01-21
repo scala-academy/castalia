@@ -1,11 +1,9 @@
 package castalia.matcher
 
-import akka.actor.{Actor, ActorSystem, ActorRef}
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.Uri.Path
-import akka.testkit.{TestProbe, TestActorRef, TestKit}
+import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
-import org.scalatest.{BeforeAndAfterEach, WordSpecLike}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-10

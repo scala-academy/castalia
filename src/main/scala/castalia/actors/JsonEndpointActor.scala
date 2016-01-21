@@ -1,8 +1,6 @@
 package castalia.actors
 
-import akka.http.scaladsl.model.StatusCodes.NotFound
 import akka.http.scaladsl.model.StatusCodes.Forbidden
-import akka.http.scaladsl.server.Directives._
 
 import akka.actor._
 import castalia.EndpointIds
@@ -24,40 +22,30 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
 
   override def receive: Receive = {
     case request: RequestMatch =>
-      log.debug("receive requestmatch")
-
       // see if there is a response available for the parameters in the request
         val responseOption = findResponse(request.pathParams)
 
         responseOption match {
           case Some(response) =>
-            log.debug("found a response")
             (response.response, response.delay) match {
               case (Some(content), Some(delay)) =>
-                log.debug("make a delayed response with body")
                 self ! new DelayedResponse(sender, new StubResponse( response.httpStatusCode, content.toJson.toString()), delay)
               case (Some(content), _) =>
-                log.debug("make a immediate response with body")
                 sender ! new StubResponse( response.httpStatusCode, content.toJson.toString)
               case (_, Some(delay)) =>
-                log.debug("make a delayed response without body")
                 self ! new DelayedResponse(sender, new StubResponse( response.httpStatusCode, ""), delay)
               case (_, _) =>
-                log.debug("make an immediate empty response")
                 sender ! new StubResponse(response.httpStatusCode, "")
             }
           case _ =>
-            log.debug("found no response")
             sender ! new StubResponse( Forbidden.intValue, Forbidden.reason)
         }
 
     case delayedResponse: DelayedResponse =>
-      log.debug("receive delayedresponse")
       context.system.scheduler.scheduleOnce(calculateDelayTime(delayedResponse.delay), self, new DelayComplete( delayedResponse.destination, delayedResponse.response))
 
 
     case delayComplete: DelayComplete =>
-      log.debug("receive delaycomplete")
       delayComplete.destination ! delayComplete.message
 
     case x: Any =>
@@ -84,7 +72,6 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
   }
 
   def calculateDelayTime( latencyConfig: LatencyConfig): FiniteDuration = {
-    log.debug("calculating delay for " + latencyConfig.duration.length + " " + latencyConfig.duration.unit)
     (latencyConfig.duration, latencyConfig.duration.isFinite()) match {
       case (duration, true) => FiniteDuration(duration.length, duration.unit)
       case (_, _) => FiniteDuration(10, MILLISECONDS)
