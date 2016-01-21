@@ -5,17 +5,17 @@ import spray.json._
 
 import scala.util.Try
 
-/**
-  * Created by M07H817 on 11-12-2015.
-  */
-case class CastaliaConfig(httpPort: Int, stubs:List[String])
+case class CastaliaConfig(
+    httpPort: Int = 9000,
+    managementPort: Int = 9090,
+    stubs: List[String] = List())
 
 object CastaliaConfig extends DefaultJsonProtocol {
-  implicit val castaliaStatusResponseFormatter = jsonFormat2(CastaliaConfig.apply)
-  val defaultPort = 9000
+  implicit val castaliaStatusResponseFormatter = jsonFormat3(CastaliaConfig.apply)
+
   def parse(config: String): CastaliaConfig = {
-    Try{
+    Try {
       JsonConverter.parseJson[CastaliaConfig](config)
-    } getOrElse CastaliaConfig(defaultPort, Nil)
+    } getOrElse CastaliaConfig()
   }
 }

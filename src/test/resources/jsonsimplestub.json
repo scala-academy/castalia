@@ -1,0 +1,43 @@
+{
+  "endpoint": "somepath/$1",
+  "responses": [
+    {
+      "ids": {
+        "$1": "1"
+      },
+      "delay": {
+        "distribution": "constant",
+        "mean": "1000 ms"
+      },
+      "httpStatusCode": 200,
+      "response": {
+        "id": "een",
+        "someValue": "123123"
+      }
+    },
+    {
+      "ids": {
+        "$1": "2"
+      },
+      "delay": {
+        "distribution": "constant",
+        "mean": "100 ms"
+      },
+      "httpStatusCode": 200,
+      "response": {
+        "id": "twee",
+        "someValue": "2222"
+      }
+    },
+    {
+      "ids": {
+        "$1": "3"
+      },
+      "httpStatusCode": 200,
+      "response": {
+        "id": "drie",
+        "someValue": "123123"
+      }
+    }
+  ]
+}

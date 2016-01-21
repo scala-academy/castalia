@@ -7,9 +7,6 @@ import spray.json._
 
 import scala.util.Try
 
-/**
-  * Created by jens on 13-12-15.
-  */
 object JsonConverter {
   def parseJson[T: JsonReader](filename: String): T = {
     val resource: URL = getClass.getResource("/" + filename)
@@ -23,9 +20,9 @@ object JsonConverter {
   protected def unmarshalJsonToClass[T: JsonReader](url: URL): Try[T] =
     Try{
       scala.io.Source.fromFile(url.getPath) // read File
-    .mkString // make it a string
-    .parseJson // parse the string to Json objects
-    .convertTo[T]}
+      .mkString // make it a string
+      .parseJson // parse the string to Json objects
+      .convertTo[T]}
 }
 
 case class UnmarshalException(s: String) extends Exception(s)
