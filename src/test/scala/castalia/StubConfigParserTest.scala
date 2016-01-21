@@ -31,7 +31,7 @@ class StubConfigParserTest extends UnitSpecBase {
       stubConfig.responses(1).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
       stubConfig.responses(1).httpStatusCode.shouldBe(200)
       stubConfig.responses(2).ids.shouldBe(Some(Map("parm" -> "0")))
-      stubConfig.responses(2).delay.shouldBe(Some(LatencyConfig("constant", "2000 ms")))
+      stubConfig.responses(2).delay.shouldBe(Some(LatencyConfig("constant", "2 s")))
       stubConfig.responses(2).httpStatusCode.shouldBe(404)
 
 
