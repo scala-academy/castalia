@@ -1,7 +1,7 @@
 package castalia.matcher
 
 import akka.actor.{Actor, ActorSystem}
-import akka.testkit.{TestActorRef, TestActor, TestKit}
+import akka.testkit.{TestProbe, TestActorRef, TestActor, TestKit}
 import castalia.actors.ActorSpecBase
 import org.scalatest.{WordSpecLike, BeforeAndAfterEach, Matchers, WordSpec}
 
@@ -13,8 +13,8 @@ class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) wi
   def this() = this(ActorSystem("RequestMatcherTest"))
 
   private var uriMatcher: RequestMatcher = _
-  private var a1 = TestActorRef[Actor]
-  private var a2 = TestActorRef[Actor]
+  private var a1 = TestProbe().ref
+  private var a2 = TestProbe().ref
 
   override def beforeEach() {
     val s1 = List("sample", "path", "with", "{partyId}", "id")
