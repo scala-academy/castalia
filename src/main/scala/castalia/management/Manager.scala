@@ -2,6 +2,8 @@ package castalia.management
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.Timeout
+import castalia.model.Messages.{UpsertResponse, Done, UpsertEndpoint}
+import castalia.model.Model.{EndpointResponseConfig, StubConfig}
 import castalia.model.Messages.{EndpointMetricsGet, UpsertEndpoint}
 import castalia.model.Model.StubConfig
 
@@ -26,5 +28,9 @@ class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
     case EndpointMetricsGet =>
       log.debug("received message to fetch metrics")
       receptionist forward EndpointMetricsGet
+    case config: EndpointResponseConfig =>
+      log.debug(s"received message to adjust response for '${config.endpoint}'")
+      receptionist forward UpsertResponse(config)
+    case x => log.debug("Unexpected message received: " + x.toString)
   }
 }

@@ -12,6 +12,14 @@ import castalia.StubConfigParser._
 import castalia._
 import castalia.model.Messages.{EndpointMetricsInit, EndpointMetricsGet, Done, UpsertEndpoint}
 import castalia.model.Model.{EndpointMetrics, StubResponse}
+import castalia.model.CastaliaConfig._
+import castalia.model.Messages.{UpsertResponse, Done, UpsertEndpoint}
+import castalia.model.Model.{ResponseConfig, EndpointResponseConfig, StubResponse}
+import com.typesafe.config.ConfigFactory
+import org.scalatest.BeforeAndAfter
+import spray.json.JsString
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
@@ -36,6 +44,22 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
         expectMsg(Done(stubConfig.endpoint))
       }
     }
+
+    "receives UpsertResponse message" should {
+      "forward it to a correct endpoint actor and eventually reply with Done" in {
+        //TODO: how to test the forwarding? will have to provide endpointMatcher to receptionist somehow
+        val responseConfig = EndpointResponseConfig("doublepathparam/$1/responsedata/$2",
+          ResponseConfig( ids = Some(Map("1" -> "1","2" -> "id1")),
+                          delay = None,
+                          httpStatusCode = 200,
+                          response = Some(Map("id" -> JsString("newId")))))
+        receptionist ! UpsertResponse(responseConfig)
+        expectMsg(Done(responseConfig.endpoint))
+      }
+    }
+
+    "receives a request to an existing endpoint " should {
+        "forward the request to the endpoint and get a configured 200 response" in {
     "receives a request to an existing endpoint " should {
         "forward the request to the endpoint and get a 200 response" in {
           val r = HttpRequest(HttpMethods.GET, "/doublepathparam/1/responsedata/id2" )
@@ -74,7 +98,7 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
 
 
-    "receives a request to a non-existing stub" should {
+    "receives a request to a non-existing endpoint" should {
       "return HTTP status code 404" in {
         val r = HttpRequest(HttpMethods.GET, "/nonexistingstub" )
         receptionist ! r

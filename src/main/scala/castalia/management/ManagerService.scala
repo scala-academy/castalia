@@ -22,12 +22,25 @@ trait ManagerService {
 
   val managementRoute: Route =
     pathPrefix("castalia" / "manager" / "endpoints") {
-      post {
-        entity(as[StubConfig]) {
-          stubConfig =>
+      pathEndOrSingleSlash {
+        post {
+          entity(as[StubConfig]) {
+            stubConfig =>
 
-            complete {
-              (managerActor ? stubConfig)
+              complete {
+                (managerActor ? stubConfig)
+                  .mapTo[Done]
+                  .map(result => s"${result.endpoint}")
+              }
+          }
+        }
+      } ~
+      path("responses") {
+        post {
+          entity(as[EndpointResponseConfig]){
+            endpointResponseConfig =>
+              complete {
+                (managerActor ? endpointResponseConfig)
                 .mapTo[Done]
                 .map(result => s"${result.endpoint}")
             }
