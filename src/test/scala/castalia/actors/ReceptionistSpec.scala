@@ -36,15 +36,26 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
         expectMsg(Done(stubConfig.endpoint))
       }
     }
-
     "receives a request to an existing endpoint " should {
-      "forward the request to the endpoint and get a 200 response" in {
+        "forward the request to the endpoint and get a 200 response" in {
           val r = HttpRequest(HttpMethods.GET, "/doublepathparam/1/responsedata/id2" )
           receptionist ! r
           expectMsg(StubResponse(OK.intValue, "{\"id\":\"twee\",\"someValue\":\"123123\",\"someAdditionalValue\":\"345345\"}"))
           // todo: rewrite into converting the response to json, unmarshal it and inspect.
+        }
+
+        "forward the request to the endpoint and get a configured 404 response" in {
+          val r = HttpRequest(HttpMethods.GET, "/doublepathparam/0/responsedata/notfound" )
+          receptionist ! r
+          expectMsg(StubResponse(NotFound.intValue, ""))
+        }
+
+        "forward the request to the endpoint and get a configured 503 response" in {
+          val r = HttpRequest(HttpMethods.GET, "/doublepathparam/0/responsedata/internalerror" )
+          receptionist ! r
+          expectMsg(StubResponse(ServiceUnavailable.intValue, ""))
+        }
       }
-    }
 
     "receives a request to get metrics for endpoints" should {
       "forward the request to the metrics collector" in {
@@ -62,57 +73,19 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
     }
 
 
-/*
-    "receives a request to a non-existing endpoint" should {
+
+    "receives a request to a non-existing stub" should {
       "return HTTP status code 404" in {
         val r = HttpRequest(HttpMethods.GET, "/nonexistingstub" )
         receptionist ! r
-        expectMsg(StubResponse(NotFound.intValue, "From receptionist " + NotFound.reason))
+        expectMsg(StubResponse(NotFound.intValue, NotFound.reason))
       }
     }
-
-    "receives a request to an existing endpoint " should {
-      "forward the request to the endpoint and get a 404" in {
-        val r = HttpRequest(HttpMethods.GET, "/doublepathparam/0/responsedata/notfound" )
-        receptionist ! r
-        expectMsg(StubResponse(NotFound.intValue, ""))
-      }
-    }
-*/
 
   }
 
 
 
-//  "A HTTP GET request to '/stubs/doublepathparam/0/responsedata/notfound' " should {
-//    "result in a HTTP 404 response from the stubserver" in {
-//      Get(s"/stubs/doublepathparam/0/responsedata/notfound") ~> service.routes ~> check {
-//        status shouldBe NotFound
-//        responseAs[String] shouldBe empty
-//      }
-//    }
-//  }
-//
-//
-//  "A HTTP GET request to '/stubs/doublepathparam/0/responsedata/internalerror' " should {
-//    "result in a HTTP 503 response from the stubserver and related response" in {
-//      Get(s"/stubs/doublepathparam/0/responsedata/internalerror") ~> service.routes ~> check {
-//        status shouldBe ServiceUnavailable
-//        responseAs[String] shouldBe empty
-//      }
-//    }
-//  }
-//
-//  "A HTTP GET request to '/stubs/doublepathparam/1/responsedata/id1' " should {
-//    "result in a HTTP 200 response from the stubserver and related response" in {
-//      Get(s"/stubs/doublepathparam/1/responsedata/id1") ~> service.routes ~> check {
-//        status shouldBe OK
-//        contentType shouldBe `application/json`
-//        responseAs[String].parseJson.convertTo[AnyJsonObject] shouldBe
-//          Some(Map("id" -> JsString("een"), "someValue" -> JsString("123123")))
-//      }
-//    }
-//  }
 //
 //  "An empty list of static responses and map of dynamic responses" should {
 //    implicit val system = ActorSystem("StubServiceSpecSystem", ConfigFactory.parseString("""akka.loggers = ["akka.testkit.TestEventListener"]"""))
