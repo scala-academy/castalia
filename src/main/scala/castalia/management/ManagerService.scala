@@ -24,16 +24,30 @@ trait ManagerService {
   import system.dispatcher
 
   val managementRoute: Route =
-    path("castalia" / "manager" / "endpoints") {
-      post {
-        entity(as[StubConfig]) {
-          stubConfig =>
+    pathPrefix("castalia" / "manager" / "endpoints") {
+      pathEndOrSingleSlash {
+        post {
+          entity(as[StubConfig]) {
+            stubConfig =>
 
-            complete {
-              (managerActor ? stubConfig)
+              complete {
+                (managerActor ? stubConfig)
+                  .mapTo[Done]
+                  .map(result => s"${result.endpoint}")
+              }
+          }
+        }
+      } ~
+      path("responses") {
+        post {
+          entity(as[EndpointResponseConfig]){
+            endpointResponseConfig =>
+              complete {
+                (managerActor ? endpointResponseConfig)
                 .mapTo[Done]
                 .map(result => s"${result.endpoint}")
-            }
+              }
+          }
         }
       }
     }

@@ -8,6 +8,7 @@ import akka.actor._
 import castalia.EndpointIds
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
+import castalia.model.Messages.{Done, UpsertResponse}
 import castalia.model.Model._
 
 import scala.concurrent.duration._
@@ -59,6 +60,11 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
     case delayComplete: DelayComplete =>
       log.debug("receive delaycomplete")
       delayComplete.destination ! delayComplete.message
+
+    case UpsertResponse(endpointResponseConfig) =>
+      log.debug("received UpsertResponse")
+      //TODO: process upsert
+      sender ! Done(endpointResponseConfig.endpoint)
 
     case x: Any =>
       log.debug("receive unexpected message [" + x + "]")

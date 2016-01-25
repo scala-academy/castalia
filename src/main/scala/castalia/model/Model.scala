@@ -9,13 +9,9 @@ import spray.json.DefaultJsonProtocol
 import scala.concurrent.duration.{FiniteDuration, Duration}
 
 object Model extends DefaultJsonProtocol  {
-  case class StubConfig(endpoint: String, responses: List[ResponseConfig]) {
-    def segments: Segments = stringToSegments(endpoint)
+  case class StubConfig(endpoint: String, responses: List[ResponseConfig])
 
-    private def stringToSegments(input: String): Segments = {
-      new UriParser().parse(input).pathList
-    }
-  }
+  case class EndpointResponseConfig(endpoint: String, response: ResponseConfig)
 
   case class ResponseConfig(
       ids:EndpointIds,
@@ -35,13 +31,14 @@ object Model extends DefaultJsonProtocol  {
 
   case class JsonFilesConfig(stubs: Array[String])
 
-  case class StubResponse( status: StatusCode, body: String)
+  case class StubResponse(status: StatusCode, body: String)
 
   case class DelayedResponse( destination: ActorRef, response: StubResponse, delay: LatencyConfig)
 
   implicit val castaliaStatusResponseFormatter = jsonFormat1(CastaliaStatusResponse)
   implicit val latencyConfigFormat = jsonFormat2(LatencyConfig)
   implicit val responseConfigFormat = jsonFormat4(ResponseConfig)
+  implicit val endpointResponseConfigFormat = jsonFormat2(EndpointResponseConfig)
   implicit val stubConfigFormat = jsonFormat2(StubConfig)
   implicit val jsonFilesConfigFormat = jsonFormat1(JsonFilesConfig)
 }

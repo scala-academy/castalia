@@ -6,8 +6,8 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.TestActor.{NoAutoPilot, AutoPilot}
 import akka.testkit.{TestActor, TestProbe}
 import castalia.management.{Manager, ManagerService}
-import castalia.model.Messages.{Done, UpsertEndpoint}
-import castalia.model.Model.{ResponseConfig, StubConfig}
+import castalia.model.Messages.{UpsertResponse, Done, UpsertEndpoint}
+import castalia.model.Model.{EndpointResponseConfig, ResponseConfig, StubConfig}
 
 class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
 
@@ -20,8 +20,8 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
     override protected implicit val system: ActorSystem = parentSystem
   }
 
-  "posting new route" should {
-    "result in status HTTP 200" in {
+  "posting new endpoint" should {
+    "forward Upsert to Receptionist and eventually result in status HTTP 200" in {
       val stubConfig = new StubConfig("my/endpoint", List(ResponseConfig(None, None, OK.intValue, None)))
 
       receptionistMock.setAutoPilot(new AutoPilot {
@@ -32,12 +32,27 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
       })
 
       Post("/castalia/manager/endpoints", stubConfig) ~> service.managementRoute ~> check {
-
-        // TODO
         status shouldBe OK
         responseAs[String] shouldBe stubConfig.endpoint
       }
     }
   }
 
+  "posting new endpoint response" should {
+    "forward Upsert to Receptionist and eventually result in status HTTP 200" in {
+      val responseConfig = new EndpointResponseConfig("my/endpoint", ResponseConfig(None, None, OK.intValue, None))
+
+      receptionistMock.setAutoPilot(new AutoPilot {
+        override def run(sender: ActorRef, msg: Any): AutoPilot = msg match{
+          case UpsertResponse(config) => sender ! Done(config.endpoint)
+            NoAutoPilot
+        }
+      })
+
+      Post("/castalia/manager/endpoints/responses", responseConfig) ~> service.managementRoute ~> check {
+        status shouldBe OK
+        responseAs[String] shouldBe responseConfig.endpoint
+      }
+    }
+  }
 }
