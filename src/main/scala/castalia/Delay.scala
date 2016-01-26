@@ -15,8 +15,6 @@ trait Delay {
                 delay: FiniteDuration
                 )(implicit ec: ExecutionContext, s: Scheduler): Future[T] =
     after(delay, s)(f)
-
-
 }
 
 

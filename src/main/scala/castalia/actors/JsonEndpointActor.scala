@@ -1,17 +1,15 @@
 package castalia.actors
 
-import akka.http.scaladsl.model.StatusCodes.NotFound
-import akka.http.scaladsl.model.StatusCodes.Forbidden
-import akka.http.scaladsl.server.Directives._
-
 import akka.actor._
-import castalia.EndpointIds
+import akka.http.scaladsl.model.StatusCodes.{Forbidden, InternalServerError}
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Model._
+import castalia.{Delay, EndpointIds}
+import spray.json.JsValue
 
+import scala.concurrent.Future
 import scala.concurrent.duration._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 case class DelayComplete( destination: ActorRef, message: StubResponse)
 
@@ -20,46 +18,48 @@ case class DelayComplete( destination: ActorRef, message: StubResponse)
   *
   * Created by Jean-Marc van Leerdam on 2016-01-16
   */
-class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLogging {
+class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
+  with ActorLogging
+  with Delay {
 
+  // We are assured that we are getting the dispatcher assigned to this actor
+  // in case it differs from the main dispatcher for the system.
+  import context._
+
+  implicit val scheduler = system.scheduler
   override def receive: Receive = {
     case request: RequestMatch =>
       log.debug("receive requestmatch")
 
       // see if there is a response available for the parameters in the request
-        val responseOption = findResponse(request.pathParams)
+      val responseOption = findResponse(request.pathParams)
 
-        responseOption match {
-          case Some(response) =>
-            log.debug("found a response")
-            (response.response, response.delay) match {
-              case (Some(content), Some(delay)) =>
-                log.debug("make a delayed response with body")
-                self ! new DelayedResponse(sender, new StubResponse( response.httpStatusCode, content.toJson.toString()), delay)
-              case (Some(content), _) =>
-                log.debug("make a immediate response with body")
-                sender ! new StubResponse( response.httpStatusCode, content.toJson.toString)
-              case (_, Some(delay)) =>
-                log.debug("make a delayed response without body")
-                self ! new DelayedResponse(sender, new StubResponse( response.httpStatusCode, ""), delay)
-              case (_, _) =>
-                log.debug("make an immediate empty response")
-                sender ! new StubResponse(response.httpStatusCode, "")
-            }
-          case _ =>
-            log.debug("found no response")
-            sender ! new StubResponse( Forbidden.intValue, Forbidden.reason)
-        }
+      // save reference of the sender
+      val orig = sender
 
-    case delayedResponse: DelayedResponse =>
-      log.debug("receive delayedresponse")
-      context.system.scheduler.scheduleOnce(calculateDelayTime(delayedResponse.delay), self, new DelayComplete( delayedResponse.destination, delayedResponse.response))
-
-
-    case delayComplete: DelayComplete =>
-      log.debug("receive delaycomplete")
-      delayComplete.destination ! delayComplete.message
-
+      responseOption match {
+        case Some(response) =>
+          log.debug("found a response")
+          (response.response, response.delay) match {
+            case (Some(content), Some(delay)) =>
+              log.debug("make a delayed response with body")
+              scheduleResponse(new StubResponse(response.httpStatusCode, content.toJson.toString),
+                calculateDelayTime(delay), orig)
+            case (Some(content), _) =>
+              log.debug("make a immediate response with body")
+              sender ! new StubResponse( response.httpStatusCode, content.toJson.toString)
+            case (_, Some(delay)) =>
+              log.debug("make a delayed response without body")
+              scheduleResponse(new StubResponse(response.httpStatusCode, ""),
+                calculateDelayTime(delay), orig)
+            case (_, _) =>
+              log.debug("make an immediate empty response")
+              sender ! new StubResponse(response.httpStatusCode, "")
+          }
+        case _ =>
+          log.debug("found no response")
+          sender ! new StubResponse( Forbidden.intValue, Forbidden.reason)
+      }
     case x: Any =>
       log.debug("receive unexpected message [" + x + "]")
   }
@@ -68,7 +68,7 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
     def findResponseRecurse( pathParams: Params, responses: List[ResponseConfig]): Option[ResponseConfig] =
       (pathParams, responses) match {
         case (_, Nil) => None
-        case (pathParams, first :: rest) => if (paramMatch(pathParams, first.ids)) Some(first) else findResponseRecurse( pathParams, rest)
+        case (params, first :: rest) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse( params, rest)
         case (_, _) => None
       }
     findResponseRecurse(pathParams, myStubConfig.responses)
@@ -87,8 +87,16 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
     log.debug("calculating delay for " + latencyConfig.duration.length + " " + latencyConfig.duration.unit)
     (latencyConfig.duration, latencyConfig.duration.isFinite()) match {
       case (duration, true) => FiniteDuration(duration.length, duration.unit)
-      case (_, _) => FiniteDuration(10, MILLISECONDS)
+      // no match, we encountered a 'non-finite duration' let's set it to 0.
+      case (_, _) => FiniteDuration(0, MILLISECONDS)
     }
+  }
+
+  def scheduleResponse(response: StubResponse,
+                       delay: FiniteDuration,
+                       orig: ActorRef): Unit = {
+    future(Future(response), delay)
+      .onComplete(f => orig ! f.getOrElse(StubResponse(InternalServerError.intValue, "Delay went wrong")))
   }
 
 }
