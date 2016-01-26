@@ -3,7 +3,7 @@
   "responses": [
     {
       "ids": {
-        "$1": "1"
+        "1": "1"
       },
       "httpStatusCode": 200,
       "response": {
@@ -13,7 +13,7 @@
     },
     {
       "ids": {
-        "$1": "2"
+        "1": "2"
       },
       "httpStatusCode": 200,
       "response": {
@@ -24,7 +24,7 @@
     },
     {
       "ids": {
-        "$1": "0"
+        "1": "0"
       },
       "httpStatusCode": 404
     }

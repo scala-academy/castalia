@@ -1,11 +1,12 @@
 package castalia.matcher
 
+import castalia.UnitSpecBase
 import org.scalatest.{Matchers, WordSpec}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-08
   */
-class UriParserSpec extends WordSpec with Matchers {
+class UriParserSpec extends UnitSpecBase {
 
   "An UniParser object" when {
     "presented with a correct URI String" should {

@@ -4,7 +4,6 @@ import castalia.utils.TestHelpers
 import org.scalatest.{BeforeAndAfterAll, Suites}
 
 class IntegrationTestSuite extends Suites (
-  new JsonConfiguredStubServerTest,
   new StubServerTest
 ) with BeforeAndAfterAll {
 

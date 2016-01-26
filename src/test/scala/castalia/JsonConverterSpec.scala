@@ -2,34 +2,38 @@ package castalia
 
 import java.io.FileNotFoundException
 
-import castalia.model.Model.{ResponseConfig, StubConfig}
+import castalia.model.Model.{LatencyConfig, ResponseConfig, StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 
-/**
-  * Created by jens on 13-12-15.
-  *
-  */
-class JsonConverterSpec extends WordSpec with Matchers {
-  // we have to supply the Protocol trait, since the jsonreaders are defined there.
+class JsonConverterSpec extends UnitSpecBase {
 
-  "A JSON file" should {
-    "be parsed" when {
-      "calling parseJson of type T for Stubconfig" in {
+  "A JsonConverter object" when {
+
+    "parsing a existing json file to a matching type" should {
+      "return correctly parsed object" in {
         val stubconfig = JsonConverter.parseJson[StubConfig]("jsonconfiguredstub.json")
-        assert(stubconfig.endpoint === "doublepathparam/$1/responsedata/$2")
+        stubconfig.endpoint.shouldBe("doublepathparam/$1/responsedata/$2")
+        stubconfig.responses.size.shouldBe(4)
+        stubconfig.responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
+        stubconfig.responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
+        stubconfig.responses(0).httpStatusCode.shouldBe(200)
       }
     }
-    "not be parsed" when {
-      "calling parsejson for a non-existing file" in {
+
+    "parsing a non-existing file" should {
+      "throw FileNotFoundException" in {
         intercept[FileNotFoundException] {
           JsonConverter.parseJson[StubConfig]("none-existing.json")
         }
       }
-      "unmarshalling an invalid Json" in {
-        intercept[UnmarshalException] {
-          JsonConverter.parseJson[ResponseConfig]("jsonconfiguredstub.json")
+    }
+
+    "parsing an existing json file to a wrong type" should {
+        "throw UnmarshalException" in {
+          intercept[UnmarshalException] {
+            JsonConverter.parseJson[ResponseConfig]("jsonconfiguredstub.json")
+          }
         }
       }
     }
-  }
 }

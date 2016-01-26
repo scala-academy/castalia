@@ -1,11 +1,16 @@
 package castalia
 
 import akka.actor._
+import akka.http.scaladsl.model.HttpRequest
+import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.RequestContext
+import akka.http.scaladsl.server.{RouteResult, RequestContext, Route}
 import akka.pattern.ask
 import akka.util.Timeout
+import castalia.actors.JsonEndpointActor
+import castalia.matcher.{RequestMatcher, Matcher}
 import castalia.model.Messages.{Done, UpsertEndpoint}
+import castalia.model.Model.{StubResponse, StubConfig}
 
 import scala.concurrent.duration._
 
@@ -14,50 +19,36 @@ object Receptionist {
 }
 
 class Receptionist extends Actor with ActorLogging {
-  implicit val timeout = Timeout(5.seconds)
-  val endpointActor = createEndPointActor()
 
-  def createEndPointActor(): ActorRef = {
-    context.actorOf(EndpointActor.props, "default")
+  var endpointMatcher: RequestMatcher = new RequestMatcher(Nil)
+
+  private def upsertEndPointActor(stubConfig: StubConfig) = {
+    val actor = context.actorOf(Props(new JsonEndpointActor(stubConfig)))
+    endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
   }
 
   override def receive: Receive = {
+    // Request to modify config
     case UpsertEndpoint(stubConfig) =>
-      log.info(s"UpSertEndpoint.")
-      // TODO update config
-      sender() ! Done(stubConfig.endpoint)
+      log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
+      upsertEndPointActor(stubConfig)
+      sender ! Done(stubConfig.endpoint)
+
     // Real request
-    case requestContext: RequestContext =>
-      log.info(s"stubsRoute.")
-      // TODO wrap in correct case class
-      endpointActor.forward(requestContext)
-  }
-
-
-  def getActor(path: String): ActorRef = {
-    val uriSegments = path.split("/")
-
-    val actor = if (uriSegments.isEmpty) {
-      endpointActor
-    } else {
-      log.debug("eerste path" + uriSegments(1))
-      endpointActor // some work here
-    }
-    actor
-  }
-
-  val stubsRoute = {
-    get {
-      extract(_.request) { request =>
-        val eventualResponse = getActor(request.uri.path.toString()) ? request
-        onSuccess(eventualResponse) {
-          response => {
-            complete(response.asInstanceOf[String])
-          }
-        }
+    case request: HttpRequest =>
+      log.info(s"receptionist received message [" + request.uri.toString() + "]")
+      val requestMatchOption = endpointMatcher.matchRequest(request.uri.toString())
+      log.info(s"receptionist attempted to match, result = " + requestMatchOption)
+      requestMatchOption match {
+        case Some(requestMatch) => requestMatch.handler forward requestMatch
+        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
       }
-    }
+
+      // unexpected messages
+    case x =>
+      log.info("Receptionist received unexpected message: " + x.toString)
   }
+
 }
 
 

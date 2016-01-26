@@ -5,23 +5,20 @@ scalaVersion  := "2.11.7"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
 libraryDependencies ++= {
-  val akkaStreamV      = "2.0-M1"
-  val scalaTestV       = "3.0.0-M12"
-  val scalaMockV       = "3.2.2"
+  val akkaStreamV      = "2.0.2"
+  val scalaTestV       = "3.0.0-M15"
+
   Seq(
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-spray-json-experimental"    % akkaStreamV,
     "org.jliszka"       %% "probability-monad" % "1.0.1",
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
-    "org.scalamock"     %% "scalamock-scalatest-support"          % scalaMockV       % "test,it",
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
     "com.miguno.akka"   %% "akka-mock-scheduler" % "0.4.0" % "test",
-    "com.twitter"       %% "finagle-http"                         % "6.30.0"         % "it"
+    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it"
   )
 }
-//libraryDependencies += "io.spray" % "spray-routing" % "1.3.1"
-
 
 // Use IntegrationTest
 // (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)
