@@ -26,7 +26,6 @@ trait ManagerService {
         post {
           entity(as[StubConfig]) {
             stubConfig =>
-
               complete {
                 (managerActor ? stubConfig)
                   .mapTo[Done]
@@ -39,6 +38,7 @@ trait ManagerService {
         post {
           entity(as[EndpointResponseConfig]){
             endpointResponseConfig =>
+              println("HELLO:"+endpointResponseConfig)
               complete {
                 (managerActor ? endpointResponseConfig)
                 .mapTo[Done]
