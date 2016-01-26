@@ -23,6 +23,8 @@ case class DelayComplete( destination: ActorRef, message: StubResponse)
   */
 class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLogging {
 
+  var responses = myStubConfig.responses
+
   override def receive: Receive = {
     case request: RequestMatch =>
       log.debug("receive requestmatch")
@@ -64,6 +66,8 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
     case UpsertResponse(endpointResponseConfig) =>
       log.debug("received UpsertResponse")
       //TODO: process upsert
+      responses = endpointResponseConfig.response :: responses
+
       sender ! Done(endpointResponseConfig.endpoint)
 
     case x: Any =>
@@ -77,7 +81,7 @@ class JsonEndpointActor( myStubConfig: StubConfig) extends Actor with ActorLoggi
         case (pathParams, first :: rest) => if (paramMatch(pathParams, first.ids)) Some(first) else findResponseRecurse( pathParams, rest)
         case (_, _) => None
       }
-    findResponseRecurse(pathParams, myStubConfig.responses)
+    findResponseRecurse(pathParams, responses)
   }
 
   def paramMatch( left: Params, right: EndpointIds): Boolean = {

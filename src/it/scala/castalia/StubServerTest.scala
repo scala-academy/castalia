@@ -8,9 +8,10 @@ import org.scalatest.DoNotDiscover
 @DoNotDiscover
 class StubServerTest extends IntegrationTestBase {
 
-  val client = finagle.Http.newService(s"$serverAddress")
+  val clientServer = finagle.Http.newService(s"$serverAddress")
+  val clientManager = finagle.Http.newService(s"$managerAddress")
 
-  describe("starting up stubserver with 'castaliaT.json'") {
+  describe("Stubserver started with 'castaliaT.json'") {
 
     it("should handle endpoint with one path parameter") {
       When("I do a HTTP GET to '/stubs/stub11/1'")
@@ -19,14 +20,14 @@ class StubServerTest extends IntegrationTestBase {
       request.host = serverAddress
 
       Then("the response should be as configured in 'jsonconfiguredstub_2.json' file")
-      val response: Response = Await.result(client(request))
+      val response: Response = Await.result(clientServer(request))
 
       assert(response.status == Status.Ok)
       assert(response.contentType.get == "application/json")
       assert(response.contentString == """{"id":"een","someValue":"123123"}""")
     }
 
-    it("should responde as configured in 'jsonconfiguredstub_1.json' file") {
+    it("should respond as configured in 'jsonconfiguredstub_1.json' file") {
       val url = "/doublepathparam/0/responsedata/internalerror"
       When(s"I do a HTTP GET to '$url'")
 
@@ -34,7 +35,7 @@ class StubServerTest extends IntegrationTestBase {
       request.host = serverAddress
 
       Then("the response should be as configured with http status code 503")
-      val response: Response = Await.result(client(request))
+      val response: Response = Await.result(clientServer(request))
 
       assert(response.status == Status.ServiceUnavailable)
       assert(response.contentString == "")
@@ -48,12 +49,49 @@ class StubServerTest extends IntegrationTestBase {
       request.host = serverAddress
 
       Then("I should get 404")
-      val response: Response = Await.result(client(request))
+      val response: Response = Await.result(clientServer(request))
 
       assert(response.status == Status.NotFound)
       assert(response.contentString == "Not Found")
     }
+
+    it("should allow adding new response to endpoint during runtime"){
+      val stubUrl = "doublepathparam/$1/responsedata/$2"
+      val manageResponsesUrl = "/castalia/manager/endpoints/responses"
+      val newParametersUrl = "/doublepathparam/2/responsedata/id2"
+
+      Given(s"the stubserver is running with a stub defined at endpoint '$stubUrl'")
+
+      val requestBefore = Request(Method.Get, newParametersUrl)
+      requestBefore.host = serverAddress
+      val responseBefore: Response = Await.result(clientServer(requestBefore))
+
+      assert(responseBefore.status == Status.Forbidden)
+      assert(responseBefore.contentString == "Forbidden")
+
+      When(s"I POST a new response for this endpoint to $manageResponsesUrl")
+
+      val postRequest = Request(Method.Post, manageResponsesUrl)
+      postRequest.host = managerAddress
+      postRequest.contentString = "{ \"endpoint\": \"doublepathparam/$1/responsedata/$2\" " +
+        "\"response\": {" +
+          "\"ids\": {\"1\": \"2\",\"2\": \"id2\"}, " +
+          "\"delay\": {\"distribution\": \"constant\",\"mean\": \"100 ms\"}," +
+          "\"httpStatusCode\": 200," +
+          "\"response\": {\"id\": \"een\",\"someValue\": \"123123\"}" +
+          "}" +
+        "}"
+      val postResponse: Response = Await.result(clientManager(postRequest))
+
+      assert(responseBefore.status == Status.Ok)
+      assert(responseBefore.contentString == "doublepathparam/$1/responsedata/$2")
+
+      Then(s"the endpoint should respond with the posted response")
+    }
   }
 
-
+  //given that the stubserver is running with a stub defined at endpoint "statefullstub"
+  //when I do a HTTP POST to .../castalia/manager/stubs/responses with a
+  // payload containing the stub endpoint {stubEndpoint} a stub response with id {statefullStubId}
+  //then that stub response should be the response after I do a HTTP GET to o .../castalia/stubs/stubEndpoint/{statefullStubId}
 }
