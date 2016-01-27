@@ -7,7 +7,7 @@ import probability_monad.Distribution
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-class DelayTraitSpec extends WordSpec with Matchers {
+class DelayTraitSpec extends UnitSpecBase {
 
   "A Delay-trait" when {
     "called with duration" should {
@@ -18,7 +18,7 @@ class DelayTraitSpec extends WordSpec with Matchers {
         implicit val scheduler = time.scheduler
 
         // Create anonymous class with trait mixed in, to test trait.
-        val t = new {} with Delay{}
+        val t: Delay with Object = new Delay{}
         val d = 20
         val delay = FiniteDuration(d, "ms")
         val result: Future[String] = t.future(Future("test"), delay)
