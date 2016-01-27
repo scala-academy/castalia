@@ -1,0 +1,42 @@
+{
+  "endpoint": "somestub/$parm",
+  "default": {
+    "delay": {
+      "distribution": "constant",
+      "mean": "100 ms"
+    }
+  },
+  "responses": [
+    {
+      "ids": {
+        "parm": "1"
+      },
+      "httpStatusCode": 200,
+      "response": {
+        "id": "een",
+        "someValue": "123123"
+      }
+    },
+    {
+      "ids": {
+        "parm": "2"
+      },
+      "httpStatusCode": 200,
+      "response": {
+        "id": "twee",
+        "someValue": "123123",
+        "someAdditionalValue": "345345"
+      }
+    },
+    {
+      "ids": {
+        "parm": "0"
+      },
+      "delay": {
+        "distribution": "constant",
+        "mean": "2 s"
+      },
+      "httpStatusCode": 404
+    }
+  ]
+}
