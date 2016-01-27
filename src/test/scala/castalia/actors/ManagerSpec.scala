@@ -17,7 +17,7 @@ class ManagerSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
     val receptionistProbe = TestProbe()
     val manager = system.actorOf(Manager.props(receptionistProbe.ref))
-    val stubConfig = StubConfig("my/endpoint", List(ResponseConfig(None, None, OK.intValue, None)))
+    val stubConfig = StubConfig("my/endpoint", None, List(ResponseConfig(None, None, OK.intValue, None)))
 
     "ask receptionist and send back Done message" in {
       manager ! stubConfig
