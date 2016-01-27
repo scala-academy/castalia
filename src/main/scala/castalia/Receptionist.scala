@@ -34,11 +34,13 @@ class Receptionist extends Actor with ActorLogging {
     endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
   }
 
-  override def receive: Receive = {
+  override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
+
+  def receiveWithMatcher(endpointMatcher : RequestMatcher) : Receive = {
     // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
-      upsertEndPointActor(stubConfig)
+      upsertEndPointActor(stubConfig, endpointMatcher)
       sender ! Done(stubConfig.endpoint)
 
     // Real request
