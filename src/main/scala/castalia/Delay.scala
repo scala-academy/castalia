@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
   * Delay trait: used for mixin with actors.
   */
 trait Delay {
-  def future[T](f: => Future[T],
+  def future[T](f: Future[T],
                 delay: FiniteDuration
                 )(implicit ec: ExecutionContext, s: Scheduler): Future[T] =
     after(delay, s)(f)

@@ -1,17 +1,15 @@
 package castalia.actors
 
 import akka.actor._
-import akka.http.scaladsl.model.StatusCodes.{Forbidden, InternalServerError}
+import akka.http.scaladsl.model.StatusCodes.Forbidden
+import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Model._
 import castalia.{Delay, EndpointIds}
-import akka.pattern.pipe
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-
-case class DelayComplete( destination: ActorRef, message: StubResponse)
 
 /**
   * Actor that provides answers based on the json configuration that is used to create this actor
