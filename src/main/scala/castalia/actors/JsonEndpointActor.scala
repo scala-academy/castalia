@@ -6,7 +6,7 @@ import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Model._
 import castalia.{Delay, EndpointIds}
-import spray.json.JsValue
+import akka.pattern.pipe
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -34,9 +34,6 @@ class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
       // see if there is a response available for the parameters in the request
       val responseOption = findResponse(request.pathParams)
 
-      // save reference of the sender
-      val orig = sender
-
       responseOption match {
         case Some(response) =>
           log.debug("found a response")
@@ -44,21 +41,21 @@ class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
             case (Some(content), Some(delay)) =>
               log.debug("make a delayed response with body")
               scheduleResponse(new StubResponse(response.httpStatusCode, content.toJson.toString),
-                calculateDelayTime(delay), orig)
+                calculateDelayTime(delay), sender())
             case (Some(content), _) =>
               log.debug("make a immediate response with body")
-              sender ! new StubResponse( response.httpStatusCode, content.toJson.toString)
+              sender() ! new StubResponse( response.httpStatusCode, content.toJson.toString)
             case (_, Some(delay)) =>
               log.debug("make a delayed response without body")
               scheduleResponse(new StubResponse(response.httpStatusCode, ""),
-                calculateDelayTime(delay), orig)
+                calculateDelayTime(delay), sender())
             case (_, _) =>
               log.debug("make an immediate empty response")
-              sender ! new StubResponse(response.httpStatusCode, "")
+              sender() ! new StubResponse(response.httpStatusCode, "")
           }
         case _ =>
           log.debug("found no response")
-          sender ! new StubResponse( Forbidden.intValue, Forbidden.reason)
+          sender() ! new StubResponse( Forbidden.intValue, Forbidden.reason)
       }
     case x: Any =>
       log.debug("receive unexpected message [" + x + "]")
@@ -68,7 +65,7 @@ class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
     def findResponseRecurse( pathParams: Params, responses: List[ResponseConfig]): Option[ResponseConfig] =
       (pathParams, responses) match {
         case (_, Nil) => None
-        case (params, first :: rest) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse( params, rest)
+        case (params, first :: rest) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse(params, rest)
         case (_, _) => None
       }
     findResponseRecurse(pathParams, myStubConfig.responses)
@@ -83,7 +80,7 @@ class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
     }
   }
 
-  def calculateDelayTime( latencyConfig: LatencyConfig): FiniteDuration = {
+  def calculateDelayTime(latencyConfig: LatencyConfig): FiniteDuration = {
     log.debug("calculating delay for " + latencyConfig.duration.length + " " + latencyConfig.duration.unit)
     (latencyConfig.duration, latencyConfig.duration.isFinite()) match {
       case (duration, true) => FiniteDuration(duration.length, duration.unit)
@@ -92,11 +89,15 @@ class JsonEndpointActor(myStubConfig: StubConfig) extends Actor
     }
   }
 
+  /**
+    * Use the Delay-trait and pipe the message to the 'recipient'
+    * @param response The Stubresponse
+    * @param delay The finiteduration of the delay
+    * @param recipient The recipient, the sender of the request.
+    */
   def scheduleResponse(response: StubResponse,
                        delay: FiniteDuration,
-                       orig: ActorRef): Unit = {
-    future(Future(response), delay)
-      .onComplete(f => orig ! f.getOrElse(StubResponse(InternalServerError.intValue, "Delay went wrong")))
-  }
+                       recipient: ActorRef): Unit =
+    future(Future(response), delay) pipeTo recipient
 
 }
