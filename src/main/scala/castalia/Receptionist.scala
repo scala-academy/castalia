@@ -20,18 +20,18 @@ object Receptionist {
 
 class Receptionist extends Actor with ActorLogging {
 
-  var endpointMatcher: RequestMatcher = new RequestMatcher(Nil)
-
-  private def upsertEndPointActor(stubConfig: StubConfig) = {
+  private def upsertEndPointActor(stubConfig: StubConfig, endpointMatcher : RequestMatcher) = {
     val actor = context.actorOf(Props(new JsonEndpointActor(stubConfig)))
-    endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
+    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
   }
 
-  override def receive: Receive = {
+  override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
+
+  def receiveWithMatcher(endpointMatcher : RequestMatcher) : Receive = {
     // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
-      upsertEndPointActor(stubConfig)
+      upsertEndPointActor(stubConfig, endpointMatcher)
       sender ! Done(stubConfig.endpoint)
 
     // Real request
