@@ -20,18 +20,18 @@ class JsonEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system)
         //RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
 
       within(1000.millis, 1200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("$1", "1")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "1")), Nil, jsonEndpoint)
 
         expectMsg(StubResponse(200, """{"id":"een","someValue":"123123"}"""))
       }
 
       within(100.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("$1", "2")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "2")), Nil, jsonEndpoint)
 
         expectMsg(StubResponse(200, """{"id":"twee","someValue":"2222"}"""))
       }
       within(50.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("$1", "3")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "3")), Nil, jsonEndpoint)
 
         expectMsg(StubResponse(200, """{"id":"drie","someValue":"123123"}"""))
       }
@@ -48,7 +48,7 @@ class JsonEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system)
       //RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
 
       within(0.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List("$1"->"1", "$2"->"2"), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List("1"->"1", "2"->"2"), Nil, jsonEndpoint)
 
         expectMsg(StubResponse(200, """{"result":"1 with 2"}"""))
       }

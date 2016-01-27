@@ -18,7 +18,7 @@ class JsonResponseProviderEndpointActor(myStubConfig: StubConfig) extends JsonEn
   private val programmedStub: (Class[_], Method) =
     myStubConfig.responseprovider match {
       case Some(responseProvider) =>
-        val `class` = ClassLoader.getSystemClassLoader.loadClass(responseProvider.`class`)
+        val `class` = Class.forName(responseProvider.`class`)
         val member = `class`.getDeclaredMethod(responseProvider.member, classOf[RequestMatch])
 
         (`class`, member)
