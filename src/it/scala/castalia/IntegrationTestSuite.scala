@@ -11,7 +11,8 @@ class IntegrationTestSuite extends Suites (
   val server = Main
 
   override def beforeAll(): Unit = {
-    if (!TestHelpers.isServerRunning(serverAddress)) {
+    val tryServer: Boolean = TestHelpers.isServerRunning(serverAddress).getOrElse(false)
+    if (!tryServer) {
       println("server is not running... spinning up.")
       server.main(Array("castaliaT.json"))
     }
