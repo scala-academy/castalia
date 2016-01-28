@@ -23,11 +23,13 @@ case class Matcher(segments: Segments, handler: ActorRef) {
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
     def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] =
-      (requestSeg, matchSeg, requestSeg.isEmpty, matchSeg.isEmpty) match {
-        case (_,    _,    true,  true)  => Some(params)
-        case (rSeg, mSeg, false, false) if isParam(mSeg.head) => marp(rSeg.tail, matchSeg.tail, (paramName(mSeg.head), rSeg.head)::params)
-        case (rSeg, mSeg, false, false) if rSeg.head.equals(mSeg.head) => marp(rSeg.tail, mSeg.tail, params)
-        case (_,    _,    _,     _)     => None
+      (requestSeg, matchSeg) match {
+        case (Nil, Nil)  => Some(params)
+        case (Nil, _) => None
+        case (_, Nil) => None
+        case (rSeg, mSeg) if isParam(mSeg.head) => marp(rSeg.tail, mSeg.tail, (paramName(mSeg.head), rSeg.head)::params)
+        case (rSeg, mSeg) if rSeg.head.equals(mSeg.head) => marp(rSeg.tail, mSeg.tail, params)
+        case (_, _) => None
     }
 
     marp( requestSegments, segments, List[(String, String)]())
