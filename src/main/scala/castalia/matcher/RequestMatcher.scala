@@ -14,15 +14,13 @@ class RequestMatcher(myMatchers: List[Matcher]) {
   def matchRequest(uriString: String): Option[RequestMatch] = {
     val parsedUri = uriParser.parse(uriString)
 
-    def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] = {
-      if (matchers.isEmpty) return None
-
-      val result = matchers.head.matchPath(segments)
-      if (result.isDefined) return Some(new RequestMatch(uriString, parsedUri.path, result.get, parsedUri.queryParams, matchers.head.handler))
-
-      // no match yet, look at the rest of the matchers
-      findMatch(segments, matchers.tail)
-    }
+    def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] =
+      (segments, matchers) match {
+        case (_, Nil) => None
+        case (seg, head :: _) if head.matchPath(seg).isDefined =>
+          Some(new RequestMatch(uriString, parsedUri.path, head.matchPath(seg).get, parsedUri.queryParams, head.handler))
+        case (seg, _ :: tail) => findMatch(seg, tail)
+      }
 
     println( "looking for [" + parsedUri.pathList + "] in [" + myMatchers + "]")
     findMatch(parsedUri.pathList, myMatchers)
