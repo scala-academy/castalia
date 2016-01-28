@@ -40,11 +40,47 @@ class DelayTraitSpec extends UnitSpecBase {
         val stdev = 2.0
 
         val dist = Distribution.normal
-        val result: Distribution[Double] = t.distributedFuture(mean, stdev, dist)
+        val result: Distribution[Double] = t.normalDistribution(mean, stdev, dist)
 
+        // hist samples for N = 10000.
         println(result.hist)
         result.mean shouldBe mean +- 0.1
         result.stdev shouldBe stdev +- 0.1
+      }
+    }
+
+    "asked for a gamma distribution" should {
+      "hand out delays according to gamma distribution" in {
+        val d = new DelayedDistribution {}
+        val shapeK = 3
+        val scaleTheta = 5
+
+        val dist = d.gammaDistribution(shapeK, scaleTheta)
+
+
+
+        println(dist.sample(1))
+        println(dist.hist)
+
+      }
+
+      //https://en.wikipedia.org/wiki/Gamma_distribution#Properties
+      "extract k-shape from distribution" should {
+        "return k within 1.5%" in {
+          val N = 10000
+          val d = new DelayedDistribution {}
+          val shapeK = 3.0
+          val scaleTheta = 1.0
+
+          val dist = d.gammaDistribution(shapeK, scaleTheta)
+          val samples: List[Double] = dist.sample(N)
+          val s = math.log(samples.sum / N) - (1/N)*samples.map(math.log).sum
+          println(s"s = $s")
+          println(dist.hist)
+          val calculatedK = ( 3 - s + math.sqrt(math.pow(s-3, 2) + 24*s) ) / (12*s)
+          val perc = (shapeK/100)*1.5
+          //calculatedK shouldBe shapeK +- perc
+        }
       }
     }
   }

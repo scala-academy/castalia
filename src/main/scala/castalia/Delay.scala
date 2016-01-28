@@ -19,9 +19,13 @@ trait Delay {
 
 
 trait DelayedDistribution extends Delay {
-  def distributedFuture[T](mean: Double,
-                           stdev: Double,
-                           dist: Distribution[Double]
+  def normalDistribution[T](mean: Double,
+                            stdev: Double,
+                            dist: Distribution[Double]
                           ): Distribution[Double] =
     dist.map(_*stdev + mean)
+
+  def gammaDistribution[T](k: Double, theta: Double): Distribution[Double] = {
+    Distribution.gamma(k, theta)
+  }
 }
