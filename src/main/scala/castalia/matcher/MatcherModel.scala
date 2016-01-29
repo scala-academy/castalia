@@ -4,6 +4,8 @@ import akka.actor.ActorRef
 import akka.http.scaladsl.model.Uri.Path
 import castalia.matcher.types._
 
+import scala.annotation.tailrec
+
 package object types{
   type Segments = List[String]
   type Params = List[(String, String)]
@@ -22,6 +24,7 @@ case class Matcher(segments: Segments, handler: ActorRef) {
     * @param requestSegments containing the path segments from the request
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
+    @tailrec
     def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] =
       (requestSeg, matchSeg) match {
         case (Nil, Nil)  => Some(params)
@@ -67,6 +70,7 @@ case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams
   */
 case class ParsedUri(uri: String, path: Path, queryParams: Params) {
   def pathList: Segments = {
+    @tailrec
     def myPathList(path: Path, segments: Segments): Segments =
       (path, path.startsWithSlash) match {
         case (p, _) if p.isEmpty => segments
