@@ -2,6 +2,7 @@ package castalia.matcher
 
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.Uri.Path
+import akka.http.scaladsl.model.Uri.Path.{Empty, Slash, Segment}
 import castalia.matcher.types._
 
 import scala.annotation.tailrec
@@ -21,6 +22,7 @@ package object types{
 case class Matcher(segments: Segments, handler: ActorRef) {
   /**
     * Compare the segments, matching the literals and collecting the parameters on the fly
+    *
     * @param requestSegments containing the path segments from the request
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
@@ -54,6 +56,7 @@ case class Matcher(segments: Segments, handler: ActorRef) {
 
 /**
   * Result of a successful match of a request uri by a Matcher
+  *
   * @param uri the original uri
   * @param path the path that was extracted from the uri
   * @param pathParams the path parameters that were extracted from the uri
@@ -64,6 +67,7 @@ case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams
 
 /**
   * Parsed uri, where the path has been split into segments and the query parameters have been converted into a Params object
+  *
   * @param uri the original uri
   * @param path the segments that were extracted from the uri
   * @param queryParams the query parameters that were extracted from the uri
@@ -72,10 +76,10 @@ case class ParsedUri(uri: String, path: Path, queryParams: Params) {
   def pathList: Segments = {
     @tailrec
     def myPathList(path: Path, segments: Segments): Segments =
-      (path, path.startsWithSlash) match {
-        case (p, _) if p.isEmpty => segments
-        case (p, true) => myPathList(p.tail, segments)
-        case (p, _) => myPathList(p.tail, p.head.toString :: segments)
+      path match {
+        case Empty => segments
+        case (Slash(tail)) => myPathList(tail, segments)
+        case (Segment(head, tail)) => myPathList(tail, head :: segments)
     }
 
     myPathList(path, List[String]()).reverse
