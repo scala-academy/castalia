@@ -27,8 +27,8 @@ case class Matcher(segments: Segments, handler: ActorRef) {
         case (Nil, Nil)  => Some(params)
         case (Nil, _) => None
         case (_, Nil) => None
-        case (rSeg, mSeg) if isParam(mSeg.head) => marp(rSeg.tail, mSeg.tail, (paramName(mSeg.head), rSeg.head)::params)
-        case (rSeg, mSeg) if rSeg.head.equals(mSeg.head) => marp(rSeg.tail, mSeg.tail, params)
+        case (rhead::rtail, mhead::mtail) if isParam(mhead) => marp(rtail, mtail, (paramName(mhead), rhead)::params)
+        case (rhead::rtail, mhead::mtail) if rhead.equals(mhead) => marp(rtail, mtail, params)
         case (_, _) => None
     }
 
