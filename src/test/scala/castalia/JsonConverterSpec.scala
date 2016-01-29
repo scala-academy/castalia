@@ -34,7 +34,7 @@ class JsonConverterSpec extends UnitSpecBase {
         stubconfig.responseprovider.isDefined.shouldBe(true)
         stubconfig.responseprovider match {
           case Some(responseProvider: ResponseProviderConfig) =>
-            responseProvider.`class`.shouldBe("castalia.ProgrammedStub")
+            responseProvider.`class`.shouldBe("castalia.plugins.ProgrammedStub")
             responseProvider.member.shouldBe("process1")
           case None => assert(false, "has no responseprovider")
         }

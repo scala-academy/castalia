@@ -1,8 +1,10 @@
-package castalia
+package castalia.plugins
+
 import akka.http.scaladsl.model.StatusCodes._
 import castalia.matcher.RequestMatch
 import castalia.model.Model.StubResponse
 import spray.json.DefaultJsonProtocol
+
 import scala.concurrent.{Future, Promise}
 
 
