@@ -31,7 +31,7 @@ class JsonResponseProviderEndpointActor(myStubConfig: StubConfig) extends JsonEn
   }
 
   override def receive: Receive = {
-    case request: RequestMatch =>
-      invokeProgrammedStub(request) pipeTo sender
+    case request: RequestMatch => invokeProgrammedStub(request) pipeTo sender
+    case _@msg => log.error("received unexpected message [" + msg + "]")
   }
 }

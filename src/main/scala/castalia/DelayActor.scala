@@ -34,5 +34,8 @@ class DelayActor extends Actor with ActorLogging {
       //val ticker = context.system.scheduler.scheduleOnce(duraton, self, LatencyTick(promise,routeResult))
       val eventualResult: Future[RouteResult] = promise.future
       eventualResult pipeTo sender
+
+    case _@msg =>
+      log.error("received unexpected message [" + msg + "]")
   }
 }

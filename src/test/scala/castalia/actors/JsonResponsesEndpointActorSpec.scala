@@ -37,5 +37,29 @@ class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase
       }
     }
 
+    "use default delay from endpoint definition" in {
+      val httpRequest = new HttpRequest(method = HttpMethods.GET, uri = "somestub/1", protocol = HttpProtocols.`HTTP/1.1` )
+      val jsonConfig = parseStubConfig("sharedproperties.json")
+      val endpoint = system.actorOf(Props(new JsonResponsesEndpointActor(jsonConfig)))
+
+      within(100.millis, 200.millis) {
+        endpoint ! new RequestMatch(httpRequest, List(("parm", "1")), Nil, endpoint)
+
+        expectMsg(StubResponse(200, """{"id":"een","someValue":"123123"}"""))
+      }
+    }
+
+    "use response specific delay from endpoint definition" in {
+      val httpRequest = new HttpRequest(method = HttpMethods.GET, uri = "somestub/0", protocol = HttpProtocols.`HTTP/1.1` )
+      val jsonConfig = parseStubConfig("sharedproperties.json")
+      val endpoint = system.actorOf(Props(new JsonResponsesEndpointActor(jsonConfig)))
+
+      within(2000.millis, 2100.millis) {
+        endpoint ! new RequestMatch(httpRequest, List(("parm", "0")), Nil, endpoint)
+
+        expectMsg(StubResponse(404, ""))
+      }
+    }
+
   }
 }

@@ -21,17 +21,18 @@ object ProgrammedStub extends DefaultJsonProtocol{
 }
 
 class ProgrammedStub {
-  private def findParamOrDefault(params : Params, name : String, default : String) : (String, String) = {
-    findParam(params, name).getOrElse(name, default)
+  private def findParamOrDefaultValue(params : Params, name : String, default : String) : String = {
+    findParamValue(params, name) getOrElse(default)
   }
-  private def findParam(params : Params, name : String) : Option[(String, String)] = {
-    params.find {param => param._1.equals(name)}
+  private def findParamValue(params : Params, name : String) : Option[String] = {
+    val param = params find { case (paramName, paramValue) => paramName.equals(name) }
+    param map { case (paramName, paramValue) => paramValue }
   }
   def process1(rc : RequestMatch) : Future[StubResponse] = {
     val promise = Promise[StubResponse]
-    val p1 = findParamOrDefault(rc.pathParams, "1", "<nil>")
-    val p2 = findParamOrDefault(rc.pathParams, "2", "<nil>")
-    val result = ProgrammedStub.Response(s"${p1._2} with ${p2._2}")
+    val v1 = findParamOrDefaultValue(rc.pathParams, "1", "<nil>")
+    val v2 = findParamOrDefaultValue(rc.pathParams, "2", "<nil>")
+    val result = ProgrammedStub.Response(s"$v1 with $v2")
     promise.success(new StubResponse(OK.intValue, result.toJson.toString()))
     promise.future
   }

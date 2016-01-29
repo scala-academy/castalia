@@ -22,7 +22,7 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
 
   "posting new route" should {
     "result in status HTTP 200" in {
-      val stubConfig = new StubConfig("my/endpoint", Some(List(ResponseConfig(None, None, OK.intValue, None))), None)
+      val stubConfig = new StubConfig("my/endpoint", None, Some(List(ResponseConfig(None, None, OK.intValue, None))), None)
 
       receptionistMock.setAutoPilot(new AutoPilot {
         override def run(sender: ActorRef, msg: Any): AutoPilot = msg match{

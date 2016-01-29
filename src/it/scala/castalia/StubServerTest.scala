@@ -53,6 +53,22 @@ class StubServerTest extends IntegrationTestBase {
       assert(response.status == Status.NotFound)
       assert(response.contentString == "Not Found")
     }
+
+    it("should delay at least 100ms") {
+      val url = "/doublepathparam/1/responsedata/id1"
+      When(s"I do a HTTP GET to '$url'")
+
+      val request = Request(Method.Get, url)
+      request.host = serverAddress
+
+      Then("I should get a response after 100 ms")
+      val timer = System.currentTimeMillis()
+      val response: Response = Await.result(client(request))
+
+      assert(System.currentTimeMillis() - timer > 100)
+      assert(response.status == Status.Ok)
+      assert(response.contentString == """{"id":"een","someValue":"123123"}""")
+    }
   }
 
 

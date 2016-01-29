@@ -9,6 +9,13 @@ env:
 
 script: ./build.sh
 
+# These directories are cached to S3 at the end of the build
+cache:
+  directories:
+    - $HOME/.m2
+    - $HOME/.ivy2
+    - $HOME/.sbt/boot
+
 notifications:
   webhooks:
     urls:
