@@ -28,7 +28,7 @@ class JsonConverterSpec extends UnitSpecBase {
 
     "parsing a existing json file to a matching type" should {
       "return correctly parsed responseProvider object" in {
-        val stubconfig = JsonConverter.parseJson[StubConfig]("jsonprogrammedstub.json")
+        val stubconfig = JsonConverter.parseJson[StubConfig]("jsonprogrammedstub1.json")
         stubconfig.endpoint.shouldBe("somepath/$1/with/$2")
         stubconfig.responses.isDefined.shouldBe(false)
         stubconfig.responseprovider.isDefined.shouldBe(true)

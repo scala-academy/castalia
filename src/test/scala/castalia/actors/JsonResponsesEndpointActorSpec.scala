@@ -7,7 +7,7 @@ import castalia.matcher.RequestMatch
 import castalia.model.Model.StubResponse
 import scala.concurrent.duration._
 
-class JsonEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
+class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("StubServerSystem"))
 
@@ -34,23 +34,6 @@ class JsonEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system)
         jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "3")), Nil, jsonEndpoint)
 
         expectMsg(StubResponse(200, """{"id":"drie","someValue":"123123"}"""))
-      }
-    }
-
-  }
-
-  "JsonResponseProviderEndpointActorTest" should {
-
-    "receive" in {
-      val httpRequest = new HttpRequest(method = HttpMethods.GET, uri = "somepath/1/with/2", protocol = HttpProtocols.`HTTP/1.1` )
-      val jsonConfig = parseStubConfig("jsonprogrammedstub.json")
-      val jsonEndpoint = system.actorOf(Props(new JsonResponseProviderEndpointActor(jsonConfig)))
-      //RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
-
-      within(0.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List("1"->"1", "2"->"2"), Nil, jsonEndpoint)
-
-        expectMsg(StubResponse(200, """{"result":"1 with 2"}"""))
       }
     }
 

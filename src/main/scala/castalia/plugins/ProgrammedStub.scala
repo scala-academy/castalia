@@ -2,6 +2,7 @@ package castalia.plugins
 
 import akka.http.scaladsl.model.StatusCodes._
 import castalia.matcher.RequestMatch
+import castalia.matcher.types.Params
 import castalia.model.Model.StubResponse
 import spray.json.DefaultJsonProtocol
 
@@ -20,17 +21,23 @@ object ProgrammedStub extends DefaultJsonProtocol{
 }
 
 class ProgrammedStub {
+  private def findParamOrDefault(params : Params, name : String, default : String) : (String, String) = {
+    findParam(params, name).getOrElse(name, default)
+  }
+  private def findParam(params : Params, name : String) : Option[(String, String)] = {
+    params.find {param => param._1.equals(name)}
+  }
   def process1(rc : RequestMatch) : Future[StubResponse] = {
     val promise = Promise[StubResponse]
-    val p1 = rc.pathParams.find { i => i._1.equals("1") } getOrElse(("1","<nil>"))
-    val p2 = rc.pathParams.find { i => i._1.equals("2") } getOrElse(("2","<nil>"))
-    val result = ProgrammedStub.Response(s"${p1._2} with ${p2._2}");
+    val p1 = findParamOrDefault(rc.pathParams, "1", "<nil>")
+    val p2 = findParamOrDefault(rc.pathParams, "2", "<nil>")
+    val result = ProgrammedStub.Response(s"${p1._2} with ${p2._2}")
     promise.success(new StubResponse(OK.intValue, result.toJson.toString()))
     promise.future
   }
   def process2(rc : RequestMatch) : Future[StubResponse] = {
     val promise = Promise[StubResponse]
-    promise.success(new StubResponse(ServiceUnavailable.intValue, s"Not used"))
+    promise.failure(new Exception("some expected failure"))
     promise.future
   }
 }
