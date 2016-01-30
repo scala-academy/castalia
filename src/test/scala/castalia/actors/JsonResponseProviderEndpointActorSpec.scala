@@ -20,11 +20,9 @@ class JsonResponseProviderEndpointActorSpec(_system: ActorSystem) extends ActorS
       val jsonConfig = parseStubConfig("jsonprogrammedstub1.json")
       val jsonEndpoint = system.actorOf(Props(new JsonResponseProviderEndpointActor(jsonConfig)))
 
-      within(0.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "1", "2" -> "2"), Nil, jsonEndpoint)
+      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "1", "2" -> "2"), Nil, jsonEndpoint)
 
-        expectMsg(StubResponse(200, """{"result":"1 with 2"}"""))
-      }
+      expectMsg(StubResponse(200, """{"result":"1 with 2"}"""))
     }
 
     "execute successfully with an exception" in {
@@ -32,11 +30,9 @@ class JsonResponseProviderEndpointActorSpec(_system: ActorSystem) extends ActorS
       val jsonConfig = parseStubConfig("jsonprogrammedstub2.json")
       val jsonEndpoint = system.actorOf(Props(new JsonResponseProviderEndpointActor(jsonConfig)))
 
-      within(0.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "3", "2" -> "4"), Nil, jsonEndpoint)
-        expectMsgClass(classOf[Failure])
-        //expectMsg(Failure(new Exception("some expected failure")))
-      }
+      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "3", "2" -> "4"), Nil, jsonEndpoint)
+      expectMsgClass(classOf[Failure])
+      //expectMsg(Failure(new Exception("some expected failure")))
     }
   }
 }
