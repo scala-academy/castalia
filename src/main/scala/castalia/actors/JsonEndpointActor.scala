@@ -8,8 +8,7 @@ import castalia.model.Model._
   *
   * Created by Jean-Marc van Leerdam on 2016-01-16
   */
-abstract class JsonEndpointActor(myStubConfig: StubConfig) extends Actor with ActorLogging {
-}
+abstract class JsonEndpointActor(myStubConfig: StubConfig) extends Actor with ActorLogging
 
 
 
