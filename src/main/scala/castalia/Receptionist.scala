@@ -20,9 +20,7 @@ object Receptionist {
 
 class Receptionist extends Actor with ActorLogging {
 
-  var endpointMatcher: RequestMatcher = new RequestMatcher(Nil)
-
-  private def upsertEndPointActor(stubConfig: StubConfig) = {
+  private def upsertEndPointActor(stubConfig: StubConfig, endpointMatcher : RequestMatcher) = {
 
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
       if (stubConfig.responseprovider.isDefined) new JsonResponseProviderEndpointActor(stubConfig)
@@ -31,7 +29,7 @@ class Receptionist extends Actor with ActorLogging {
     }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
-    endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
+    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
   }
 
   override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
