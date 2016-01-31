@@ -20,15 +20,18 @@ object Receptionist {
 
 class Receptionist extends Actor with ActorLogging {
 
+  // the endpointMatcher is a var because it gets replaced whenever a new UpsertEndpoint
+  // message is processed.
   var endpointMatcher: RequestMatcher = new RequestMatcher(Nil)
 
   private def upsertEndPointActor(stubConfig: StubConfig) = {
 
-    def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
-      if (stubConfig.responseprovider.isDefined) new JsonResponseProviderEndpointActor(stubConfig)
-      else if (stubConfig.responses.isDefined) new JsonResponsesEndpointActor(stubConfig)
-      else throw new UnsupportedOperationException
-    }
+    def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor =
+      (stubConfig.responseprovider, stubConfig.responses) match {
+        case (Some(provider), _) => new JsonResponseProviderEndpointActor(stubConfig)
+        case (_, Some(provider)) => new JsonResponsesEndpointActor(stubConfig)
+        case (_, _) => throw new UnsupportedOperationException
+      }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
     endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
