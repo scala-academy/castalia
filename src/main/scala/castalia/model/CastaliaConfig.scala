@@ -11,7 +11,7 @@ case class CastaliaConfig(
     stubs: List[String] = List())
 
 object CastaliaConfig extends DefaultJsonProtocol {
-  implicit val castaliaStatusResponseFormatter = jsonFormat3(CastaliaConfig.apply)
+  implicit val castaliaConfigFormatter = jsonFormat3(CastaliaConfig.apply)
 
   def parse(config: String): CastaliaConfig = {
     Try {
