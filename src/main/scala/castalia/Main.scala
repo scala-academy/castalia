@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model._
 import castalia.management.{Manager, ManagerService}
-import castalia.model.CastaliaConfig
+import castalia.model.Model.CastaliaConfig
 import castalia.model.Model.StubResponse
 
 import akka.http.scaladsl.server._

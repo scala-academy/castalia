@@ -7,12 +7,26 @@ import castalia.matcher.types.Segments
 import spray.json.DefaultJsonProtocol
 
 import scala.concurrent.duration.{FiniteDuration, Duration}
+import scala.util.Try
 
 /**
   * Definition of all case classes that are also represented as json strings/files.
   *
   */
 object Model extends DefaultJsonProtocol  {
+
+  /**
+    * Configuration for the stub server, providing the http port, manager port, and optional list of stub
+    * configuration files to parse.
+    *
+    * @param httpPort Int port number to listen on for stub requests
+    * @param managementPort Int port number to listen on for management requests
+    * @param stubs List of json files to parse for endpoint configurations
+    */
+  case class CastaliaConfig(
+                             httpPort: Int = 9000,
+                             managementPort: Int = 9090,
+                             stubs: List[String] = List())
 
   /**
     * Default clause for responses, providing defaults to be used for responses that do not provide these values
@@ -77,10 +91,24 @@ object Model extends DefaultJsonProtocol  {
     */
   case class StubResponse( status: StatusCode, body: String)
 
+  /**
+    * Define a default configuration to use when parsing the json fails
+    */
+  object CastaliaConfig extends DefaultJsonProtocol {
+
+    def parse(config: String): CastaliaConfig = {
+      Try {
+        JsonConverter.parseJson[CastaliaConfig](config)
+      } getOrElse CastaliaConfig()
+    }
+  }
+
   // Note: these implicits mus tbe declared in the correct order (first the leaves, then the composing classes)
+  implicit val castaliaConfigFormatter = jsonFormat3(CastaliaConfig.apply)
   implicit val latencyConfigFormat = jsonFormat2(LatencyConfig)
   implicit val responseProviderFormat = jsonFormat(ResponseProviderConfig, "class", "member")
   implicit val defaultResponseConfigFormat = jsonFormat3(DefaultResponseConfig)
   implicit val responseConfigFormat = jsonFormat4(ResponseConfig)
   implicit val stubConfigFormat = jsonFormat4(StubConfig)
+
 }
