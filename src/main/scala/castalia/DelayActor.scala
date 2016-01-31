@@ -2,10 +2,11 @@ package castalia
 
 
 import akka.actor.{Actor, ActorLogging}
+import akka.http.scaladsl.server.RouteResult
 import akka.pattern.pipe
 import castalia.DelayActor.{DelayRoute, LatencyTick}
 
-import scala.concurrent.Promise
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration.FiniteDuration
 
 
@@ -31,6 +32,10 @@ class DelayActor extends Actor with ActorLogging {
 
       val promise = Promise[akka.http.scaladsl.server.RouteResult]()
       //val ticker = context.system.scheduler.scheduleOnce(duraton, self, LatencyTick(promise,routeResult))
-      promise.future pipeTo sender
+      val eventualResult: Future[RouteResult] = promise.future
+      eventualResult pipeTo sender
+
+    case _@msg =>
+      log.error("received unexpected message [" + msg + "]")
   }
 }

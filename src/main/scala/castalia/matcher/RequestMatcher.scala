@@ -1,6 +1,6 @@
 package castalia.matcher
 
-import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.model.{HttpRequest, Uri}
 import castalia.matcher.types.Segments
 
 /**
@@ -11,14 +11,14 @@ import castalia.matcher.types.Segments
 class RequestMatcher(myMatchers: List[Matcher]) {
   val uriParser = new UriParser()
 
-  def matchRequest(uriString: String): Option[RequestMatch] = {
-    val parsedUri = uriParser.parse(uriString)
+  def matchRequest(httpRequest: HttpRequest): Option[RequestMatch] = {
+    val parsedUri = uriParser.parse(httpRequest.uri.toString())
 
     def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] =
       (segments, matchers) match {
         case (_, Nil) => None
         case (seg, head :: _) if head.matchPath(seg).isDefined =>
-          Some(new RequestMatch(uriString, parsedUri.path, head.matchPath(seg).get, parsedUri.queryParams, head.handler))
+          Some(new RequestMatch(httpRequest, head.matchPath(seg).get, parsedUri.queryParams, head.handler))
         case (seg, _ :: tail) => findMatch(seg, tail)
       }
 

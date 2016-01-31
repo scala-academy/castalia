@@ -1,6 +1,7 @@
 package castalia.matcher
 
 import akka.actor.ActorRef
+import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.Uri.Path.{Empty, Slash, Segment}
 import castalia.matcher.types._
@@ -56,14 +57,13 @@ case class Matcher(segments: Segments, handler: ActorRef) {
 
 /**
   * Result of a successful match of a request uri by a Matcher
-  *
-  * @param uri the original uri
-  * @param path the path that was extracted from the uri
+ *
+  * @param httpRequest the original HttpRequest
   * @param pathParams the path parameters that were extracted from the uri
   * @param queryParams the query parameters that were extracted from the uri
   * @param handler the ActorRef of the handler actor that should process the request
   */
-case class RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: ActorRef)
+case class RequestMatch(httpRequest: HttpRequest, pathParams: Params, queryParams: Params, handler: ActorRef)
 
 /**
   * Parsed uri, where the path has been split into segments and the query parameters have been converted into a Params object

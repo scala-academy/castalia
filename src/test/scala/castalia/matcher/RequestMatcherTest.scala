@@ -1,6 +1,8 @@
 package castalia.matcher
 
 import akka.actor.{Actor, ActorSystem}
+import akka.http.scaladsl.model.{HttpProtocols, HttpMethods, HttpRequest}
+import akka.testkit.{TestActorRef, TestActor, TestKit}
 import akka.testkit.{TestProbe, TestActorRef, TestActor, TestKit}
 import castalia.actors.ActorSpecBase
 import org.scalatest.{WordSpecLike, BeforeAndAfterEach, Matchers, WordSpec}
@@ -32,13 +34,13 @@ class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) wi
 
     "not find a match for an incorrect Request" in {
 
-      val r1 = uriMatcher.matchRequest("foo")
+      val r1 = uriMatcher.matchRequest(new HttpRequest(method = HttpMethods.GET, uri = "foo", protocol = HttpProtocols.`HTTP/1.1` ))
       r1.shouldBe(None)
 
     }
 
     "find a match for a correct Request" in {
-      val r1 = uriMatcher.matchRequest("http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar")
+      val r1 = uriMatcher.matchRequest(new HttpRequest(method = HttpMethods.GET, uri = "http://localhost:1234/sample/path/with/12/id?p1=foo&p2=bar", protocol = HttpProtocols.`HTTP/1.1` ))
       r1.get.handler.shouldBe(a1)
 
       val pathParms = r1.get.pathParams
@@ -49,7 +51,7 @@ class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) wi
     }
 
     "find a match for another correct Request" in {
-      val r1 = uriMatcher.matchRequest("http://localhost:1234/another/path/without/id?p1=foo&p2=bar")
+      val r1 = uriMatcher.matchRequest(new HttpRequest(method = HttpMethods.GET, uri = "http://localhost:1234/another/path/without/id?p1=foo&p2=bar", protocol = HttpProtocols.`HTTP/1.1` ))
       r1.get.handler.shouldBe(a2)
       val pathParms = r1.get.pathParams
       pathParms.isEmpty.shouldBe(true)

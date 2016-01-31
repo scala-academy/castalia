@@ -3,6 +3,7 @@ package castalia
 import java.io.FileNotFoundException
 
 import castalia.model.Model.{DefaultResponseConfig, LatencyConfig, ResponseConfig, StubConfig}
+import castalia.model.Model.{ResponseProviderConfig, LatencyConfig, ResponseConfig, StubConfig}
 import org.scalatest.{Matchers, WordSpec}
 
 class JsonConverterSpec extends UnitSpecBase {
@@ -13,13 +14,33 @@ class JsonConverterSpec extends UnitSpecBase {
       "return correctly parsed object" in {
         val stubconfig = JsonConverter.parseJson[StubConfig]("jsonconfiguredstub.json")
         stubconfig.endpoint.shouldBe("doublepathparam/$1/responsedata/$2")
-        stubconfig.responses.size.shouldBe(4)
-        stubconfig.responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
-        stubconfig.responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
-        stubconfig.responses(0).httpStatusCode.shouldBe(200)
+        stubconfig.responses.isDefined.shouldBe(true)
+        stubconfig.responses match {
+          case Some(responses: List[ResponseConfig]) =>
+            responses.size.shouldBe(4)
+            responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
+            responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
+            responses(0).httpStatusCode.shouldBe(200)
+          case None => assert(false, "has no response definition")
+        }
+        stubconfig.responseprovider.isDefined.shouldBe(false)
       }
     }
 
+    "parsing a existing json file to a matching type" should {
+      "return correctly parsed responseProvider object" in {
+        val stubconfig = JsonConverter.parseJson[StubConfig]("jsonprogrammedstub1.json")
+        stubconfig.endpoint.shouldBe("somepath/$1/with/$2")
+        stubconfig.responses.isDefined.shouldBe(false)
+        stubconfig.responseprovider.isDefined.shouldBe(true)
+        stubconfig.responseprovider match {
+          case Some(responseProvider: ResponseProviderConfig) =>
+            responseProvider.clazz.shouldBe("castalia.plugins.ProgrammedStub")
+            responseProvider.member.shouldBe("process1")
+          case None => assert(false, "has no responseprovider")
+        }
+      }
+    }
     "parsing a non-existing file" should {
       "throw FileNotFoundException" in {
         intercept[FileNotFoundException] {
@@ -38,11 +59,15 @@ class JsonConverterSpec extends UnitSpecBase {
 
     "parsing a stubconfig with default" should {
       "return correctly parsed stubconfig" in {
-        val stubConfig = JsonConverter.parseJson[StubConfig]("sharedproperties.json")
+        val stubconfig = JsonConverter.parseJson[StubConfig]("sharedproperties.json")
+        stubconfig.endpoint.shouldBe("somestub/$parm")
+        stubconfig.default.shouldBe(Some(DefaultResponseConfig(Some(LatencyConfig("constant", "100 ms")), None, None)))
+        stubconfig.responses match {
+          case Some(responses: List[ResponseConfig]) =>
+            responses.head.ids.shouldBe(Some(Map(("parm", "1"))))
+          case None => assert(false, "has no response definition")
 
-        stubConfig.endpoint.shouldBe("somestub/$parm")
-        stubConfig.default.shouldBe(Some(DefaultResponseConfig(Some(LatencyConfig("constant", "100 ms")), None, None)))
-        stubConfig.responses.head.ids.shouldBe(Some(Map(("parm", "1"))))
+        }
       }
     }
   }
