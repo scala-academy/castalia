@@ -16,13 +16,18 @@ libraryDependencies ++= {
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
     "com.miguno.akka"   %% "akka-mock-scheduler"                  % "0.4.0"          % "test",
-    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it"
+    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it",
+    "io.gatling.highcharts" % "gatling-charts-highcharts"         % "2.1.7" % "test",
+    "io.gatling"            % "gatling-test-framework"            % "2.1.7" % "test",
+    "org.scalaj"        % "scalaj-http_2.11"                      % "2.2.1"
+
   )
 }
 
 // Use IntegrationTest
 // (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)
 lazy val root = project.in(file("."))
+  .enablePlugins(GatlingPlugin)
   .configs(IntegrationTest)
   .settings( Defaults.itSettings : _* )
 
@@ -37,3 +42,5 @@ publishArtifact in Test := false
 pomIncludeRepository := { _ => false }
 
 fork in run := true
+
+mainClass in (Compile, run) := Some("castalia.Main")
