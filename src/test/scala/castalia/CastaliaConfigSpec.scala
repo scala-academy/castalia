@@ -1,6 +1,6 @@
 package castalia
 
-import castalia.model.CastaliaConfig
+import castalia.model.Model.CastaliaConfig
 
 class CastaliaConfigSpec extends UnitSpecBase {
 

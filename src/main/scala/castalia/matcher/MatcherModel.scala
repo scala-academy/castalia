@@ -3,7 +3,10 @@ package castalia.matcher
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
+import akka.http.scaladsl.model.Uri.Path.{Empty, Slash, Segment}
 import castalia.matcher.types._
+
+import scala.annotation.tailrec
 
 package object types{
   type Segments = List[String]
@@ -24,12 +27,15 @@ case class Matcher(segments: Segments, handler: ActorRef) {
     * @param requestSegments containing the path segments from the request
     */
   def matchPath(requestSegments: Segments): Option[Params] = {
+    @tailrec
     def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] =
-      (requestSeg, matchSeg, requestSeg.isEmpty, matchSeg.isEmpty) match {
-        case (_,    _,    true,  true)  => Some(params)
-        case (rSeg, mSeg, false, false) if isParam(mSeg.head) => marp(rSeg.tail, matchSeg.tail, (paramName(mSeg.head), rSeg.head)::params)
-        case (rSeg, mSeg, false, false) if rSeg.head.equals(mSeg.head) => marp(rSeg.tail, mSeg.tail, params)
-        case (_,    _,    _,     _)     => None
+      (requestSeg, matchSeg) match {
+        case (Nil, Nil)  => Some(params)
+        case (Nil, _) => None
+        case (_, Nil) => None
+        case (rhead::rtail, mhead::mtail) if isParam(mhead) => marp(rtail, mtail, (paramName(mhead), rhead)::params)
+        case (rhead::rtail, mhead::mtail) if rhead.equals(mhead) => marp(rtail, mtail, params)
+        case (_, _) => None
     }
 
     marp( requestSegments, segments, List[(String, String)]())
@@ -68,11 +74,12 @@ case class RequestMatch(httpRequest: HttpRequest, pathParams: Params, queryParam
   */
 case class ParsedUri(uri: String, path: Path, queryParams: Params) {
   def pathList: Segments = {
+    @tailrec
     def myPathList(path: Path, segments: Segments): Segments =
-      (path, path.isEmpty, path.startsWithSlash) match {
-        case (p, true, _) => segments
-        case (p, _, true) => myPathList(p.tail, segments)
-        case (p, _, _) => myPathList(p.tail, p.head.toString :: segments)
+      path match {
+        case Empty => segments
+        case (Slash(tail)) => myPathList(tail, segments)
+        case (Segment(head, tail)) => myPathList(tail, head :: segments)
     }
 
     myPathList(path, List[String]()).reverse

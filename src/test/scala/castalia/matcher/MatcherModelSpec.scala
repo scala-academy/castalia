@@ -2,6 +2,7 @@ package castalia.matcher
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
+import akka.http.scaladsl.model.Uri.Path.Empty
 import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
 
@@ -21,6 +22,14 @@ class MatcherModelSpec (_system: ActorSystem) extends ActorSpecBase(_system) {
       val parsedUri = new ParsedUri( uri.toString(), uri.path, uri.query().toList)
 
       assert( resList.equals(parsedUri.pathList))
+    }
+
+    "return an empty list when no path is given" in {
+      val uri:Uri = "http://example.com/"
+
+      val parsedUri = new ParsedUri( uri.toString(), uri.path, uri.query().toList)
+
+      assert(parsedUri.pathList.equals(List()))
     }
   }
 
