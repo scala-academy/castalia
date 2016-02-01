@@ -7,9 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
 import castalia.model.Messages.Done
-import castalia.model.Model
-import castalia.model.Model._
-import castalia.model.Model.StubConfig
+import castalia.model.Model.{StubConfig, _}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -17,9 +15,11 @@ import scala.language.postfixOps
 trait ManagerService {
 
   protected def managerActor: ActorRef
+
   protected implicit val system: ActorSystem
 
   private implicit val timeout = Timeout(2 second)
+
   import system.dispatcher
 
   val managementRoute: Route =
