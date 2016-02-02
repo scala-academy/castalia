@@ -38,7 +38,6 @@ trait ManagerService {
         post {
           entity(as[EndpointResponseConfig]){
             endpointResponseConfig =>
-              println("HELLO:"+endpointResponseConfig)
               complete {
                 (managerActor ? endpointResponseConfig)
                 .mapTo[Done]
