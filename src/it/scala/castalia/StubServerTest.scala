@@ -73,7 +73,8 @@ class StubServerTest extends IntegrationTestBase {
 
       val postRequest = Request(Method.Post, manageResponsesUrl)
       postRequest.host = managerAddress
-      postRequest.contentString = "{ \"endpoint\": \"doublepathparam/$1/responsedata/$2\" " +
+      postRequest.contentType = "application/json"
+      postRequest.contentString = "{ \"endpoint\": \"doublepathparam/$1/responsedata/$2\", " +
         "\"response\": {" +
           "\"ids\": {\"1\": \"2\",\"2\": \"id2\"}, " +
           "\"delay\": {\"distribution\": \"constant\",\"mean\": \"100 ms\"}," +
@@ -83,10 +84,16 @@ class StubServerTest extends IntegrationTestBase {
         "}"
       val postResponse: Response = Await.result(clientManager(postRequest))
 
-      assert(responseBefore.status == Status.Ok)
-      assert(responseBefore.contentString == "doublepathparam/$1/responsedata/$2")
+      assert(postResponse.status == Status.Ok)
+      assert(postResponse.contentString == "doublepathparam/$1/responsedata/$2")
 
       Then(s"the endpoint should respond with the posted response")
+      val requestAfter = Request(Method.Get, newParametersUrl)
+      requestAfter.host = serverAddress
+      val responseAfter: Response = Await.result(clientServer(requestBefore))
+
+      assert(responseAfter.status == Status.Ok)
+      assert(responseAfter.contentString == "{\"id\":\"een\",\"someValue\":\"123123\"}")
     }
   }
 
