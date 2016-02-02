@@ -1,8 +1,6 @@
 package castalia
 
 import com.miguno.akka.testing.VirtualTime
-import org.scalactic.TolerantNumerics
-import org.scalatest.{Matchers, WordSpec}
 import probability_monad.Distribution
 
 import scala.concurrent.Future
@@ -49,38 +47,53 @@ class DelayTraitSpec extends UnitSpecBase {
       }
     }
 
-    "asked for a gamma distribution" should {
-      "hand out delays according to gamma distribution" in {
+    "asked for a gamma distribution with two probabilities" should {
+      "return a gamma distribution" in {
+        val p50 = 20
+        val p90 = 300
+
         val d = new DelayedDistribution {}
-        val shapeK = 3
-        val scaleTheta = 5
 
-        val dist = d.gammaDistribution(shapeK, scaleTheta)
+        val (k, t) = d.gammaRatios(0.5, p50, 0.9, p90)
 
-
-
-        println(dist.sample(1))
+        k shouldBe 0.2672 +- 0.0001
+        t shouldBe 376.0 +- 0.2
+        val dist = d.gammaDistribution(k, t)
         println(dist.hist)
-
       }
 
-      //https://en.wikipedia.org/wiki/Gamma_distribution#Properties
-      "extract k-shape from distribution" should {
-        "return k within 1.5%" in {
-          val N = 10000
-          val d = new DelayedDistribution {}
-          val shapeK = 3.0
-          val scaleTheta = 1.0
+      "have a mean equal to shape times scale" in {
+        val p50 = 100
+        val p90 = 800
+        val d = new DelayedDistribution {}
 
-          val dist = d.gammaDistribution(shapeK, scaleTheta)
-          val samples: List[Double] = dist.sample(N)
-          val s = math.log(samples.sum / N) - (1/N)*samples.map(math.log).sum
-          println(s"s = $s")
-          println(dist.hist)
-          val calculatedK = ( 3 - s + math.sqrt(math.pow(s-3, 2) + 24*s) ) / (12*s)
-          val perc = (shapeK/100)*1.5
-          //calculatedK shouldBe shapeK +- perc
-        }
+        val (k, t) = d.gammaRatios(p50, p90)
+        val dist = d.gammaDistribution(k, t)
+
+
+        println(s"Gamma distribution with p50 $p50 and p90 $p90")
+        println(dist.hist)
+
+        dist.mean shouldBe (k * t) +- 20
+
+      }
+    }
+
+    "asked for a weibull distribution with two probabilities" should {
+      val tolerance = 0.0001
+      "return a gamma distribution" in {
+        val p95 = 6.57803
+        val p99 = 7.32456
+        val d = new DelayedDistribution {}
+
+        val shape = 4.0
+        val scale = 5.0
+        val (g, b) = d.getWeibullParametersFromPercentiles(p95, p99)
+
+        g shouldBe shape +- tolerance
+        b shouldBe scale +- tolerance
+
+        println(Distribution.weibull(g,b).hist)
       }
     }
   }
