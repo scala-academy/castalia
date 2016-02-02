@@ -1,8 +1,8 @@
 package castalia.actors
 
 import akka.actor._
-import akka.pattern.pipe
 import akka.http.scaladsl.model.StatusCodes.Forbidden
+import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Model.{StubConfig, StubResponse, _}
@@ -18,7 +18,8 @@ case class DelayComplete(destination: ActorRef, message: StubResponse)
   *
   * Created on 2016-01-23
   */
-class JsonResponsesEndpointActor(myStubConfig: StubConfig) extends JsonEndpointActor(myStubConfig)
+class JsonResponsesEndpointActor(override val stubConfig: StubConfig, override val metricsCollector: ActorRef)
+  extends JsonEndpointActor
   with ActorLogging
   with Delay {
 
@@ -68,7 +69,7 @@ class JsonResponsesEndpointActor(myStubConfig: StubConfig) extends JsonEndpointA
         case (params, Some(first :: rest)) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse(params, Some(rest))
         case (_, _) => None
       }
-    findResponseRecurse(pathParams, myStubConfig.responses)
+    findResponseRecurse(pathParams, stubConfig.responses)
   }
 
   def paramMatch( left: Params, right: EndpointIds): Boolean = {

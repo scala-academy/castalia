@@ -1,6 +1,7 @@
 package castalia.actors
 
 import akka.actor._
+import akka.contrib.pattern.ReceivePipeline
 import castalia.model.Model._
 
 /**
@@ -8,7 +9,8 @@ import castalia.model.Model._
   *
   * Created by Jean-Marc van Leerdam on 2016-01-16
   */
-abstract class JsonEndpointActor(myStubConfig: StubConfig) extends Actor with ActorLogging
+trait JsonEndpointActor
+  extends Actor with ActorLogging with ReceivePipeline with EndpointRequestInterceptor
 
 
 
