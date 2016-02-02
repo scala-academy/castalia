@@ -3,6 +3,8 @@ package castalia.matcher
 import akka.http.scaladsl.model.{HttpRequest, Uri}
 import castalia.matcher.types.Segments
 
+import scala.annotation.tailrec
+
 /**
   * Takes a list of endpoint matchers and determines which one matches.
   *
@@ -13,7 +15,7 @@ class RequestMatcher(myMatchers: List[Matcher]) {
 
   def matchRequest(httpRequest: HttpRequest): Option[RequestMatch] = {
     val parsedUri = uriParser.parse(httpRequest.uri.toString())
-
+    @tailrec
     def findMatch( segments: Segments, matchers: List[Matcher]): Option[RequestMatch] =
       (segments, matchers) match {
         case (_, Nil) => None
@@ -22,7 +24,6 @@ class RequestMatcher(myMatchers: List[Matcher]) {
         case (seg, _ :: tail) => findMatch(seg, tail)
       }
 
-    println( "looking for [" + parsedUri.pathList + "] in [" + myMatchers + "]")
     findMatch(parsedUri.pathList, myMatchers)
   }
 
