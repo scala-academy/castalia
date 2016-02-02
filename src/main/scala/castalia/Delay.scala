@@ -23,8 +23,8 @@ trait DelayedDistribution extends Delay {
   def normalDistribution[T](mean: Double,
                             stdev: Double,
                             dist: Distribution[Double]
-                          ): Distribution[Double] =
-    dist.map(_*stdev + mean)
+                           ): Distribution[Double] =
+    dist.map(_ * stdev + mean)
 
   def gammaDistribution[T](k: Double, theta: Double): Distribution[Double] = {
     Distribution.gamma(k, theta)
@@ -52,11 +52,11 @@ trait DelayedDistribution extends Delay {
   def getWeibullParametersFromPercentiles(p95: Double, p99: Double): (Double, Double) = {
 
     def getGammaFromPercentiles: Double = {
-      (math.log(-math.log(1-0.99)) - math.log(-math.log(1-0.95))) / (math.log(p99) - math.log(p95))
+      (math.log(-math.log(1 - 0.99)) - math.log(-math.log(1 - 0.95))) / (math.log(p99) - math.log(p95))
     }
 
     def getBetaFromGamma(gamma: Double): Double = {
-      p95 / math.pow(-math.log(1-0.95), 1/gamma)
+      p95 / math.pow(-math.log(1 - 0.95), 1 / gamma)
     }
 
     val gamma = getGammaFromPercentiles
@@ -66,6 +66,7 @@ trait DelayedDistribution extends Delay {
 
   /**
     * Generate weibull distribution
+    *
     * @param p95
     * @param p99
     * @return
@@ -78,6 +79,7 @@ trait DelayedDistribution extends Delay {
 
   /**
     * Bisect method
+    *
     * @param f
     * @param x
     * @param y
@@ -86,9 +88,9 @@ trait DelayedDistribution extends Delay {
     */
   @tailrec
   final def halveTheIntervalFP(f: Double => Double,
-                         x: Double,
-                         y: Double,
-                         tolerance: Double): Double = {
+                               x: Double,
+                               y: Double,
+                               tolerance: Double): Double = {
     if (Math.abs(x - y) <= tolerance) {
       x
     }
@@ -106,7 +108,7 @@ trait DelayedDistribution extends Delay {
   /**
     * The "signs are opposite" helper function.
     */
-  def signsAreOpposite(x: Double, y: Double):Boolean = {
+  def signsAreOpposite(x: Double, y: Double): Boolean = {
     if (x < 0 && y > 0) true
     else if (x > 0 && y < 0) true
     else false
@@ -114,6 +116,7 @@ trait DelayedDistribution extends Delay {
 
   /**
     * Default gamma ratios of 0.5 and 0.9
+    *
     * @param x1 value at probability 50%
     * @param x2 value at probability 90%
     * @return The shape and the scale parameter of the gamma distribution that
@@ -137,18 +140,17 @@ trait DelayedDistribution extends Delay {
     // We don't care about scaling theta -> set it to 1
     // only shape K is relevant
     val theta = 1
-    val ratio = x2/x1
+    val ratio = x2 / x1
 
-    def f(shape: Double) = castalia.Dist.qgamma(0.9,shape, theta)/
-      castalia.Dist.qgamma(0.5,shape,theta) - ratio
+    def f(shape: Double) = castalia.Dist.qgamma(0.9, shape, theta) /
+      castalia.Dist.qgamma(0.5, shape, theta) - ratio
 
     val left = 0.1
     val right = 1.0
     val tolerance = 0.0001
     val shape = halveTheIntervalFP(f, left, right, tolerance)
 
-    val scale = x1 / castalia.Dist.qgamma(0.5,shape,1)
+    val scale = x1 / castalia.Dist.qgamma(0.5, shape, 1)
     (shape, scale)
   }
-
 }
