@@ -6,12 +6,10 @@ import akka.http.scaladsl.model.StatusCodes.Forbidden
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Model.{StubConfig, StubResponse, _}
-import castalia.{Delay, EndpointIds}
+import castalia.{DelayedDistribution, Delay, EndpointIds}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
-
-case class DelayComplete(destination: ActorRef, message: StubResponse)
 
 /**
   * Actor that provides answers based on the responses listed in the json configuration that is used to create this actor
@@ -20,7 +18,8 @@ case class DelayComplete(destination: ActorRef, message: StubResponse)
   */
 class JsonResponsesEndpointActor(myStubConfig: StubConfig) extends JsonEndpointActor(myStubConfig)
   with ActorLogging
-  with Delay {
+  with Delay
+  with DelayedDistribution {
 
   // We are assured that we are getting the dispatcher assigned to this actor
   // in case it differs from the main dispatcher for the system.
@@ -81,11 +80,12 @@ class JsonResponsesEndpointActor(myStubConfig: StubConfig) extends JsonEndpointA
   }
 
   def calculateDelayTime(latencyConfig: LatencyConfig): FiniteDuration = {
-    log.debug("calculating delay for " + latencyConfig.duration.length + " " + latencyConfig.duration.unit)
-    (latencyConfig.duration, latencyConfig.duration.isFinite()) match {
-      case (duration, true) => FiniteDuration(duration.length, duration.unit)
+    latencyConfig.sample() match {
+      case duration if duration.isFinite() =>
+        log.debug("calculating delay for " + latencyConfig.duration.length + " " + latencyConfig.duration.unit)
+        FiniteDuration(duration.length, duration.unit)
       // no match, we encountered a 'non-finite duration' let's set it to 0.
-      case (_, _) => FiniteDuration(0, MILLISECONDS)
+      case _ => FiniteDuration(0, MILLISECONDS)
     }
   }
 
