@@ -81,7 +81,7 @@ class DelayTraitSpec extends UnitSpecBase {
 
     "asked for a weibull distribution with two probabilities" should {
       val tolerance = 0.0001
-      "return a gamma distribution" in {
+      "return a weibull distribution" in {
         val p95 = 6.57803
         val p99 = 7.32456
         val d = new DelayedDistribution {}

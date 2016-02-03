@@ -20,13 +20,13 @@ trait Delay {
 
 
 trait DelayedDistribution extends Delay {
-  def normalDistribution[T](mean: Double,
+  def normalDistribution(mean: Double,
                             stdev: Double,
                             dist: Distribution[Double]
                            ): Distribution[Double] =
     dist.map(_ * stdev + mean)
 
-  def gammaDistribution[T](k: Double, theta: Double): Distribution[Double] = {
+  def gammaDistribution(k: Double, theta: Double): Distribution[Double] = {
     Distribution.gamma(k, theta)
   }
 
@@ -35,12 +35,12 @@ trait DelayedDistribution extends Delay {
     * parametrized by two positive shape parameters, denoted by α and β,
     * that appear as exponents of the random variable and control the shape of the distribution.
     *
-    * @param α
-    * @param β
+    * @param a
+    * @param b
     * @return Distribution obeying beta
     */
-  def betaDistribution(α: Double, β: Double): Distribution[Double] = {
-    Distribution.beta(α, β)
+  def betaDistribution(a: Double, b: Double): Distribution[Double] = {
+    Distribution.beta(a, b)
   }
 
   /**
@@ -78,13 +78,13 @@ trait DelayedDistribution extends Delay {
 
 
   /**
-    * Bisect method
+    * Bisection method (Interval Halving method)
     *
-    * @param f
-    * @param x
-    * @param y
-    * @param tolerance
-    * @return
+    * @param f Function to find root
+    * @param x left edge
+    * @param y right edge
+    * @param tolerance precision
+    * @return The value at which the function's root is.
     */
   @tailrec
   final def halveTheIntervalFP(f: Double => Double,
@@ -109,9 +109,7 @@ trait DelayedDistribution extends Delay {
     * The "signs are opposite" helper function.
     */
   def signsAreOpposite(x: Double, y: Double): Boolean = {
-    if (x < 0 && y > 0) true
-    else if (x > 0 && y < 0) true
-    else false
+    (x < 0 && y > 0) || (x > 0 && y < 0)
   }
 
   /**
@@ -146,7 +144,8 @@ trait DelayedDistribution extends Delay {
       castalia.Dist.qgamma(0.5, shape, theta) - ratio
 
     val left = 0.1
-    val right = 1.0
+    // arbitrary right side starting point
+    val right = 10.0
     val tolerance = 0.0001
     val shape = halveTheIntervalFP(f, left, right, tolerance)
 
