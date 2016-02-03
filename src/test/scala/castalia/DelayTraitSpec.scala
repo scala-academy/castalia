@@ -47,6 +47,31 @@ class DelayTraitSpec extends UnitSpecBase {
       }
     }
 
+    "asked for a beta distribution with mean and stddev" should {
+      val tolerance = 0.0001
+
+      "return the a and beta parameter" in {
+        val d = new DelayedDistribution {}
+        val mu = 5.0/6.0
+        val sigma = math.sqrt(5.0/13.0)/6.0
+        val (a, b) = d.getBetaParametersFromMeanAndSigma(mu, sigma)
+
+        a shouldBe 10.0 +- tolerance
+        b shouldBe 2.0 +- tolerance
+      }
+
+      "plot a beta distribution" in {
+        val d = new DelayedDistribution {}
+        val mu = 5.0/6.0
+        val sigma = math.sqrt(5.0/13.0)/6.0
+        val dist = d.betaDistribution(mu, sigma)
+
+        println("BetaDistribution" + dist.hist)
+
+        dist.mean shouldBe mu +- 0.01
+      }
+    }
+
     "asked for a gamma distribution with two probabilities" should {
       "return a gamma distribution" in {
         val p50 = 20

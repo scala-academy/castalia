@@ -35,12 +35,19 @@ trait DelayedDistribution extends Delay {
     * parametrized by two positive shape parameters, denoted by α and β,
     * that appear as exponents of the random variable and control the shape of the distribution.
     *
-    * @param a
-    * @param b
-    * @return Distribution obeying beta
+    * @param mu mean
+    * @param sigma stdev
+    * @return Distribution obeying beta: for use scaling should be applied
     */
-  def betaDistribution(a: Double, b: Double): Distribution[Double] = {
+  def betaDistribution(mu: Double, sigma: Double): Distribution[Double] = {
+    val (a, b) = getBetaParametersFromMeanAndSigma(mu, sigma)
     Distribution.beta(a, b)
+  }
+
+  def getBetaParametersFromMeanAndSigma(mu: Double, sigma: Double): (Double, Double) = {
+    val a = ((1 - mu)/math.pow(sigma,2)-(1/mu))* math.pow(mu,2)
+    val b = a * ((1/mu) - 1)
+    (a, b)
   }
 
   /**
