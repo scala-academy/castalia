@@ -16,7 +16,7 @@ import akka.stream.Materializer
 import akka.testkit.EventFilter
 import castalia.StubConfigParser._
 import castalia._
-import castalia.model.CastaliaConfig._
+import castalia.model.Model.CastaliaConfig._
 import castalia.model.Messages.{Done, UpsertEndpoint}
 import castalia.model.Model.StubResponse
 import com.typesafe.config.ConfigFactory
