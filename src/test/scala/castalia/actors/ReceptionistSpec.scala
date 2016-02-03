@@ -2,40 +2,31 @@ package castalia.actors
 
 //
 //import akka.actor.ActorSystem
-import akka.actor.ActorSystem
-import akka.event.LoggingAdapter
-import akka.http.impl.server.RequestContextImpl
-import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport
-import akka.http.scaladsl.marshalling.ToResponseMarshallable
-import akka.http.scaladsl.model.ContentTypes.`application/json`
-import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.{HttpResponse, HttpMethods, HttpRequest}
+import akka.actor.ActorDSL._
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.{Rejection, RoutingSettings, RouteResult, RequestContext}
-import akka.stream.Materializer
-import akka.testkit.EventFilter
+import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
+import akka.testkit.TestActor.{NoAutoPilot, AutoPilot}
+import akka.testkit.TestProbe
 import castalia.StubConfigParser._
 import castalia._
-import castalia.model.Model.CastaliaConfig._
-import castalia.model.Messages.{Done, UpsertEndpoint}
-import castalia.model.Model.StubResponse
-import com.typesafe.config.ConfigFactory
-import org.scalatest.BeforeAndAfter
-
-import scala.concurrent.{ExecutionContext, Future}
+import castalia.model.Messages.{EndpointMetricsInit, EndpointMetricsGet, Done, UpsertEndpoint}
+import castalia.model.Model.{EndpointMetrics, StubResponse}
 
 class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("ReceptionistSpec"))
 
-  val receptionist = system.actorOf(Receptionist.props)
+  val metricsCollectorProbe = new TestProbe(_system)
+  val receptionist = actor("receptionist")(new Receptionist() {
+    override def createMetricsCollector(): ActorRef = metricsCollectorProbe.ref
+  })
 
   val stubConfig = parseStubConfigs(List("jsonconfiguredstub.json")).head
 
   override def beforeAll: Unit = {
     receptionist ! UpsertEndpoint(stubConfig)
     expectMsg(Done(stubConfig.endpoint))
-
   }
 
   "Receptionist actor" when {
@@ -45,15 +36,30 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
         expectMsg(Done(stubConfig.endpoint))
       }
     }
+
     "receives a request to an existing endpoint " should {
-        "forward the request to the endpoint and get a 200 response" in {
+      "forward the request to the endpoint and get a 200 response" in {
           val r = HttpRequest(HttpMethods.GET, "/doublepathparam/1/responsedata/id2" )
           receptionist ! r
           expectMsg(StubResponse(OK.intValue, "{\"id\":\"twee\",\"someValue\":\"123123\",\"someAdditionalValue\":\"345345\"}"))
           // todo: rewrite into converting the response to json, unmarshal it and inspect.
-        }
       }
+    }
 
+    "receives a request to get metrics for endpoints" should {
+      "forward the request to the metrics collector" in {
+        val metrics = Map("endpoint" -> Map("calls" -> 1))
+        metricsCollectorProbe.setAutoPilot(new AutoPilot {
+          override def run(sender: ActorRef, msg: Any): AutoPilot = msg match{
+            case EndpointMetricsGet => sender ! EndpointMetrics(metrics)
+              NoAutoPilot
+          }
+        })
+
+        receptionist ! EndpointMetricsGet
+        expectMsg(EndpointMetrics(metrics))
+      }
+    }
 
 
 /*

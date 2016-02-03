@@ -6,8 +6,8 @@ import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.TestActor.{NoAutoPilot, AutoPilot}
 import akka.testkit.{TestActor, TestProbe}
 import castalia.management.{Manager, ManagerService}
-import castalia.model.Messages.{Done, UpsertEndpoint}
-import castalia.model.Model.{ResponseConfig, StubConfig}
+import castalia.model.Messages.{EndpointMetricsGet, Done, UpsertEndpoint}
+import castalia.model.Model.{EndpointMetrics, ResponseConfig, StubConfig}
 
 class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
 
@@ -20,8 +20,9 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
     override protected implicit val system: ActorSystem = parentSystem
   }
 
-  "posting new route" should {
-    "result in status HTTP 200" in {
+  "ManagerService" should {
+
+    "accept endpoint insert/update" in {
       val stubConfig = new StubConfig("my/endpoint", None, Some(List(ResponseConfig(None, None, OK.intValue, None))), None)
 
       receptionistMock.setAutoPilot(new AutoPilot {
@@ -32,10 +33,24 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
       })
 
       Post("/castalia/manager/endpoints", stubConfig) ~> service.managementRoute ~> check {
-
-        // TODO
         status shouldBe OK
         responseAs[String] shouldBe stubConfig.endpoint
+      }
+    }
+
+    "accept get metrics request" in {
+      val metrics = Map("some/$1/endpoint" -> Map("calls" -> 1))
+
+      receptionistMock.setAutoPilot(new AutoPilot {
+        override def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
+          case EndpointMetricsGet => sender ! EndpointMetrics(metrics)
+            NoAutoPilot
+        }
+      })
+
+      Get("/castalia/manager/endpoints/metrics") ~> service.managementRoute ~> check {
+        status shouldBe OK
+        responseAs[EndpointMetrics] shouldBe EndpointMetrics(metrics)
       }
     }
   }
