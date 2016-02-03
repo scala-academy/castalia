@@ -3,6 +3,7 @@ package castalia.metrics
 import akka.actor.{Actor, ActorLogging, Props}
 import castalia.model.Messages.{EndpointCalled, EndpointMetricsInit, EndpointMetricsGet}
 import castalia.model.Model.EndpointMetrics
+import MetricsCollectorActor._
 
 object MetricsCollectorActor {
 
@@ -15,8 +16,6 @@ object MetricsCollectorActor {
   * Actor that aggregates various metrics specific to endpoints.
   */
 class MetricsCollectorActor extends Actor with ActorLogging {
-
-  import MetricsCollectorActor._
 
   override def receive: Receive = active(new MetricsRegistry())
 
