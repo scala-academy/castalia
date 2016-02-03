@@ -2,6 +2,7 @@ package castalia.actors
 
 import java.lang.reflect.Method
 
+import akka.actor.ActorRef
 import castalia.matcher.RequestMatch
 import castalia.model.Model.{StubConfig, StubResponse}
 import scala.concurrent.Future
@@ -14,11 +15,12 @@ import scala.language.existentials
   *
   * Created on 2016-01-23
   */
-class JsonResponseProviderEndpointActor(myStubConfig: StubConfig) extends JsonEndpointActor(myStubConfig) {
+class JsonResponseProviderEndpointActor(override val stubConfig: StubConfig, override val metricsCollector: ActorRef)
+  extends JsonEndpointActor {
   private case class ResponseProvider(clazz : Class[_], member : Method)
 
   private val programmedStub: ResponseProvider =
-    myStubConfig.responseprovider match {
+    stubConfig.responseprovider match {
       case Some(responseProvider) =>
         val clazz = Class.forName(responseProvider.clazz)
         val member = clazz.getDeclaredMethod(responseProvider.member, classOf[RequestMatch])

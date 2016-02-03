@@ -3,16 +3,11 @@ package castalia
 import akka.actor._
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.StatusCodes._
-import akka.http.scaladsl.server.Directives._
-import akka.http.scaladsl.server.{RouteResult, RequestContext, Route}
-import akka.pattern.ask
-import akka.util.Timeout
-import castalia.actors.{JsonResponsesEndpointActor, JsonResponseProviderEndpointActor, JsonEndpointActor}
-import castalia.matcher.{RequestMatcher, Matcher}
-import castalia.model.Messages.{Done, UpsertEndpoint}
-import castalia.model.Model.{StubResponse, StubConfig}
-
-import scala.concurrent.duration._
+import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
+import castalia.matcher.{Matcher, RequestMatcher}
+import castalia.metrics.MetricsCollectorActor
+import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
+import castalia.model.Model.{StubConfig, StubResponse}
 
 object Receptionist {
   def props: Props = Props[Receptionist]
@@ -20,28 +15,27 @@ object Receptionist {
 
 class Receptionist extends Actor with ActorLogging {
 
-  // the endpointMatcher is a var because it gets replaced whenever a new UpsertEndpoint
-  // message is processed.
-  var endpointMatcher: RequestMatcher = new RequestMatcher(Nil)
+  val metricsCollector = createMetricsCollector
 
-  private def upsertEndPointActor(stubConfig: StubConfig) = {
+  private def upsertEndPointActor(stubConfig: StubConfig, endpointMatcher : RequestMatcher) = {
 
-    def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor =
-      (stubConfig.responseprovider, stubConfig.responses) match {
-        case (Some(provider), _) => new JsonResponseProviderEndpointActor(stubConfig)
-        case (_, Some(provider)) => new JsonResponsesEndpointActor(stubConfig)
-        case (_, _) => throw new UnsupportedOperationException
-      }
+    def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
+      if (stubConfig.responseprovider.isDefined) new JsonResponseProviderEndpointActor(stubConfig, metricsCollector)
+      else if (stubConfig.responses.isDefined) new JsonResponsesEndpointActor(stubConfig, metricsCollector)
+      else throw new UnsupportedOperationException
+    }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
-    endpointMatcher = endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))
+    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
   }
 
-  override def receive: Receive = {
+  override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
+
+  def receiveWithMatcher(endpointMatcher : RequestMatcher) : Receive = {
     // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
-      upsertEndPointActor(stubConfig)
+      upsertEndPointActor(stubConfig, endpointMatcher)
       sender ! Done(stubConfig.endpoint)
 
     // Real request
@@ -54,11 +48,16 @@ class Receptionist extends Actor with ActorLogging {
         case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
       }
 
+    case EndpointMetricsGet =>
+      log.info("fetching metrics for all endpoints")
+      metricsCollector forward EndpointMetricsGet
+
       // unexpected messages
     case x =>
       log.info("Receptionist received unexpected message: " + x.toString)
   }
 
+  def createMetricsCollector: ActorRef = context.actorOf(MetricsCollectorActor.props, "metricsCollector")
 }
 
 

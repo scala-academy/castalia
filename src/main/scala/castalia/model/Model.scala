@@ -134,6 +134,8 @@ object Model extends DefaultJsonProtocol {
     }
   }
 
+  case class EndpointMetrics(metrics: Map[Endpoint, Metrics])
+
   // Note: these implicits mus tbe declared in the correct order (first the leaves, then the composing classes)
   implicit val castaliaConfigFormatter = jsonFormat3(CastaliaConfig.apply)
   implicit val latencyConfigFormat = jsonFormat(LatencyConfig, "distribution", "mean", "p1", "p2")
@@ -141,5 +143,6 @@ object Model extends DefaultJsonProtocol {
   implicit val defaultResponseConfigFormat = jsonFormat3(DefaultResponseConfig)
   implicit val responseConfigFormat = jsonFormat4(ResponseConfig)
   implicit val stubConfigFormat = jsonFormat4(StubConfig)
+  implicit val endpointMetricsFormat = jsonFormat1(EndpointMetrics)
 
 }
