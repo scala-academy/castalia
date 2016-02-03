@@ -54,7 +54,7 @@ class Receptionist extends Actor with ActorLogging {
 
     case UpsertResponse(responseConfig) =>
       log.info(s"receptionist received UpsertResponse message, adding response to " + responseConfig.endpoint)
-      val requestMatchOption = endpointMatcher.matchRequest(responseConfig.endpoint)
+      val requestMatchOption = endpointMatcher.matchEndpoint(responseConfig.endpoint)
       log.info(s"receptionist attempted to match, result = " + requestMatchOption)
       requestMatchOption match {
         case Some(requestMatch) => requestMatch.handler forward UpsertResponse(responseConfig)

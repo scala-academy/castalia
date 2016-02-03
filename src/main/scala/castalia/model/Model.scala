@@ -92,6 +92,13 @@ object Model extends DefaultJsonProtocol  {
   case class StubResponse( status: StatusCode, body: String)
 
   /**
+    * A response configuration for an endpoint
+    * @param endpoint String with the endpoint id
+    * @param response ResponseConfig with the response to be updated at the endpoint
+    */
+  case class EndpointResponseConfig(endpoint: String, response: ResponseConfig)
+
+  /**
     * Define a default configuration to use when parsing the json fails
     */
   object CastaliaConfig extends DefaultJsonProtocol {
@@ -113,5 +120,6 @@ object Model extends DefaultJsonProtocol  {
   implicit val responseConfigFormat = jsonFormat4(ResponseConfig)
   implicit val stubConfigFormat = jsonFormat4(StubConfig)
   implicit val endpointMetricsFormat = jsonFormat1(EndpointMetrics)
+  implicit val endpointResponseConfigFormat = jsonFormat2(EndpointResponseConfig)
 
 }

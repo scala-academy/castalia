@@ -65,13 +65,12 @@ class StubServerTest extends IntegrationTestBase {
 
       Then("I should get a response after 100 ms")
       val timer = System.currentTimeMillis()
-      val response: Response = Await.result(client(request))
+      val response: Response = Await.result(clientServer(request))
 
       assert(System.currentTimeMillis() - timer > 100)
       assert(response.status == Status.Ok)
       assert(response.contentString == """{"id":"een","someValue":"123123"}""")
     }
-  }
 
     it("should allow adding new response to endpoint during runtime"){
       val stubUrl = "doublepathparam/$1/responsedata/$2"

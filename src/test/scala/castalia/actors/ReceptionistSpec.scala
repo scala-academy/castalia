@@ -60,9 +60,7 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
     "receives a request to an existing endpoint " should {
         "forward the request to the endpoint and get a configured 200 response" in {
-    "receives a request to an existing endpoint " should {
-        "forward the request to the endpoint and get a 200 response" in {
-          val r = HttpRequest(HttpMethods.GET, "/doublepathparam/1/responsedata/id2" )
+         val r = HttpRequest(HttpMethods.GET, "/doublepathparam/1/responsedata/id2" )
           receptionist ! r
           expectMsg(StubResponse(OK.intValue, "{\"id\":\"twee\",\"someValue\":\"123123\",\"someAdditionalValue\":\"345345\"}"))
           // todo: rewrite into converting the response to json, unmarshal it and inspect.

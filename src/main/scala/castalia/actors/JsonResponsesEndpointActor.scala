@@ -5,6 +5,8 @@ import akka.http.scaladsl.model.StatusCodes.Forbidden
 import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
+import castalia.model.Messages.{Done, UpsertResponse}
+import castalia.model.Model.{StubConfig, StubResponse, _}
 import castalia.model.Model.{StubResponse, _}
 import castalia.{Delay, EndpointIds}
 
@@ -28,6 +30,9 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
   import context._
 
   implicit val scheduler = system.scheduler
+
+  var responses: Option[List[ResponseConfig]] = myStubConfig.responses
+
   override def receive: Receive = {
     case request: RequestMatch =>
       log.debug("receive requestmatch")
@@ -58,6 +63,13 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
           log.debug("found no response")
           sender() ! new StubResponse( Forbidden.intValue, Forbidden.reason)
       }
+
+    case UpsertResponse(endpointResponseConfig) =>
+      log.debug("received UpsertResponse")
+      responses = Some(endpointResponseConfig.response :: responses.getOrElse(List()))
+
+      sender ! Done(endpointResponseConfig.endpoint)
+
     case _@msg =>
       log.error("received unexpected message [" + msg + "]")
   }
