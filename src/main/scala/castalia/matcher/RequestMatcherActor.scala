@@ -2,7 +2,7 @@ package castalia.matcher
 
 import akka.actor.{ActorLogging, Props, ActorRef, Actor}
 import akka.http.scaladsl.model.HttpRequest
-import castalia.matcher.MatcherActor.ForwardIfMatched
+import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
 
 /**
@@ -10,7 +10,7 @@ import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
   */
 
 object RequestMatcherActor {
-  case class FindMatchAndForward(httpRequest: HttpRequest)
+  case class FindMatchAndForward(httpRequest: HttpRequest, origin: ActorRef)
   case class AddMatcher(matcherActor: ActorRef)
   def props(): Props = Props[RequestMatcherActor]
 }
@@ -24,10 +24,13 @@ class RequestMatcherActor extends Actor with ActorLogging {
       log.debug(s"Added matcher ${matcher} to RequestMatcherActor ${self.toString()}")
       context.become(normal(matchers + matcher))
     }
-    case FindMatchAndForward(httpRequest) => {
+    case FindMatchAndForward(httpRequest, origin) => {
       val parsedUri = new ParsedUri(httpRequest.uri.toString().replace(';', '&'),httpRequest.uri.path,  httpRequest.uri.query().toList)
       log.debug(s"RequestMatcherActor received http request ${parsedUri}")
-      matchers.foreach(matchers => matchers forward ForwardIfMatched(parsedUri, httpRequest))
+
+      val gatherer = context.actorOf(MatchResultGatherer.props(matchers.size, origin))
+
+      matchers.foreach(matchers => matchers forward RespondIfMatched(parsedUri, httpRequest, gatherer))
     }
   }
 }

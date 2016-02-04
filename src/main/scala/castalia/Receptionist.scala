@@ -7,7 +7,7 @@ import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, Js
 import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
 import castalia.matcher.{MatcherActor, RequestMatcherActor, Matcher, RequestMatcher}
 import castalia.metrics.MetricsCollectorActor
-import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
+import castalia.model.Messages.{EndpointMetricsGet, Done, UpsertEndpoint}
 import castalia.model.Model.{StubConfig, StubResponse}
 
 object Receptionist {
@@ -55,7 +55,7 @@ class Receptionist extends Actor with ActorLogging {
 //        case Some(requestMatch) => requestMatch.handler forward requestMatch
 //        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
 //      }
-      requestMatcherActor forward FindMatchAndForward(request) // new
+      requestMatcherActor ! FindMatchAndForward(request, sender) // new
 
     case EndpointMetricsGet =>
       log.info("fetching metrics for all endpoints")
