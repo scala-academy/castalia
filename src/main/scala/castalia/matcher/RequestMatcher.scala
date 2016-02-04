@@ -22,7 +22,7 @@ class RequestMatcher(myMatchers: List[Matcher]) {
         case (seg, _ :: tail) => findMatch(seg, tail)
       }
 
-    println( "looking for [" + parsedUri.pathList + "] in [" + myMatchers + "]")
+//    println( "looking for [" + parsedUri.pathList + "] in [" + myMatchers + "]")
     findMatch(parsedUri.pathList, myMatchers)
   }
 

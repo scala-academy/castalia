@@ -17,15 +17,18 @@ class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) wi
   private var uriMatcher: RequestMatcher = _
   private var a1 = TestProbe().ref
   private var a2 = TestProbe().ref
+  private var a3 = TestProbe().ref
 
   override def beforeEach() {
     val s1 = List("sample", "path", "with", "{partyId}", "id")
     val s2 = List("another", "path", "without", "id")
+    val s3 = List("foo", "{foo}")
 
     val m1 = new Matcher(s1, a1)
     val m2 = new Matcher(s2, a2)
+    val m3 = new Matcher(s3, a3)
 
-    val matchers = List(m1, m2)
+    val matchers = List(m1, m2, m3)
 
     uriMatcher = new RequestMatcher(matchers)
   }
@@ -37,6 +40,13 @@ class RequestMatcherTest(_system: ActorSystem) extends ActorSpecBase(_system) wi
       val r1 = uriMatcher.matchRequest(new HttpRequest(method = HttpMethods.GET, uri = "foo", protocol = HttpProtocols.`HTTP/1.1` ))
       r1.shouldBe(None)
 
+    }
+
+    "only match the correct parameter" in {
+
+      val r1 = uriMatcher.matchRequest(new HttpRequest(method = HttpMethods.GET, uri = "foo/bar", protocol = HttpProtocols.`HTTP/1.1` ))
+      r1.get.handler.shouldBe(a3)
+      r1.get.pathParams.length.shouldBe(1)
     }
 
     "find a match for a correct Request" in {

@@ -4,7 +4,8 @@ import akka.actor._
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.StatusCodes._
 import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
-import castalia.matcher.{Matcher, RequestMatcher}
+import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
+import castalia.matcher.{MatcherActor, RequestMatcherActor, Matcher, RequestMatcher}
 import castalia.metrics.MetricsCollectorActor
 import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
 import castalia.model.Model.{StubConfig, StubResponse}
@@ -17,6 +18,9 @@ class Receptionist extends Actor with ActorLogging {
 
   val metricsCollector = createMetricsCollector
 
+  val requestMatcherActor = context.actorOf(RequestMatcherActor.props()) // new
+
+
   private def upsertEndPointActor(stubConfig: StubConfig, endpointMatcher : RequestMatcher) = {
 
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
@@ -26,7 +30,11 @@ class Receptionist extends Actor with ActorLogging {
     }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
-    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
+//    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
+
+    requestMatcherActor ! AddMatcher(context.actorOf(MatcherActor.props(stubConfig.segments, actor))) // new
+
+    log.debug(s"Registering matcher with segments ${stubConfig.segments}")
   }
 
   override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
@@ -41,12 +49,13 @@ class Receptionist extends Actor with ActorLogging {
     // Real request
     case request: HttpRequest =>
       log.info(s"receptionist received message [" + request.uri.toString() + "]")
-      val requestMatchOption = endpointMatcher.matchRequest(request)
-      log.info(s"receptionist attempted to match, result = " + requestMatchOption)
-      requestMatchOption match {
-        case Some(requestMatch) => requestMatch.handler forward requestMatch
-        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
-      }
+//      val requestMatchOption = endpointMatcher.matchRequest(request)
+//      log.info(s"receptionist attempted to match, result = " + requestMatchOption)
+//      requestMatchOption match {
+//        case Some(requestMatch) => requestMatch.handler forward requestMatch
+//        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
+//      }
+      requestMatcherActor forward FindMatchAndForward(request) // new
 
     case EndpointMetricsGet =>
       log.info("fetching metrics for all endpoints")
