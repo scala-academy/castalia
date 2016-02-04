@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.TestProbe
 import castalia.management.Manager
-import castalia.model.Messages.{Done, UpsertEndpoint}
+import castalia.model.Messages.{EndpointMetricsGet, Done, UpsertEndpoint}
 import castalia.model.Model.{ResponseConfig, StubConfig}
 
 import scala.language.postfixOps
@@ -23,7 +23,11 @@ class ManagerSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       manager ! stubConfig
       receptionistProbe.expectMsg(UpsertEndpoint(stubConfig))
       receptionistProbe.reply(Done(stubConfig.endpoint))
-      //expectMsg(Done(stubConfig.endpoint))
+    }
+
+    "ask receptionist to get endpoint metrics" in {
+      manager ! EndpointMetricsGet
+      receptionistProbe.expectMsg(EndpointMetricsGet)
     }
   }
 }

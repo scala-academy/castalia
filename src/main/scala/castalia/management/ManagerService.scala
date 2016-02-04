@@ -6,10 +6,8 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import castalia.model.Messages.Done
-import castalia.model.Model
-import castalia.model.Model._
-import castalia.model.Model.StubConfig
+import castalia.model.Messages.{EndpointMetricsGet, Done}
+import castalia.model.Model.{EndpointMetrics, StubConfig}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -23,7 +21,7 @@ trait ManagerService {
   import system.dispatcher
 
   val managementRoute: Route =
-    path("castalia" / "manager" / "endpoints") {
+    pathPrefix("castalia" / "manager" / "endpoints") {
       post {
         entity(as[StubConfig]) {
           stubConfig =>
@@ -34,7 +32,13 @@ trait ManagerService {
                 .map(result => s"${result.endpoint}")
             }
         }
-      }
+      } ~ path("metrics") {
+            get {
+              complete {
+                (managerActor ? EndpointMetricsGet).mapTo[EndpointMetrics]
+              }
+            }
+          }
     }
 
 }

@@ -5,4 +5,5 @@ package object castalia {
   type StatusCode = Int
   type Endpoint = String
   type EndpointIds = Option[Map[String, String]]
+  type Metrics = Map[String, Int]
 }
