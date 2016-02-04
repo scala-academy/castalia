@@ -21,8 +21,8 @@ class Receptionist extends Actor with ActorLogging {
 
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
       stubConfig match {
-        case StubConfig(_, _, _, Some(config)) => new JsonResponseProviderEndpointActor(stubConfig, metricsCollector)
-        case StubConfig(_, _, Some(responses), _) => new JsonResponsesEndpointActor(stubConfig, metricsCollector)
+        case StubConfig(endpoint, _, _, Some(config)) => new JsonResponseProviderEndpointActor(endpoint, config, metricsCollector)
+        case StubConfig(endpoint, _, Some(responses), _) => new JsonResponsesEndpointActor(endpoint, responses, metricsCollector)
         case _ => throw new UnsupportedOperationException
       }
     }
