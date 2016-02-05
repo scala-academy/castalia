@@ -1,7 +1,5 @@
 package castalia.matcher
 
-import java.util.regex.MatchResult
-
 import akka.actor.{ActorLogging, Actor, ActorRef, Props}
 import akka.http.scaladsl.model.HttpRequest
 import castalia.Main

@@ -2,24 +2,18 @@ package castalia.matcher
 
 import akka.actor.{Props, ActorRef, ActorContext, ActorSystem}
 import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.StatusCodes._
-import akka.testkit.{TestActor, TestProbe}
+import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
-import castalia.matcher.MatchResultGatherer.MatchNotFound
 import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
 import castalia.matcher.types._
-import castalia.model.Model.StubResponse
-import org.scalamock.scalatest.MockFactory
-
-import scala.concurrent.duration._
 
 class RequestMatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("RequestMatcherActor"))
 
   trait TestRequestMatcherActorCreator extends RequestMatcherActorCreator {
-    val probe = TestProbe()
+    val probe = TestProbe() //("Probe from TestRequestMatcherActorCreator")
     def createRequestMatcherActor(context: ActorContext, segments: Segments, handler: ActorRef): ActorRef = {
       probe.ref
     }
@@ -37,15 +31,5 @@ class RequestMatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_syste
 
       probe.expectMsgClass(classOf[RespondIfMatched]) // Probe not receiving anything???
     }
-//    "forwards requests to the registered matchers (multiple matchers)" in {
-//      val origin = TestProbe()
-//      val matchers = List(TestProbe(),TestProbe(),TestProbe(),TestProbe())
-//      val requestMatcherActor = system.actorOf(Props(new RequestMatcherActor with TestRequestMatcherActorCreater))
-//
-//      matchers.foreach(matcher => requestMatcherActor ! AddMatcher(matcher.ref))
-//      requestMatcherActor ! FindMatchAndForward(HttpRequest(), origin.ref)
-//
-//      matchers.foreach(_.expectMsgClass(classOf[RespondIfMatched]))
-//    }
   }
 }

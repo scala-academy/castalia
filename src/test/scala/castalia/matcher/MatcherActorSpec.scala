@@ -3,14 +3,8 @@ package castalia.matcher
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.HttpRequest
 import akka.testkit.TestProbe
-import castalia.Main
 import castalia.actors.ActorSpecBase
 import castalia.matcher.MatcherActor.RespondIfMatched
-import castalia.metrics.MetricsCollectorActor
-import castalia.metrics.MetricsCollectorActor._
-import castalia.model.Messages._
-import castalia.model.Model.EndpointMetrics
-import org.scalamock.scalatest.MockFactory
 import scala.concurrent.duration._
 
 class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
@@ -32,7 +26,6 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
       handler.expectMsgClass(2.seconds, classOf[RequestMatch])
       handler.reply("HandlerResponse")
-      //      handler.expectMsg(new RequestMatch(httpRequest, List(("bparm","123")), List(), handler.ref), 2 seconds)
       gatherer.expectMsg("HandlerResponse")
     }
   }

@@ -1,17 +1,11 @@
 package castalia.matcher
 
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.StatusCodes._
 import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
 import castalia.matcher.MatchResultGatherer.MatchNotFound
-import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.model.Model.StubResponse
-import org.scalamock.scalatest.MockFactory
-
-import scala.concurrent.duration._
-import scala.concurrent.duration._
 
 class MatchResultGathererActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
