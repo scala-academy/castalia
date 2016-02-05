@@ -16,24 +16,23 @@ import scala.concurrent.duration._
 class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) with MockFactory {
 
   def this() = this(ActorSystem("MatcherActor"))
-  import Main.timeout
 
-  "MetricsCollector actor" must {
+  "MatcherActor" must {
 
-    "forward a match to the matchresult gatherer" in {
+    "forward a match to the match result gatherer" in {
       val gatherer = TestProbe()
       val handler = TestProbe()
       val segments = List("a", "{bparm}", "c")
       val matcherActor = system.actorOf(MatcherActor.props(segments, handler.ref))
       val uriParser = new UriParser()
-      val parsedUri =uriParser.parse("/a/123/c")
+      val parsedUri = uriParser.parse("/a/123/c")
       val httpRequest = HttpRequest()
 
       matcherActor ! RespondIfMatched(parsedUri, httpRequest, gatherer.ref)
 
       handler.expectMsgClass(2.seconds, classOf[RequestMatch])
       handler.reply("HandlerResponse")
-//      handler.expectMsg(new RequestMatch(httpRequest, List(("bparm","123")), List(), handler.ref), 2 seconds)
+      //      handler.expectMsg(new RequestMatch(httpRequest, List(("bparm","123")), List(), handler.ref), 2 seconds)
       gatherer.expectMsg("HandlerResponse")
     }
   }
