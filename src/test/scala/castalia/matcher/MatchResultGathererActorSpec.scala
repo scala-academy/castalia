@@ -31,23 +31,27 @@ class MatchResultGathererActorSpec(_system: ActorSystem) extends ActorSpecBase(_
     "forward the first match and not the second result to origin" in {
       val origin = TestProbe()
       val matchResultGathererActor = system.actorOf(MatchResultGatherer.props(3, origin.ref))
+      origin watch matchResultGathererActor
 
       matchResultGathererActor ! MatchNotFound
       matchResultGathererActor ! "match"
       origin.expectMsg("match")
 
       matchResultGathererActor ! "match2"
-      origin.expectNoMsg(100.millis)
+      origin.expectTerminated(matchResultGathererActor)
+
     }
     "send a 404 if no match is received" in {
       val origin = TestProbe()
       val matchResultGathererActor = system.actorOf(MatchResultGatherer.props(3, origin.ref))
+      origin watch matchResultGathererActor
 
       matchResultGathererActor ! MatchNotFound
       matchResultGathererActor ! MatchNotFound
       matchResultGathererActor ! MatchNotFound
 
       origin.expectMsg(StubResponse(NotFound.intValue, NotFound.reason))
+      origin.expectTerminated(matchResultGathererActor)
     }
   }
 }
