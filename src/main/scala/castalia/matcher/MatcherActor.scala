@@ -29,12 +29,16 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
 
   def receive: Receive = {
     case RespondIfMatched(parsedUri, httpRequest, gatherer) => {
-      log.debug(s"MatcherActor received ForwardIfMatched with ${parsedUri}")
+      log.debug(s"MatcherActor received ForwardIfMatched with $parsedUri")
 
       matchPath(parsedUri.pathList) match {
         case Some(params) => {
-          log.debug(s"MatcherActor found match: ${params}. Forwarding request to ${handler}")
-          val result = handler ? (new RequestMatch(httpRequest, params, parsedUri.queryParams, handler))
+          log.debug(s"MatcherActor found match: $params. Forwarding request to $handler")
+          // TODO: RequestMatch should not contain handler as that is a self-reference of the receiver
+          val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams, handler)
+          log.debug(s"RequestMatch: $requestMatch")
+          log.debug(s"sending to $handler")
+          val result = handler ? requestMatch
           result.map(response => gatherer ! response)
         }
         case None => gatherer ! MatchNotFound
