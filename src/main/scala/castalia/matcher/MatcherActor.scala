@@ -17,20 +17,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by m06f791 on 4-2-2016.
   */
 object MatcherActor {
-
   case class RespondIfMatched(parsedUri: ParsedUri, httpRequest: HttpRequest, gatherer: ActorRef)
-
   def props(segments: Segments, handler: ActorRef): Props = Props(new MatcherActor(segments, handler))
 }
-
 class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with ActorLogging {
-
   import Main.timeout
 
   def receive: Receive = {
     case RespondIfMatched(parsedUri, httpRequest, gatherer) => {
-      log.debug(s"MatcherActor received ForwardIfMatched with $parsedUri")
-
       matchPath(parsedUri.pathList) match {
         case Some(params) => {
           log.debug(s"MatcherActor found match: $params. Forwarding request to $handler")

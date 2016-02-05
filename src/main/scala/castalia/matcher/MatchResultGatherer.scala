@@ -9,9 +9,7 @@ import akka.http.scaladsl.model.StatusCodes._
   * Created by Jordi on 4-2-2016.
   */
 object MatchResultGatherer {
-
   case object MatchNotFound
-
   def props(nOfMatchers: Int, origin: ActorRef): Props = Props(new MatchResultGatherer(nOfMatchers, origin))
 }
 

@@ -13,7 +13,7 @@ import castalia.model.Model.EndpointMetrics
 import org.scalamock.scalatest.MockFactory
 import scala.concurrent.duration._
 
-class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) with MockFactory {
+class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("MatcherActor"))
 

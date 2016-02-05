@@ -32,7 +32,8 @@ class Receptionist extends Actor with ActorLogging {
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
 //    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
 
-    requestMatcherActor ! AddMatcher(context.actorOf(MatcherActor.props(stubConfig.segments, actor))) // new
+    requestMatcherActor ! AddMatcher(stubConfig.segments, actor) // new
+//    requestMatcherActor ! AddMatcher(context.actorOf(MatcherActor.props(stubConfig.segments, actor))) // new
 
     log.debug(s"Registering matcher with segments ${stubConfig.segments}")
   }

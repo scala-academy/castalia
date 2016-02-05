@@ -13,7 +13,7 @@ import org.scalamock.scalatest.MockFactory
 import scala.concurrent.duration._
 import scala.concurrent.duration._
 
-class MatchResultGathererSpec(_system: ActorSystem) extends ActorSpecBase(_system) with MockFactory {
+class MatchResultGathererActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   def this() = this(ActorSystem("MatchResultGatherer"))
 
@@ -46,6 +46,7 @@ class MatchResultGathererSpec(_system: ActorSystem) extends ActorSpecBase(_syste
       matchResultGathererActor ! MatchNotFound
       matchResultGathererActor ! MatchNotFound
       matchResultGathererActor ! MatchNotFound
+
       origin.expectMsg(StubResponse(NotFound.intValue, NotFound.reason))
     }
   }
