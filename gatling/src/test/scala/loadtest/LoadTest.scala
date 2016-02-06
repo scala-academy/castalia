@@ -15,14 +15,14 @@ class LoadTest extends Simulation {
 
   val maxUsers = 10
   val rampUp = 10
-  val testDuration = 60
+  val testDuration = 40
 
   val endPoints = List(
       """{"endpoint":"perf/endpoint_0", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "100 ms"},"response": {"value": "0"}}]}""",
       """{"endpoint":"perf/endpoint_1", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "200 ms"},"response": {"value": "1"}}]}""",
       """{"endpoint":"perf/endpoint_2", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "500 ms"},"response": {"value": "2"}}]}""",
       """{"endpoint":"perf/endpoint_3", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "750 ms"},"response": {"value": "3"}}]}""",
-      """{"endpoint":"perf/endpoint_4", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "2 s"},   "response": {"value": "4"}}]}"""
+      """{"endpoint":"perf/endpoint_4", "responses": [{"httpStatusCode": 200, "delay": { "distribution": "constant", "mean": "2000 ms"},   "response": {"value": "4"}}]}"""
     )
 
   // Send the endpoints via the management interface to the stub server
@@ -36,7 +36,7 @@ class LoadTest extends Simulation {
 
   // setup the scenario
   val callAllEndpoints = repeat(endPoints.length, "index"){
-    exec( http("perf/endpoint_${index}").get("/perf/endpoint_${index}")).pause(2500 milli)
+    exec( http("perf/endpoint_${index}").get("/perf/endpoint_${index}")).pause(500 milli)
   }
 
   val scenarioA = scenario("Load Test A").exec(callAllEndpoints)
