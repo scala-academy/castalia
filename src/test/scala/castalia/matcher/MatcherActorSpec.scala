@@ -1,8 +1,8 @@
 package castalia.matcher
 
-import akka.actor.ActorSystem
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.HttpRequest
-import akka.testkit.TestProbe
+import akka.testkit.{TestActor, TestProbe}
 import castalia.actors.ActorSpecBase
 import castalia.matcher.MatcherActor.RespondIfMatched
 
@@ -22,12 +22,17 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val uriParser = new UriParser()
       val parsedUri = uriParser.parse("/a/123/c")
       val httpRequest = HttpRequest()
+      handler.setAutoPilot(new TestActor.AutoPilot {
+        def run(sender: ActorRef, msg: Any): TestActor.AutoPilot = {
+          sender ! "HandlerResponse"
+          TestActor.NoAutoPilot
+        }
+      })
 
-        matcherActor ! RespondIfMatched(parsedUri, httpRequest, gatherer.ref)
+      matcherActor ! RespondIfMatched(parsedUri, httpRequest, gatherer.ref)
 
-        handler.expectMsgClass(2.seconds, classOf[RequestMatch])
-        handler.reply("HandlerResponse")
-        gatherer.expectMsg("HandlerResponse")
+      handler.expectMsgClass(2.seconds, classOf[RequestMatch])
+      gatherer.expectMsg("HandlerResponse")
     }
   }
 }
