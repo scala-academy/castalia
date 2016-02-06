@@ -8,7 +8,7 @@ import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.matcher.types.{Params, Segments}
 import scala.util.{Success, Failure}
 import scala.annotation.tailrec
-import akka.pattern.ask
+import akka.pattern.{ask, pipe}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -25,13 +25,12 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
     case RespondIfMatched(parsedUri, httpRequest, gatherer) => {
       matchPath(parsedUri.pathList) match {
         case Some(params) => {
-          log.debug(s"MatcherActor found match: $params. Forwarding request to $handler")
+          log.debug(s"MatcherActor found match: $params from $sender. Forwarding request to $handler")
           // TODO: RequestMatch should not contain handler as that is a self-reference of the receiver
           val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams, handler)
           log.debug(s"RequestMatch: $requestMatch")
-          log.debug(s"sending to $handler")
-          val result = handler ? requestMatch
-          result.map(response => gatherer ! response)
+          log.debug(s"sending to $gatherer")
+          (handler ? requestMatch) pipeTo gatherer
         }
         case None => gatherer ! MatchNotFound
       }

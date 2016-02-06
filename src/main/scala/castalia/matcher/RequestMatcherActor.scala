@@ -29,7 +29,7 @@ class RequestMatcherActor extends Actor with ActorLogging {
 
     case FindMatchAndForward(httpRequest, origin) =>
       val parsedUri = new ParsedUri(httpRequest.uri.toString().replace(';', '&'), httpRequest.uri.path, httpRequest.uri.query().toList)
-      log.debug(s"RequestMatcherActor received http request $parsedUri")
+      log.debug(s"RequestMatcherActor received http request $parsedUri from $sender")
       val gatherer = context.actorOf(MatchResultGatherer.props(matchers.size, origin))
       matchers.foreach(matcher =>{
         log.debug(s"sending to ${matcher._1} ${RespondIfMatched(parsedUri, httpRequest, gatherer)}")

@@ -13,7 +13,7 @@ class RequestMatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_syste
   def this() = this(ActorSystem("RequestMatcherActor"))
 
   trait TestRequestMatcherActorCreator extends RequestMatcherActorCreator {
-    val probe = TestProbe() //("Probe from TestRequestMatcherActorCreator")
+    val probe = TestProbe("TestRequestMatcherActor")
     def createRequestMatcherActor(context: ActorContext, segments: Segments, handler: ActorRef): ActorRef = {
       probe.ref
     }
