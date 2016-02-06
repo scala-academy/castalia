@@ -28,9 +28,9 @@ libraryDependencies ++= {
   )
 }
 
-testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework") // ScalaMeter
+//testFrameworks += new TestFramework("org.scalameter.ScalaMeterFramework") // ScalaMeter
 
-parallelExecution in Test := false // ScalaMeter
+//parallelExecution in Test := false // ScalaMeter
 
 // Use IntegrationTest
 // (http://www.scala-sbt.org/release/docs/Testing.html#Integration+Tests)

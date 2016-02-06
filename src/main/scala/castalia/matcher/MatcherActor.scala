@@ -28,8 +28,7 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
           log.debug(s"MatcherActor found match: $params from $sender. Forwarding request to $handler")
           // TODO: RequestMatch should not contain handler as that is a self-reference of the receiver
           val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams, handler)
-          log.debug(s"RequestMatch: $requestMatch")
-          log.debug(s"sending to $gatherer")
+          log.debug(s"($handler ? $requestMatch) pipeTo $gatherer")
           (handler ? requestMatch) pipeTo gatherer
         }
         case None => gatherer ! MatchNotFound
