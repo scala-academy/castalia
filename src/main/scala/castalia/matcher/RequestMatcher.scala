@@ -18,7 +18,7 @@ class RequestMatcher(myMatchers: List[Matcher]) {
       (segments, matchers) match {
         case (_, Nil) => None
         case (seg, head :: _) if head.matchPath(seg).isDefined =>
-          Some(new RequestMatch(httpRequest, head.matchPath(seg).get, parsedUri.queryParams, head.handler))
+          Some(new RequestMatch(httpRequest, head.matchPath(seg).get, parsedUri.queryParams))
         case (seg, _ :: tail) => findMatch(seg, tail)
       }
 

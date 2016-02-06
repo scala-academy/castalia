@@ -2,7 +2,7 @@ package castalia.matcher
 
 import akka.actor.{ActorLogging, Actor, ActorRef, Props}
 import akka.http.scaladsl.model.HttpRequest
-import castalia.Main
+import akka.util.Timeout
 import castalia.matcher.MatchResultGatherer.MatchNotFound
 import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.matcher.types.{Params, Segments}
@@ -10,6 +10,7 @@ import scala.util.{Success, Failure}
 import scala.annotation.tailrec
 import akka.pattern.{ask, pipe}
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 /**
   * Created by m06f791 on 4-2-2016.
@@ -19,21 +20,18 @@ object MatcherActor {
   def props(segments: Segments, handler: ActorRef): Props = Props(new MatcherActor(segments, handler))
 }
 class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with ActorLogging {
-  import Main.timeout
+  implicit val timeout = Timeout(2.seconds)
 
   def receive: Receive = {
-    case RespondIfMatched(parsedUri, httpRequest, gatherer) => {
+    case RespondIfMatched(parsedUri, httpRequest, gatherer) =>
       matchPath(parsedUri.pathList) match {
-        case Some(params) => {
+        case Some(params) =>
           log.debug(s"MatcherActor found match: $params from $sender. Forwarding request to $handler")
-          // TODO: RequestMatch should not contain handler as that is a self-reference of the receiver
-          val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams, handler)
+          val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams)
           log.debug(s"($handler ? $requestMatch) pipeTo $gatherer")
           (handler ? requestMatch) pipeTo gatherer
-        }
         case None => gatherer ! MatchNotFound
       }
-    }
   }
 
   /**
