@@ -28,16 +28,35 @@ class MatchResultGatherer(nrOfMatchers: Int, origin: ActorRef) extends Actor wit
   def receive: Receive = awaitResponses(false, nrOfMatchers)
 
   def awaitResponses(responseSent: Boolean, responsesToGet: Int): Receive = {
-    case MatchNotFound if responsesToGet > 1 => context.become(awaitResponses(responseSent, responsesToGet - 1))
     case MatchNotFound =>
+      handleMatchNotFound(responseSent, responsesToGet)
+    case MatchFound(handler, requestMatch) =>
+      handleMatchFound(responseSent, responsesToGet, handler, requestMatch)
+  }
+
+  def handleMatchNotFound(responseSent: Boolean, responsesToGet: Int): Unit = {
+    if (responsesToGet > 1) {
+      // No match was found, wait for other matcher results
+      context.become(awaitResponses(responseSent, responsesToGet - 1))
+    } else if (!responseSent) {
+      // No match was found and we are no longer waiting for the results of other matchers
       origin ! StubResponse(NotFound.intValue, NotFound.reason)
       self ! Kill
-    case MatchFound(handler, requestMatch) if !responseSent && responsesToGet > 0 =>
-      (handler ? requestMatch) pipeTo origin
+    }
+  }
+
+  def handleMatchFound(responseSent: Boolean, responsesToGet: Int, stubHandler: ActorRef, requestMatch: RequestMatch): Unit = {
+    if (!responseSent) {
+      // First match result found, let stub handler create response and return that to consumer
+      log.debug(s"match found for $stubHandler: $requestMatch")
+      (stubHandler ? requestMatch) pipeTo origin
+    }
+    if (responsesToGet > 1) {
+      // Other matchers will still send their result to this actor, stay alive until they have done so
       context.become(awaitResponses(true, responsesToGet - 1))
-    case MatchFound if responsesToGet > 1 =>
-      context.become(awaitResponses(true, responsesToGet - 1))
-    case _ =>
+    } else {
+      // No more matchers will send their result
       self ! Kill
+    }
   }
 }

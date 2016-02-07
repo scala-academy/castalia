@@ -24,9 +24,12 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
     case RespondIfMatched(parsedUri, httpRequest, gatherer) =>
       matchPath(parsedUri.pathList) match {
         case Some(params) =>
+          log.debug(s"Match found for $segments and $parsedUri: $params to be handled by $handler")
           val requestMatch = new RequestMatch(httpRequest, params, parsedUri.queryParams)
           gatherer ! MatchFound(handler, requestMatch)
-        case None => gatherer ! MatchNotFound
+        case None =>
+          log.debug(s"Match not found for $segments and $parsedUri")
+          gatherer ! MatchNotFound
       }
   }
 

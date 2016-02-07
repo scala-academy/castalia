@@ -25,11 +25,12 @@ class RequestMatcherActor extends Actor with ActorLogging {
     case AddMatcher(segments, handler) =>
       val matcher = createRequestMatcherActor(context, segments, handler)
       log.debug(s"Added matcher $matcher to RequestMatcherActor ${self.toString()}")
-      // if there is already a matcher with the same segments, kill that one
-      matchers.find(_._2.equals(segments)).map(_._1 ! Kill)
+      // if there is already a matcher with the same segments, kill that one and replace with new one
+      matchers.filter(_._2.equals(segments)).foreach(_._1 ! Kill)
       context.become(normal(matchers.filter(!_._2.equals(segments)) + ((matcher, segments))))
 
     case FindMatchAndForward(httpRequest, origin) =>
+      // Foward match request to all registered matchers. Create result gatherer to gather and handle results
       val parsedUri = new ParsedUri(httpRequest.uri.toString().replace(';', '&'), httpRequest.uri.path, httpRequest.uri.query().toList)
       log.debug(s"RequestMatcherActor received http request $parsedUri from $sender")
       val gatherer = context.actorOf(MatchResultGatherer.props(matchers.size, origin))
