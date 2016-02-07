@@ -7,6 +7,7 @@ scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf
 libraryDependencies ++= {
   val akkaStreamV      = "2.0.2"
   val scalaTestV       = "3.0.0-M15"
+
   Seq(
     "com.typesafe.akka" %% "akka-stream-experimental"             % akkaStreamV,
     "com.typesafe.akka" %% "akka-http-core-experimental"          % akkaStreamV,
@@ -17,11 +18,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
     "com.typesafe.akka" %% "akka-testkit"       % "2.4.1"      % "test,it",
     "com.miguno.akka"   %% "akka-mock-scheduler"                  % "0.4.0"          % "test",
-    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it",
-    "io.gatling.highcharts" % "gatling-charts-highcharts"         % "2.1.7" % "test",
-    "io.gatling"            % "gatling-test-framework"            % "2.1.7" % "test",
-    "org.scalaj"        % "scalaj-http_2.11"                      % "2.2.1",
-    "org.scalamock" %% "scalamock-scalatest-support" % "3.2" % "test"
+    "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it"
   )
 }
 

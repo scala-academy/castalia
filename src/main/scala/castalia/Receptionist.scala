@@ -17,7 +17,7 @@ class Receptionist extends Actor with ActorLogging {
 
   val metricsCollector = createMetricsCollector
 
-  val requestMatcherActor = context.actorOf(RequestMatcherActor.props()) // new
+  val requestMatcherActor = context.actorOf(RequestMatcherActor.props())
 
   private def upsertEndPointActor(stubConfig: StubConfig) = {
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
@@ -27,7 +27,7 @@ class Receptionist extends Actor with ActorLogging {
     }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
-    requestMatcherActor ! AddMatcher(stubConfig.segments, actor) // new
+    requestMatcherActor ! AddMatcher(stubConfig.segments, actor)
     log.debug(s"Registering matcher with segments ${stubConfig.segments}")
   }
 
@@ -35,13 +35,13 @@ class Receptionist extends Actor with ActorLogging {
     // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
-      upsertEndPointActor(stubConfig) // new
+      upsertEndPointActor(stubConfig)
       sender ! Done(stubConfig.endpoint)
 
     // Real request
     case request: HttpRequest =>
       log.info(s"receptionist received message [" + request.uri.toString() + "]")
-      requestMatcherActor ! FindMatchAndForward(request, sender) // new
+      requestMatcherActor ! FindMatchAndForward(request, sender)
 
     case EndpointMetricsGet =>
       log.info("fetching metrics for all endpoints")
