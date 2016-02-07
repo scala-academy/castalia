@@ -29,8 +29,10 @@ class RequestMatcherActor extends Actor with ActorLogging {
     case AddMatcher(segments, handler) =>
       val matcher = createRequestMatcherActor(context, segments, handler)
       log.debug(s"Added matcher $matcher to RequestMatcherActor ${self.toString()}")
-      matchers.find(_._2.equals(segments)).foreach{case (matcherRef, _) => context.stop(matcherRef)}
-      context.become(normal(matchers.filter(!_._2.equals(segments)) + ((matcher, segments))))
+      val matcherOnSameSegments = matchers.find(_._2.equals(segments))
+      matcherOnSameSegments.foreach { case (matcherRef, _) => context.stop(matcherRef) }
+      val newSetOfMatchers = matchers.filter(!_._2.equals(segments)) + ((matcher, segments))
+      context.become(normal(newSetOfMatchers))
 
     // Foward match request to all registered matchers. Create result gatherer to gather and handle results
     case FindMatchAndForward(httpRequest, origin) =>
@@ -39,8 +41,13 @@ class RequestMatcherActor extends Actor with ActorLogging {
       val gatherer = context.actorOf(MatchResultGatherer.props(matchers.size, origin))
       matchers.foreach(matcher => {
         log.debug(s"sending to ${matcher._1} ${RespondIfMatched(parsedUri, httpRequest, gatherer)}")
-        matcher._1 ! RespondIfMatched(parsedUri, httpRequest, gatherer)
+        val matcherRef = matcher._1
+        matcherRef ! RespondIfMatched(parsedUri, httpRequest, gatherer)
       })
+
+    // unexpected messages
+    case x =>
+      log.info("Receptionist received unexpected message: " + x.toString)
   }
 }
 
