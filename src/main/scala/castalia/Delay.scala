@@ -147,8 +147,8 @@ trait DelayedDistribution extends Delay {
     val theta = 1
     val ratio = x2 / x1
 
-    def f(shape: Double) = castalia.Dist.qgamma(0.9, shape, theta) /
-      castalia.Dist.qgamma(0.5, shape, theta) - ratio
+    def f(shape: Double) = jdistlib.Gamma.quantile(p2, shape, theta, true, false) /
+      jdistlib.Gamma.quantile(p1, shape, theta, true, false) - ratio
 
     val left = 0.1
     // arbitrary right side starting point
@@ -156,7 +156,7 @@ trait DelayedDistribution extends Delay {
     val tolerance = 0.0001
     val shape = halveTheIntervalFP(f, left, right, tolerance)
 
-    val scale = x1 / castalia.Dist.qgamma(0.5, shape, 1)
+    val scale = x1 / jdistlib.Gamma.quantile(p1, shape, theta, true, false)
     (shape, scale)
   }
 }
