@@ -29,7 +29,7 @@ class RequestMatcherActor extends Actor with ActorLogging {
     case AddMatcher(segments, handler) =>
       val matcher = createRequestMatcherActor(context, segments, handler)
       log.debug(s"Added matcher $matcher to RequestMatcherActor ${self.toString()}")
-      matchers.find(_._2.equals(segments)).map{case (matcherRef, _) => context.stop(matcherRef)}
+      matchers.find(_._2.equals(segments)).foreach{case (matcherRef, _) => context.stop(matcherRef)}
       context.become(normal(matchers.filter(!_._2.equals(segments)) + ((matcher, segments))))
 
     // Foward match request to all registered matchers. Create result gatherer to gather and handle results
