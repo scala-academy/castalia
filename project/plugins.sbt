@@ -10,5 +10,3 @@ addSbtPlugin("com.typesafe.sbt" %% "sbt-native-packager" % "1.0.4")
 // Needs to be added to support codacy scala coverage.
 // see: https://github.com/codacy/sbt-codacy-coverage#sbt-codacy-coverage
 addSbtPlugin("com.codacy" % "sbt-codacy-coverage" % "1.2.1")
-
-addSbtPlugin("io.gatling" % "gatling-sbt" % "2.1.7")

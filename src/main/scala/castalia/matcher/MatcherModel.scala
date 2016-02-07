@@ -36,7 +36,6 @@ case class Matcher(segments: Segments, handler: ActorRef) {
         case (Nil, Nil)  => Some(params)
         case (Nil, _) => None
         case (_, Nil) => None
-//        case (rhead::rtail, mhead::mtail) if isParam(mhead) => marp(rtail, mtail, (paramName(mhead), rhead)::params)
         case (rhead::rtail, mhead::mtail) if parsedSegments.contains(mhead) => marp(rtail, mtail, (parsedSegments(mhead), rhead)::params)
         case (rhead::rtail, mhead::mtail) if rhead.equals(mhead) => marp(rtail, mtail, params)
         case (_, _) => None
