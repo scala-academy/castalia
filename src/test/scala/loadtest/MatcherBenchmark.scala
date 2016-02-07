@@ -2,14 +2,14 @@ package loadtest
 
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.HttpRequest
-import castalia.matcher.{Matcher, RequestMatcher}
+import castalia.matcher.Matcher
 import org.scalameter.api._
 
 /**
   * Created by m06f791 on 4-2-2016.
   */
 object MatcherBenchmark extends Bench.LocalTime {
-
+/* TODO refactor to use actor based request matching
   val sizes = Gen.range("size")(100, 10000, 9900)
 
   val ranges = for {
@@ -36,5 +36,5 @@ object MatcherBenchmark extends Bench.LocalTime {
         r => r.foreach( i => matcher.matchRequest(httpRequests(i % 5)))
       }
     }
-  }
+  }*/
 }

@@ -2,13 +2,12 @@ package castalia
 
 import akka.actor._
 import akka.http.scaladsl.model.HttpRequest
-import akka.http.scaladsl.model.StatusCodes._
 import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
-import castalia.matcher.RequestMatcherActor.{FindMatchAndForward, AddMatcher}
-import castalia.matcher.{MatcherActor, RequestMatcherActor, Matcher, RequestMatcher}
+import castalia.matcher.RequestMatcherActor
+import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatchAndForward}
 import castalia.metrics.MetricsCollectorActor
-import castalia.model.Messages.{EndpointMetricsGet, Done, UpsertEndpoint}
-import castalia.model.Model.{StubConfig, StubResponse}
+import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
+import castalia.model.Model.StubConfig
 
 object Receptionist {
   def props: Props = Props[Receptionist]
@@ -20,9 +19,7 @@ class Receptionist extends Actor with ActorLogging {
 
   val requestMatcherActor = context.actorOf(RequestMatcherActor.props()) // new
 
-
-  private def upsertEndPointActor(stubConfig: StubConfig, endpointMatcher : RequestMatcher) = {
-
+  private def upsertEndPointActor(stubConfig: StubConfig) = {
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
       if (stubConfig.responseprovider.isDefined) new JsonResponseProviderEndpointActor(stubConfig, metricsCollector)
       else if (stubConfig.responses.isDefined) new JsonResponsesEndpointActor(stubConfig, metricsCollector)
@@ -30,39 +27,27 @@ class Receptionist extends Actor with ActorLogging {
     }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
-//    context.become(receiveWithMatcher(endpointMatcher.addOrReplaceMatcher(new Matcher(stubConfig.segments, actor))))
-
     requestMatcherActor ! AddMatcher(stubConfig.segments, actor) // new
-//    requestMatcherActor ! AddMatcher(context.actorOf(MatcherActor.props(stubConfig.segments, actor))) // new
-
     log.debug(s"Registering matcher with segments ${stubConfig.segments}")
   }
 
-  override def receive: Receive = receiveWithMatcher(new RequestMatcher(Nil))
-
-  def receiveWithMatcher(endpointMatcher : RequestMatcher) : Receive = {
+  def receive: Receive = {
     // Request to modify config
     case UpsertEndpoint(stubConfig) =>
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
-      upsertEndPointActor(stubConfig, endpointMatcher)
+      upsertEndPointActor(stubConfig) // new
       sender ! Done(stubConfig.endpoint)
 
     // Real request
     case request: HttpRequest =>
       log.info(s"receptionist received message [" + request.uri.toString() + "]")
-//      val requestMatchOption = endpointMatcher.matchRequest(request)
-//      log.info(s"receptionist attempted to match, result = " + requestMatchOption)
-//      requestMatchOption match {
-//        case Some(requestMatch) => requestMatch.handler forward requestMatch
-//        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
-//      }
       requestMatcherActor ! FindMatchAndForward(request, sender) // new
 
     case EndpointMetricsGet =>
       log.info("fetching metrics for all endpoints")
       metricsCollector forward EndpointMetricsGet
 
-      // unexpected messages
+    // unexpected messages
     case x =>
       log.info("Receptionist received unexpected message: " + x.toString)
   }
