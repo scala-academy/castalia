@@ -25,8 +25,8 @@ class RequestMatcherActor extends Actor with ActorLogging {
     case AddMatcher(segments, handler) =>
       val matcher = createRequestMatcherActor(context, segments, handler)
       log.debug(s"Added matcher $matcher to RequestMatcherActor ${self.toString()}")
-      // if there is already a mather with the same segments, kill that one
-      matchers.filter(_._2.equals(segments)).foreach(_._1 ! Kill)
+      // if there is already a matcher with the same segments, kill that one
+      matchers.find(_._2.equals(segments)).map(_._1 ! Kill)
       context.become(normal(matchers.filter(!_._2.equals(segments)) + ((matcher, segments))))
 
     case FindMatchAndForward(httpRequest, origin) =>
