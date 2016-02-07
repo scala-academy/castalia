@@ -30,11 +30,10 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
         case None =>
           log.debug(s"Match not found for $segments and $parsedUri")
           gatherer ! MatchNotFound
-
-        // impossible case but satisfies codacy :s
-        case x =>
-          log.info("Receptionist received unexpected message: " + x.toString)
       }
+    // unexpected messages
+    case x =>
+      log.info("Receptionist received unexpected message: " + x.toString)
   }
 
   /**
