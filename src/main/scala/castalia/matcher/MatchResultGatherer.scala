@@ -41,7 +41,7 @@ class MatchResultGatherer(nrOfMatchers: Int, origin: ActorRef) extends Actor wit
     } else if (!responseSent) {
       // No match was found and we are no longer waiting for the results of other matchers
       origin ! StubResponse(NotFound.intValue, NotFound.reason)
-      self ! Kill
+      context.stop(self)
     }
   }
 
@@ -56,7 +56,7 @@ class MatchResultGatherer(nrOfMatchers: Int, origin: ActorRef) extends Actor wit
       context.become(awaitResponses(true, responsesToGet - 1))
     } else {
       // No more matchers will send their result
-      self ! Kill
+      context.stop(self)
     }
   }
 }
