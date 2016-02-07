@@ -15,13 +15,13 @@ trait EndpointRequestInterceptor {
 
   this: ReceivePipeline =>
 
-  def stubConfig: StubConfig
+  def endpoint: String
   def metricsCollector: ActorRef
 
-  metricsCollector ! EndpointMetricsInit(stubConfig.endpoint)
+  metricsCollector ! EndpointMetricsInit(endpoint)
 
   pipelineOuter {
-    case rm: RequestMatch => { metricsCollector ! EndpointCalled(stubConfig.endpoint) }
+    case rm: RequestMatch => { metricsCollector ! EndpointCalled(endpoint) }
     Inner(rm)
   }
 

@@ -14,32 +14,29 @@ class EndpointRequestInterceptorSpec(_system: ActorSystem) extends ActorSpecBase
 
   "EndpointRequestInterceptor" must {
 
-    val stubConfig = StubConfig("my endpoint", None, None, None)
+    val endpoint = "my endpoint"
     val metricsCollector = new TestProbe(_system)
 
     "send message to reset stats and collect stats" in {
 
-      val actorWithInterceptor = system.actorOf(Props(new AnActor(stubConfig, metricsCollector.ref)
+      val actorWithInterceptor = system.actorOf(Props(new AnActor(endpoint, metricsCollector.ref)
         with EndpointRequestInterceptor))
 
       // send initial reset stats endpoint metrics
-      metricsCollector.expectMsg(EndpointMetricsInit(stubConfig.endpoint))
+      metricsCollector.expectMsg(EndpointMetricsInit(endpoint))
 
       actorWithInterceptor ! RequestMatch(new HttpRequest(), List(), List())
 
       // metrics provider will intercept RequestMatch message and add it's own behaviour on top of Done message back
-      expectMsg(Done(stubConfig.endpoint))
-      metricsCollector.expectMsg(EndpointCalled(stubConfig.endpoint))
+      expectMsg(Done(endpoint))
+      metricsCollector.expectMsg(EndpointCalled(endpoint))
     }
 
   }
 
-  class AnActor(myStubConfig: StubConfig, myMetricsCollector: ActorRef) extends Actor with ReceivePipeline {
-    def stubConfig: StubConfig = myStubConfig
-    def metricsCollector: ActorRef = myMetricsCollector
-
+  class AnActor(val endpoint: String, val metricsCollector: ActorRef) extends Actor with ReceivePipeline {
     def receive: Receive = {
-      case m: RequestMatch ⇒ sender ! Done(stubConfig.endpoint)
+      case m: RequestMatch ⇒ sender ! Done(endpoint)
     }
   }
 }

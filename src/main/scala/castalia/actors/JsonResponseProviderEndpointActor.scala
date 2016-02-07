@@ -3,11 +3,12 @@ package castalia.actors
 import java.lang.reflect.Method
 
 import akka.actor.ActorRef
-import castalia.matcher.RequestMatch
-import castalia.model.Model.{StubConfig, StubResponse}
-import scala.concurrent.Future
 import akka.pattern.pipe
+import castalia.matcher.RequestMatch
+import castalia.model.Model.{StubConfig, ResponseProviderConfig, StubResponse}
+
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.language.existentials
 
 /**
@@ -15,19 +16,15 @@ import scala.language.existentials
   *
   * Created on 2016-01-23
   */
-class JsonResponseProviderEndpointActor(override val stubConfig: StubConfig, override val metricsCollector: ActorRef)
+class JsonResponseProviderEndpointActor(override val endpoint:String, val responseProvider: ResponseProviderConfig, override val metricsCollector: ActorRef)
   extends JsonEndpointActor {
-  private case class ResponseProvider(clazz : Class[_], member : Method)
+  private case class ResponseProvider(clazz: Class[_], member: Method)
 
-  private val programmedStub: ResponseProvider =
-    stubConfig.responseprovider match {
-      case Some(responseProvider) =>
-        val clazz = Class.forName(responseProvider.clazz)
-        val member = clazz.getDeclaredMethod(responseProvider.member, classOf[RequestMatch])
-
-        ResponseProvider(clazz, member)
-      case None => throw new Exception(s"stubconfig doesn't contain a responseProvider")
-    }
+  private val programmedStub: ResponseProvider = {
+    val clazz = Class.forName(responseProvider.clazz)
+    val member = clazz.getDeclaredMethod(responseProvider.member, classOf[RequestMatch])
+    ResponseProvider(clazz, member)
+  }
   protected def invokeProgrammedStub(requestMatch: RequestMatch): Future[StubResponse] = {
     val instance = programmedStub.clazz.newInstance
     programmedStub.member.invoke(instance, requestMatch).asInstanceOf[Future[StubResponse]]

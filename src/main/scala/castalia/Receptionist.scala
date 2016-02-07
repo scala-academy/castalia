@@ -21,9 +21,11 @@ class Receptionist extends Actor with ActorLogging {
 
   private def upsertEndPointActor(stubConfig: StubConfig) = {
     def endpointActorFactory(stubConfig: StubConfig): JsonEndpointActor = {
-      if (stubConfig.responseprovider.isDefined) new JsonResponseProviderEndpointActor(stubConfig, metricsCollector)
-      else if (stubConfig.responses.isDefined) new JsonResponsesEndpointActor(stubConfig, metricsCollector)
-      else throw new UnsupportedOperationException
+      stubConfig match {
+        case StubConfig(endpoint, _, _, Some(config)) => new JsonResponseProviderEndpointActor(endpoint, config, metricsCollector)
+        case StubConfig(endpoint, _, Some(responses), _) => new JsonResponsesEndpointActor(endpoint, responses, metricsCollector)
+        case _ => throw new UnsupportedOperationException
+      }
     }
 
     val actor = context.actorOf(Props(endpointActorFactory(stubConfig)))
