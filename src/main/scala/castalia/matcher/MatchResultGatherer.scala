@@ -38,10 +38,14 @@ class MatchResultGatherer(nrOfMatchers: Int, origin: ActorRef) extends Actor wit
     if (responsesToGet > 1) {
       // No match was found, wait for other matcher results
       context.become(awaitResponses(responseSent, responsesToGet - 1))
-    } else if (!responseSent) {
-      // No match was found and we are no longer waiting for the results of other matchers
-      origin ! StubResponse(NotFound.intValue, NotFound.reason)
+    } else {
+      // This is the last match result we are waiting for. Stop this actor after processing this message
       context.stop(self)
+
+      if (!responseSent) {
+        // No response to origin was sent yet, do so now
+        origin ! StubResponse(NotFound.intValue, NotFound.reason)
+      }
     }
   }
 
