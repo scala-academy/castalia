@@ -7,7 +7,7 @@ import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
 import castalia.model.Messages.{EndpointMetricsGet, Done}
-import castalia.model.Model.{EndpointMetrics, StubConfig}
+import castalia.model.Model.{EndpointResponseConfig, EndpointMetrics, StubConfig}
 
 import scala.concurrent.duration._
 import scala.language.postfixOps

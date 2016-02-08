@@ -16,9 +16,10 @@ import castalia.model.Model.{StubResponse, StubConfig}
 
 import scala.concurrent.duration._
 import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
-import castalia.matcher.{Matcher, RequestMatcher}
+import castalia.matcher.types.Segments
+import castalia.matcher.{UriParser, Matcher, RequestMatcher}
 import castalia.metrics.MetricsCollectorActor
-import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
+import castalia.model.Messages.{UpsertResponse, Done, EndpointMetricsGet, UpsertEndpoint}
 import castalia.model.Model.{StubConfig, StubResponse}
 
 object Receptionist {

@@ -31,7 +31,7 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
 
   implicit val scheduler = system.scheduler
 
-  var responses: Option[List[ResponseConfig]] = myStubConfig.responses
+  var responses: Option[List[ResponseConfig]] = stubConfig.responses
 
   override def receive: Receive = {
     case request: RequestMatch =>

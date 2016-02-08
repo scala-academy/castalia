@@ -2,7 +2,7 @@ package castalia.management
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.Timeout
-import castalia.model.Messages.{UpsertResponse, Done, UpsertEndpoint}
+import castalia.model.Messages.{EndpointMetricsGet, UpsertResponse, Done, UpsertEndpoint}
 import castalia.model.Model.{EndpointResponseConfig, StubConfig}
 import castalia.model.Messages.{EndpointMetricsGet, UpsertEndpoint}
 import castalia.model.Model.StubConfig

@@ -28,6 +28,24 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
       val stubConfig = new StubConfig("my/endpoint", None, Some(List(ResponseConfig(None, None, OK.intValue, None))), None)
 
       receptionistMock.setAutoPilot(new AutoPilot {
+        override def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
+          case UpsertEndpoint(config) => sender ! Done(config.endpoint)
+            NoAutoPilot
+        }
+      })
+
+      Post("/castalia/manager/endpoints", stubConfig) ~> service.managementRoute ~> check {
+        status shouldBe OK
+        responseAs[String] shouldBe stubConfig.endpoint
+      }
+    }
+  }
+
+  "posting new endpoint" should {
+    "forward Upsert to Receptionist and eventually result in status HTTP 200" in {
+     val stubConfig = new StubConfig("my/endpoint", None, Some(List(ResponseConfig(None, None, OK.intValue, None))), None)
+
+      receptionistMock.setAutoPilot(new AutoPilot {
         override def run(sender: ActorRef, msg: Any): AutoPilot = msg match{
           case UpsertEndpoint(config) => sender ! Done(config.endpoint)
             NoAutoPilot
@@ -35,6 +53,8 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
       })
 
       Post("/castalia/manager/endpoints", stubConfig) ~> service.managementRoute ~> check {
+
+        // TODO
         status shouldBe OK
         responseAs[String] shouldBe stubConfig.endpoint
       }
