@@ -8,9 +8,6 @@ import castalia.matcher.types.{Params, Segments}
 
 import scala.annotation.tailrec
 
-/**
-  * Created by m06f791 on 4-2-2016.
-  */
 object MatcherActor {
 
   case class RespondIfMatched(parsedUri: ParsedUri, httpRequest: HttpRequest, gatherer: ActorRef)

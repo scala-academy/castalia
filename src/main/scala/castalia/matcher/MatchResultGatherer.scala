@@ -10,9 +10,6 @@ import castalia.model.Model.StubResponse
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-/**
-  * Created by Jordi on 4-2-2016.
-  */
 object MatchResultGatherer {
 
   case object MatchNotFound

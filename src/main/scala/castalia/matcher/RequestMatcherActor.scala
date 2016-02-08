@@ -6,10 +6,6 @@ import castalia.matcher.MatcherActor.RespondIfMatched
 import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatchAndForward}
 import castalia.matcher.types._
 
-/**
-  * Created by m06f791 on 4-2-2016.
-  */
-
 object RequestMatcherActor {
 
   case class FindMatchAndForward(httpRequest: HttpRequest, origin: ActorRef)
