@@ -1,6 +1,5 @@
 package castalia.matcher
 
-import akka.actor.ActorRef
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
 import akka.http.scaladsl.model.Uri.Path.{Empty, Slash, Segment}
@@ -13,53 +12,8 @@ package object types{
   type Params = List[(String, String)]
 }
 
-
 /**
-  * Holds an endpoint matching structure and an ActorRef that can process the request
-  *
-  * @param segments containing the path segment matches and path parameters
-  * @param handler ActorRef containing the name of the actor that can process this request
-  */
-case class Matcher(segments: Segments, handler: ActorRef) {
-
-  val parsedSegments = segments.filter(isParam(_)).map{segment => (segment -> paramName(segment))}.toMap[String, String]
-
-  /**
-    * Compare the segments, matching the literals and collecting the parameters on the fly
-    *
-    * @param requestSegments containing the path segments from the request
-    */
-  def matchPath(requestSegments: Segments): Option[Params] = {
-    @tailrec
-    def marp( requestSeg: Segments, matchSeg: Segments, params: Params): Option[Params] =
-      (requestSeg, matchSeg) match {
-        case (Nil, Nil)  => Some(params)
-        case (Nil, _) => None
-        case (_, Nil) => None
-        case (rhead::rtail, mhead::mtail) if parsedSegments.contains(mhead) => marp(rtail, mtail, (parsedSegments(mhead), rhead)::params)
-        case (rhead::rtail, mhead::mtail) if rhead.equals(mhead) => marp(rtail, mtail, params)
-        case (_, _) => None
-    }
-
-    marp( requestSegments, segments, List[(String, String)]())
-  }
-
-  private def isParam(segment: String): Boolean = {
-    segment.startsWith("{") && segment.endsWith("}") || segment.startsWith("$")
-  }
-
-  private def paramName( segment: String): String =
-    (segment, segment.startsWith("{"), segment.startsWith("$")) match {
-    case (seg, true, _)    => seg.substring(1, segment.length - 1)
-    case (seg, _,    true) => seg.substring(1, segment.length)
-    case (seg, _,    _)    => seg
-  }
-
-
-}
-
-/**
-  * Result of a successful match of a request uri by a Matcher
+  * Result of a successful match of a request uri by a MatcherActor
  *
   * @param httpRequest the original HttpRequest
   * @param pathParams the path parameters that were extracted from the uri
