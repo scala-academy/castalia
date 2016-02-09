@@ -20,7 +20,7 @@ case class DelayComplete(destination: ActorRef, message: StubResponse)
   *
   * Created on 2016-01-23
   */
-class JsonResponsesEndpointActor(override val endpoint: String, val responses: List[ResponseConfig], override val metricsCollector: ActorRef)
+class JsonResponsesEndpointActor(override val endpoint: String, var responses: List[ResponseConfig], override val metricsCollector: ActorRef)
   extends JsonEndpointActor
     with ActorLogging
     with Delay {
@@ -30,8 +30,6 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
   import context._
 
   implicit val scheduler = system.scheduler
-
-  var responses: Option[List[ResponseConfig]] = stubConfig.responses
 
   override def receive: Receive = {
     case request: RequestMatch =>
@@ -66,7 +64,7 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
 
     case UpsertResponse(endpointResponseConfig) =>
       log.debug("received UpsertResponse")
-      responses = Some(endpointResponseConfig.response :: responses.getOrElse(List()))
+      responses = endpointResponseConfig.response :: responses
 
       sender ! Done(endpointResponseConfig.endpoint)
 

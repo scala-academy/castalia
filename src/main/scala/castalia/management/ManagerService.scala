@@ -36,21 +36,22 @@ trait ManagerService {
       } ~
       path("responses") {
         post {
-          entity(as[EndpointResponseConfig]){
+          entity(as[EndpointResponseConfig]) {
             endpointResponseConfig =>
               complete {
                 (managerActor ? endpointResponseConfig)
-                .mapTo[Done]
-                .map(result => s"${result.endpoint}")
-            }
+                  .mapTo[Done]
+                  .map(result => s"${result.endpoint}")
+              }
+          }
         }
       } ~ path("metrics") {
-            get {
-              complete {
-                (managerActor ? EndpointMetricsGet).mapTo[EndpointMetrics]
-              }
-            }
+        get {
+          complete {
+            (managerActor ? EndpointMetricsGet).mapTo[EndpointMetrics]
           }
+        }
+      }
     }
 
 }

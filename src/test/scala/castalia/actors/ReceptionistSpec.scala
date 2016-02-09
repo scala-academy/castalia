@@ -1,25 +1,16 @@
 package castalia.actors
 
-//
-//import akka.actor.ActorSystem
 import akka.actor.ActorDSL._
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes._
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest}
-import akka.testkit.TestActor.{NoAutoPilot, AutoPilot}
+import akka.testkit.TestActor.{AutoPilot, NoAutoPilot}
 import akka.testkit.TestProbe
 import castalia.StubConfigParser._
 import castalia._
-import castalia.model.Messages.{EndpointMetricsInit, EndpointMetricsGet, Done, UpsertEndpoint}
-import castalia.model.Model.{EndpointMetrics, StubResponse}
-import castalia.model.CastaliaConfig._
-import castalia.model.Messages.{UpsertResponse, Done, UpsertEndpoint}
-import castalia.model.Model.{ResponseConfig, EndpointResponseConfig, StubResponse}
-import com.typesafe.config.ConfigFactory
-import org.scalatest.BeforeAndAfter
+import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint, UpsertResponse}
+import castalia.model.Model.{EndpointMetrics, EndpointResponseConfig, ResponseConfig, StubResponse}
 import spray.json.JsString
-
-import scala.concurrent.{ExecutionContext, Future}
 
 class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
