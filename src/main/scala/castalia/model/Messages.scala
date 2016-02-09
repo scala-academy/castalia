@@ -3,6 +3,7 @@ package castalia.model
 import castalia.Endpoint
 import castalia.model.Model.StubConfig
 import castalia.model.Model.{EndpointResponseConfig, StubConfig}
+import castalia.model.Model.{EndpointResponseConfig, StubConfig}
 
 object Messages {
   case class UpsertEndpoint(config: StubConfig)

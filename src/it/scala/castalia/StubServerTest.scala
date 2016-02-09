@@ -83,7 +83,8 @@ class StubServerTest extends IntegrationTestBase {
       requestBefore.host = serverAddress
       val responseBefore: Response = Await.result(clientServer(requestBefore))
 
-      val randomResponse = Random.nextInt(1000000)
+      assert(responseBefore.status == Status.Forbidden)
+      assert(responseBefore.contentString == "Forbidden")
 
       When(s"I POST a new response for this endpoint to $manageResponsesUrl")
 
@@ -95,12 +96,11 @@ class StubServerTest extends IntegrationTestBase {
           "\"ids\": {\"1\": \"2\",\"2\": \"id2\"}, " +
           "\"delay\": {\"distribution\": \"constant\",\"mean\": \"100 ms\"}," +
           "\"httpStatusCode\": 200," +
-          "\"response\": {\"id\": \"een\",\"someValue\": \""+randomResponse+"\"}" +
+          "\"response\": {\"id\": \"een\",\"someValue\": \"123123\"}" +
           "}" +
         "}"
       val postResponse: Response = Await.result(clientManager(postRequest))
 
-      Then(s"I should get 200 response with endpoint string in the content")
       assert(postResponse.status == Status.Ok)
       assert(postResponse.contentString == "doublepathparam/$1/responsedata/$2")
 
@@ -110,7 +110,7 @@ class StubServerTest extends IntegrationTestBase {
       val responseAfter: Response = Await.result(clientServer(requestBefore))
 
       assert(responseAfter.status == Status.Ok)
-      assert(responseAfter.contentString == "{\"id\":\"een\",\"someValue\":\""+randomResponse+"\"}")
+      assert(responseAfter.contentString == "{\"id\":\"een\",\"someValue\":\"123123\"}")
     }
   }
 
