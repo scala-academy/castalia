@@ -51,12 +51,12 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
         val metrics = Map("endpoint" -> Map("calls" -> 1))
         metricsCollectorProbe.setAutoPilot(new AutoPilot {
           override def run(sender: ActorRef, msg: Any): AutoPilot = msg match{
-            case EndpointMetricsGet => sender ! EndpointMetrics(metrics)
+            case EndpointMetricsGet(None) => sender ! EndpointMetrics(metrics)
               NoAutoPilot
           }
         })
 
-        receptionist ! EndpointMetricsGet
+        receptionist ! EndpointMetricsGet(None)
         expectMsg(EndpointMetrics(metrics))
       }
     }

@@ -43,7 +43,7 @@ class ManagerServiceSpec extends ServiceSpecBase with SprayJsonSupport {
 
       receptionistMock.setAutoPilot(new AutoPilot {
         override def run(sender: ActorRef, msg: Any): AutoPilot = msg match {
-          case EndpointMetricsGet => sender ! EndpointMetrics(metrics)
+          case EndpointMetricsGet(None) => sender ! EndpointMetrics(metrics)
             NoAutoPilot
         }
       })

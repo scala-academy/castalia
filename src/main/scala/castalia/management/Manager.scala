@@ -23,8 +23,8 @@ class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
     case config: StubConfig =>
       log.debug(s"received message to adjust configuration for '${config.endpoint}'")
       receptionist forward UpsertEndpoint(config)
-    case EndpointMetricsGet =>
-      log.debug("received message to fetch metrics")
-      receptionist forward EndpointMetricsGet
+    case msg:EndpointMetricsGet =>
+      log.debug(s"received message to fetch metrics $msg")
+      receptionist forward msg
   }
 }

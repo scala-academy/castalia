@@ -6,7 +6,7 @@ import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server.Route
 import akka.pattern.ask
 import akka.util.Timeout
-import castalia.model.Messages.{EndpointMetricsGet, Done}
+import castalia.model.Messages.{Done, EndpointMetricsGet}
 import castalia.model.Model.{EndpointMetrics, StubConfig}
 
 import scala.concurrent.duration._
@@ -32,13 +32,22 @@ trait ManagerService {
                 .map(result => s"${result.endpoint}")
             }
         }
-      } ~ path("metrics") {
-            get {
-              complete {
-                (managerActor ? EndpointMetricsGet).mapTo[EndpointMetrics]
-              }
+      } ~ get {
+            pathPrefix("metrics") {
+              pathEndOrSingleSlash {
+                complete {
+                  (managerActor ? EndpointMetricsGet(None))
+                    .mapTo[EndpointMetrics].map(em => em.toJson)
+                }
+              } ~ path(RestPath) {
+                    endpoint =>
+                      complete {
+                        (managerActor ? EndpointMetricsGet(Some(endpoint.toString)))
+                          .mapTo[EndpointMetrics].map(em => em.toJson)
+                      }
+                  }
             }
-          }
+        }
     }
 
 }
