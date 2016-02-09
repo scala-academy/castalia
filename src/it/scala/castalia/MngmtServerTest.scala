@@ -10,14 +10,14 @@ import org.scalatest.DoNotDiscover
 class MngmtServerTest extends IntegrationTestBase {
 
   val client = finagle.Http.newService(s"$serverAddress")
-  val mngmtClient = finagle.Http.newService(s"$mngmtAddress")
+  val mngmtClient = finagle.Http.newService(s"$managerAddress")
   val mngmtPath = "castalia/manager/endpoints"
 
   describe("starting up stubserver with 'castaliaT.json'") {
 
     it("should be possible to configure a new endpoint via manager endpoint") {
 
-      val url = s"http://$mngmtAddress/$mngmtPath"
+      val url = s"http://$managerAddress/$mngmtPath"
       val data = """{"endpoint": "my/endpoint/$1", "responses": [{"ids": {"1": "0"},"httpStatusCode": 200}]}"""
 
       When(s"""I do a HTTP POST to "$url" with new endpoint """)
@@ -36,7 +36,7 @@ class MngmtServerTest extends IntegrationTestBase {
 
     When("Getting endpoint metrics")
     val mngmtRequest = Request(Method.Get, s"/$mngmtPath/metrics")
-    mngmtRequest.host = mngmtAddress
+    mngmtRequest.host = managerAddress
 
     Then("the response should contain the metrics")
     var responseMng: Response = Await.result(mngmtClient(mngmtRequest))

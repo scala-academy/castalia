@@ -1,12 +1,12 @@
 package castalia.actors
 
 import akka.actor.{ActorSystem, Props}
-import akka.http.scaladsl.model.{HttpProtocols, HttpMethods, HttpRequest, Uri}
+import akka.http.scaladsl.model.{HttpMethods, HttpProtocols, HttpRequest}
 import akka.testkit.TestProbe
 import castalia.StubConfigParser._
 import castalia.matcher.RequestMatch
 import castalia.model.Model.StubResponse
-import spray.json
+
 import scala.concurrent.duration._
 
 class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {

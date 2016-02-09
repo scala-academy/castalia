@@ -1,15 +1,13 @@
 package castalia.actors
 
-import akka.actor.{ActorSystem, Props}
 import akka.actor.Status.Failure
+import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.model.{HttpMethods, HttpProtocols, HttpRequest}
 import akka.testkit.TestProbe
 import castalia.StubConfigParser._
 import castalia.matcher.RequestMatch
-import castalia.model.Messages.{EndpointMetricsInit, EndpointCalled}
+import castalia.model.Messages.{EndpointCalled, EndpointMetricsInit}
 import castalia.model.Model.StubResponse
-
-import scala.concurrent.duration._
 
 class JsonResponseProviderEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 

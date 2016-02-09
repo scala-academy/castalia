@@ -6,7 +6,6 @@ import akka.http.scaladsl.model.HttpRequest
 import akka.testkit.TestProbe
 import castalia.matcher.RequestMatch
 import castalia.model.Messages.{Done, EndpointCalled, EndpointMetricsInit}
-import castalia.model.Model.StubConfig
 
 class EndpointRequestInterceptorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
@@ -31,7 +30,6 @@ class EndpointRequestInterceptorSpec(_system: ActorSystem) extends ActorSpecBase
       expectMsg(Done(endpoint))
       metricsCollector.expectMsg(EndpointCalled(endpoint))
     }
-
   }
 
   class AnActor(val endpoint: String, val metricsCollector: ActorRef) extends Actor with ReceivePipeline {

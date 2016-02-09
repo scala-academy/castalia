@@ -1,7 +1,7 @@
 package castalia
 
 import castalia.StubConfigParser._
-import castalia.model.Model.{ResponseConfig, LatencyConfig}
+import castalia.model.Model.{LatencyConfig, ResponseConfig}
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-21
@@ -17,9 +17,9 @@ class StubConfigParserTest extends UnitSpecBase {
       stubConfig.responses match {
         case Some(responses: List[ResponseConfig]) =>
           responses.size.shouldBe(3)
-          responses(0).ids.shouldBe(Some(Map("1" -> "1")))
-          responses(0).delay.shouldBe(Some(LatencyConfig("constant", "1000 ms")))
-          responses(0).httpStatusCode.shouldBe(200)
+          responses.head.ids.shouldBe(Some(Map("1" -> "1")))
+          responses.head.delay.shouldBe(Some(LatencyConfig("constant", "1000 ms")))
+          responses.head.httpStatusCode.shouldBe(200)
         case None => assert(false, "has no response definition")
       }
       stubConfig.responseprovider.isDefined.shouldBe(false)
@@ -32,9 +32,9 @@ class StubConfigParserTest extends UnitSpecBase {
       stubConfig.responses match {
         case Some(responses: List[ResponseConfig]) =>
           responses.size.shouldBe(3)
-          responses(0).ids.shouldBe(Some(Map("parm" -> "1")))
-          responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
-          responses(0).httpStatusCode.shouldBe(200)
+          responses.head.ids.shouldBe(Some(Map("parm" -> "1")))
+          responses.head.delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
+          responses.head.httpStatusCode.shouldBe(200)
           responses(1).ids.shouldBe(Some(Map("parm" -> "2")))
           responses(1).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
           responses(1).httpStatusCode.shouldBe(200)

@@ -2,9 +2,7 @@ package castalia
 
 import java.io.FileNotFoundException
 
-import castalia.model.Model.{DefaultResponseConfig, LatencyConfig, ResponseConfig, StubConfig}
-import castalia.model.Model.{ResponseProviderConfig, LatencyConfig, ResponseConfig, StubConfig}
-import org.scalatest.{Matchers, WordSpec}
+import castalia.model.Model.{DefaultResponseConfig, LatencyConfig, ResponseConfig, ResponseProviderConfig, StubConfig}
 
 class JsonConverterSpec extends UnitSpecBase {
 
@@ -18,9 +16,9 @@ class JsonConverterSpec extends UnitSpecBase {
         stubconfig.responses match {
           case Some(responses: List[ResponseConfig]) =>
             responses.size.shouldBe(4)
-            responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
-            responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
-            responses(0).httpStatusCode.shouldBe(200)
+            responses.head.ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
+            responses.head.delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
+            responses.head.httpStatusCode.shouldBe(200)
           case None => assert(false, "has no response definition")
         }
         stubconfig.responseprovider.isDefined.shouldBe(false)

@@ -1,9 +1,6 @@
 package castalia.matcher
 
-// import java.net.URLDecoder
-
 import akka.http.scaladsl.model.Uri
-
 
 /**
   * Helper class that will parse an URI string into a ParsedUri object which is easier to manipulate

@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.StatusCodes._
 import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
 import castalia.matcher.{Matcher, RequestMatcher}
 import castalia.metrics.MetricsCollectorActor
-import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
+import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint, UpsertResponse}
 import castalia.model.Model.{StubConfig, StubResponse}
 
 object Receptionist {
@@ -39,6 +39,16 @@ class Receptionist extends Actor with ActorLogging {
       log.info(s"receptionist received UpsertEndpoint message, adding endpoint " + stubConfig.endpoint)
       upsertEndPointActor(stubConfig, endpointMatcher)
       sender ! Done(stubConfig.endpoint)
+
+    // Request to modify response of an endpoint
+    case UpsertResponse(responseConfig) =>
+      log.info(s"receptionist received UpsertResponse message, adding response to " + responseConfig.endpoint)
+      val requestMatchOption = endpointMatcher.matchEndpoint(responseConfig.endpoint)
+      log.info(s"receptionist attempted to match, result = " + requestMatchOption)
+      requestMatchOption match {
+        case Some(requestMatch) => requestMatch.handler forward UpsertResponse(responseConfig)
+        case _ => sender ! StubResponse(NotFound.intValue, NotFound.reason)
+      }
 
     // Real request
     case request: HttpRequest =>

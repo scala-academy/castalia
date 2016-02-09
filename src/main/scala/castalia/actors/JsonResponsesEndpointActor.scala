@@ -5,6 +5,7 @@ import akka.http.scaladsl.model.StatusCodes.Forbidden
 import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
+import castalia.model.Messages.{Done, UpsertResponse}
 import castalia.model.Model.{StubResponse, _}
 import castalia.{Delay, EndpointIds}
 
@@ -18,7 +19,7 @@ case class DelayComplete(destination: ActorRef, message: StubResponse)
   *
   * Created on 2016-01-23
   */
-class JsonResponsesEndpointActor(override val endpoint: String, val responses: List[ResponseConfig], override val metricsCollector: ActorRef)
+class JsonResponsesEndpointActor(override val endpoint: String, var responses: List[ResponseConfig], override val metricsCollector: ActorRef)
   extends JsonEndpointActor
     with ActorLogging
     with Delay {
@@ -28,6 +29,8 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
   import context._
 
   implicit val scheduler = system.scheduler
+
+  //TODO: rewrite without using var
   override def receive: Receive = {
     case request: RequestMatch =>
       log.debug("receive requestmatch")
@@ -58,8 +61,14 @@ class JsonResponsesEndpointActor(override val endpoint: String, val responses: L
           log.debug("found no response")
           sender() ! new StubResponse( Forbidden.intValue, Forbidden.reason)
       }
+
+    case UpsertResponse(endpointResponseConfig) =>
+      log.debug("received UpsertResponse")
+      responses = endpointResponseConfig.response :: responses
+      sender ! Done(endpointResponseConfig.endpoint)
+
     case _@msg =>
-      log.error("received unexpected message [" + msg + "]")
+      log.error("JsonResponsesEndpointActor received unexpected message [" + msg + "]")
   }
 
   def findResponse(pathParams: Params): Option[ResponseConfig] = {

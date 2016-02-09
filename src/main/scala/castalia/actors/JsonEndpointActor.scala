@@ -2,7 +2,6 @@ package castalia.actors
 
 import akka.actor._
 import akka.contrib.pattern.ReceivePipeline
-import castalia.model.Model._
 
 /**
   * Actor that provides answers based on the json configuration that is used to create this actor
