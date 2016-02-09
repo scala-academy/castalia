@@ -6,7 +6,6 @@ import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
 import castalia.model.Messages.{Done, UpsertResponse}
-import castalia.model.Model.{StubConfig, StubResponse, _}
 import castalia.model.Model.{StubResponse, _}
 import castalia.{Delay, EndpointIds}
 
@@ -69,7 +68,7 @@ class JsonResponsesEndpointActor(override val endpoint: String, var responses: L
       sender ! Done(endpointResponseConfig.endpoint)
 
     case _@msg =>
-      log.error("received unexpected message [" + msg + "]")
+      log.error("JsonResponsesEndpointActor received unexpected message [" + msg + "]")
   }
 
   def findResponse(pathParams: Params): Option[ResponseConfig] = {

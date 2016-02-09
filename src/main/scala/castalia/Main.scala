@@ -4,13 +4,12 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.Http.ServerBinding
 import akka.http.scaladsl.model._
-import castalia.management.{Manager, ManagerService}
-import castalia.model.Model.{CastaliaConfig, StubResponse}
-
 import akka.http.scaladsl.server._
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
+import castalia.management.{Manager, ManagerService}
+import castalia.model.Model.{CastaliaConfig, StubResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
