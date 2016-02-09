@@ -30,6 +30,7 @@ class JsonResponsesEndpointActor(override val endpoint: String, var responses: L
 
   implicit val scheduler = system.scheduler
 
+  //TODO: rewrite without using var
   override def receive: Receive = {
     case request: RequestMatch =>
       log.debug("receive requestmatch")
@@ -64,7 +65,6 @@ class JsonResponsesEndpointActor(override val endpoint: String, var responses: L
     case UpsertResponse(endpointResponseConfig) =>
       log.debug("received UpsertResponse")
       responses = endpointResponseConfig.response :: responses
-
       sender ! Done(endpointResponseConfig.endpoint)
 
     case _@msg =>

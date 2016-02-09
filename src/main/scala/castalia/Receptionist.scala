@@ -40,6 +40,7 @@ class Receptionist extends Actor with ActorLogging {
       upsertEndPointActor(stubConfig, endpointMatcher)
       sender ! Done(stubConfig.endpoint)
 
+    // Request to modify response of an endpoint
     case UpsertResponse(responseConfig) =>
       log.info(s"receptionist received UpsertResponse message, adding response to " + responseConfig.endpoint)
       val requestMatchOption = endpointMatcher.matchEndpoint(responseConfig.endpoint)

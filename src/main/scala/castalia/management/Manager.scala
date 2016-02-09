@@ -2,21 +2,19 @@ package castalia.management
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.util.Timeout
-import castalia.model.Messages.{EndpointMetricsGet, UpsertResponse, Done, UpsertEndpoint}
+import castalia.model.Messages.{EndpointMetricsGet, UpsertEndpoint, UpsertResponse}
 import castalia.model.Model.{EndpointResponseConfig, StubConfig}
-import castalia.model.Messages.{EndpointMetricsGet, UpsertEndpoint}
-import castalia.model.Model.StubConfig
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-/**
-  * Actor that delegates request to adjust the endpoint configuration to a receptionist actor.
-  */
 case object Manager {
   def props(receptionist: ActorRef): Props = Props(new Manager(receptionist))
 }
 
+/**
+  * Actor that delegates request to adjust the endpoint configuration to a receptionist actor.
+  */
 class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
 
   private implicit val timeout = Timeout(2 seconds)

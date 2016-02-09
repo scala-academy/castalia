@@ -1,6 +1,6 @@
 package castalia.matcher
 
-import akka.http.scaladsl.model.{HttpRequest, Uri}
+import akka.http.scaladsl.model.HttpRequest
 import castalia.matcher.types.Segments
 
 /**
@@ -27,6 +27,7 @@ class RequestMatcher(myMatchers: List[Matcher]) {
     findMatch(parsedUri.pathList, myMatchers)
   }
 
+  //TODO: implement without code duplication
   def matchEndpoint(endpoint: String): Option[EndpointMatch] = {
     val parsedUri = uriParser.parse(endpoint)
 

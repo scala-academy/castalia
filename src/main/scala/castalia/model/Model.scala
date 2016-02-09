@@ -1,12 +1,11 @@
 package castalia.model
 
-import akka.actor.ActorRef
 import castalia._
 import castalia.matcher.UriParser
 import castalia.matcher.types.Segments
 import spray.json.DefaultJsonProtocol
 
-import scala.concurrent.duration.{FiniteDuration, Duration}
+import scala.concurrent.duration.Duration
 import scala.util.Try
 
 /**
@@ -112,7 +111,7 @@ object Model extends DefaultJsonProtocol  {
 
   case class EndpointMetrics(metrics: Map[Endpoint, Metrics])
 
-  // Note: these implicits mus tbe declared in the correct order (first the leaves, then the composing classes)
+  // Note: these implicits must tbe declared in the correct order (first the leaves, then the composing classes)
   implicit val castaliaConfigFormatter = jsonFormat3(CastaliaConfig.apply)
   implicit val latencyConfigFormat = jsonFormat2(LatencyConfig)
   implicit val responseProviderFormat = jsonFormat(ResponseProviderConfig, "class", "member")

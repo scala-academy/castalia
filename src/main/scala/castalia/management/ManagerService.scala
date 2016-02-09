@@ -12,6 +12,9 @@ import castalia.model.Model.{EndpointResponseConfig, EndpointMetrics, StubConfig
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
+/**
+  * Service that serves management requests
+  */
 trait ManagerService {
 
   protected def managerActor: ActorRef
@@ -27,9 +30,7 @@ trait ManagerService {
           entity(as[StubConfig]) {
             stubConfig =>
               complete {
-                (managerActor ? stubConfig)
-                  .mapTo[Done]
-                  .map(result => s"${result.endpoint}")
+                (managerActor ? stubConfig).mapTo[Done].map(result => s"${result.endpoint}")
               }
           }
         }
@@ -39,9 +40,7 @@ trait ManagerService {
           entity(as[EndpointResponseConfig]) {
             endpointResponseConfig =>
               complete {
-                (managerActor ? endpointResponseConfig)
-                  .mapTo[Done]
-                  .map(result => s"${result.endpoint}")
+                (managerActor ? endpointResponseConfig).mapTo[Done].map(result => s"${result.endpoint}")
               }
           }
         }

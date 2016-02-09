@@ -16,7 +16,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object Main extends App with Config with ManagerService {
-  //  protected val serviceName = "Main"
+
   implicit val timeout = Timeout(2.seconds)
   implicit val system: ActorSystem = ActorSystem()
   protected implicit val materializer: ActorMaterializer = ActorMaterializer()
