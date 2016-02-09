@@ -5,7 +5,6 @@ import akka.contrib.pattern.ReceivePipeline
 import akka.contrib.pattern.ReceivePipeline.Inner
 import castalia.matcher.RequestMatch
 import castalia.model.Messages._
-import castalia.model.Model.StubConfig
 
 /**
   * Triggers registration of endpoint stats by intercepting RequestMatch messages

@@ -1,13 +1,12 @@
 package castalia
 
-import castalia.model.Model.{ResponseConfig, DefaultResponseConfig, StubConfig}
-
+import castalia.model.Model.{DefaultResponseConfig, ResponseConfig, StubConfig}
 
 object StubConfigParser {
 
   def parseStubConfig(jsonFile: String): StubConfig = {
     val initialConfig = JsonConverter.parseJson[StubConfig](jsonFile)
-    (initialConfig.default) match {
+    initialConfig.default match {
       case (Some(default)) =>
         initialConfig.responses match {
           case None =>
@@ -24,11 +23,11 @@ object StubConfigParser {
   }
 
   def parseStubConfigs(jsonFiles: List[String]): List[StubConfig] = {
-    jsonFiles.map(parseStubConfig(_))
+    jsonFiles.map(parseStubConfig)
   }
 
   private def addDefaults(default: DefaultResponseConfig, responses: List[ResponseConfig]): List[ResponseConfig] =
-    (responses) match {
+    responses match {
       case (Nil) => Nil
       case (first :: rest) => mix(default, first) :: addDefaults(default, rest)
     }

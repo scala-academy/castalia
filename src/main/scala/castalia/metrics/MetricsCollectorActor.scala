@@ -1,9 +1,9 @@
 package castalia.metrics
 
 import akka.actor.{Actor, ActorLogging, Props}
-import castalia.model.Messages.{EndpointCalled, EndpointMetricsInit, EndpointMetricsGet}
+import castalia.metrics.MetricsCollectorActor._
+import castalia.model.Messages.{EndpointCalled, EndpointMetricsGet, EndpointMetricsInit}
 import castalia.model.Model.EndpointMetrics
-import MetricsCollectorActor._
 
 object MetricsCollectorActor {
 

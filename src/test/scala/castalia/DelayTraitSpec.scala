@@ -1,12 +1,11 @@
 package castalia
 
 import com.miguno.akka.testing.VirtualTime
-import org.scalactic.TolerantNumerics
-import org.scalatest.{Matchers, WordSpec}
 import probability_monad.Distribution
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+
 class DelayTraitSpec extends UnitSpecBase {
 
   "A Delay-trait" when {

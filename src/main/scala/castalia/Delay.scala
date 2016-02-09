@@ -4,7 +4,7 @@ import akka.actor.Scheduler
 import akka.pattern.after
 import probability_monad.Distribution
 
-import scala.concurrent.duration.{Duration, FiniteDuration}
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 /**

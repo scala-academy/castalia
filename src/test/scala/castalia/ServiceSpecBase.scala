@@ -1,10 +1,9 @@
 package castalia
 
-import akka.event.{ NoLogging, LoggingAdapter }
+import akka.event.{LoggingAdapter, NoLogging}
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import org.scalatest.{ WordSpec, Matchers }
+import org.scalatest.{Matchers, WordSpec}
 
-//TODO: find out if we still need this
 /**
   * Base trait for service tests
   */

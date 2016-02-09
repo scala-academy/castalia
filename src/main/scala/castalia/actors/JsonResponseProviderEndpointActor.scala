@@ -5,7 +5,7 @@ import java.lang.reflect.Method
 import akka.actor.ActorRef
 import akka.pattern.pipe
 import castalia.matcher.RequestMatch
-import castalia.model.Model.{StubConfig, ResponseProviderConfig, StubResponse}
+import castalia.model.Model.{ResponseProviderConfig, StubResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

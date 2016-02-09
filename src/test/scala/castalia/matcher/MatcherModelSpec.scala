@@ -2,7 +2,6 @@ package castalia.matcher
 
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.Uri
-import akka.http.scaladsl.model.Uri.Path.Empty
 import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
 

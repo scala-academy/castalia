@@ -18,7 +18,7 @@ class ReceptionistSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
   val metricsCollectorProbe = new TestProbe(_system)
   val receptionist = actor("receptionist")(new Receptionist() {
-    override def createMetricsCollector(): ActorRef = metricsCollectorProbe.ref
+    override def createMetricsCollector: ActorRef = metricsCollectorProbe.ref
   })
 
   val stubConfig = parseStubConfigs(List("jsonconfiguredstub.json")).head

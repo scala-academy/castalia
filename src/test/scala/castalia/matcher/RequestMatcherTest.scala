@@ -1,11 +1,10 @@
 package castalia.matcher
 
-import akka.actor.{Actor, ActorSystem}
-import akka.http.scaladsl.model.{HttpProtocols, HttpMethods, HttpRequest}
-import akka.testkit.{TestActorRef, TestActor, TestKit}
-import akka.testkit.{TestProbe, TestActorRef, TestActor, TestKit}
+import akka.actor.ActorSystem
+import akka.http.scaladsl.model.{HttpMethods, HttpProtocols, HttpRequest}
+import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
-import org.scalatest.{WordSpecLike, BeforeAndAfterEach, Matchers, WordSpec}
+import org.scalatest.BeforeAndAfterEach
 
 /**
   * Created by Jean-Marc van Leerdam on 2016-01-09

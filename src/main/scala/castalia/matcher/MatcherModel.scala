@@ -3,7 +3,7 @@ package castalia.matcher
 import akka.actor.ActorRef
 import akka.http.scaladsl.model.HttpRequest
 import akka.http.scaladsl.model.Uri.Path
-import akka.http.scaladsl.model.Uri.Path.{Empty, Slash, Segment}
+import akka.http.scaladsl.model.Uri.Path.{Empty, Segment, Slash}
 import castalia.matcher.types._
 
 import scala.annotation.tailrec
