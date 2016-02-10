@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.Uri.Path
 import akka.testkit.{TestActorRef, TestProbe}
 import castalia.actors.ActorSpecBase
 import castalia.matcher.MatchResultGatherer.{MatchFound, MatchNotFound}
-import castalia.matcher.MatcherActor.RespondIfMatched
+import castalia.matcher.MatcherActor.TryMatch
 
 class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
 
@@ -23,7 +23,7 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val handler = TestProbe("HandlerProbe")
       val matcherActor = system.actorOf(MatcherActor.props(segments, handler.ref))
 
-      matcherActor ! RespondIfMatched(parsedUri, httpRequest, gatherer.ref)
+      matcherActor ! TryMatch(parsedUri, httpRequest, gatherer.ref)
 
       gatherer.expectMsgClass(classOf[MatchFound])
     }
@@ -38,16 +38,16 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val matcherActor2 = TestActorRef(new MatcherActor(s2, handler.ref))
       val matcherActor3 = TestActorRef(new MatcherActor(s3, handler.ref))
 
-      matcherActor1 ! RespondIfMatched(uriParser.parse("/sample/path/with/12/id?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
+      matcherActor1 ! TryMatch(uriParser.parse("/sample/path/with/12/id?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
       gatherer.expectMsgPF() { case MatchFound(_, RequestMatch(_, List(("partyId", "12")), List(("p1", "foo"), ("p2", "bar")))) => () }
 
-      matcherActor1 ! RespondIfMatched(uriParser.parse("/sample/path/with/12/id/aswell?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
+      matcherActor1 ! TryMatch(uriParser.parse("/sample/path/with/12/id/aswell?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
       gatherer.expectMsg(MatchNotFound)
 
-      matcherActor2 ! RespondIfMatched(uriParser.parse("/sample/path/with/12/id?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
+      matcherActor2 ! TryMatch(uriParser.parse("/sample/path/with/12/id?p1=foo&p2=bar"), HttpRequest(), gatherer.ref)
       gatherer.expectMsg(MatchNotFound)
 
-      matcherActor3 ! RespondIfMatched(uriParser.parse("/sample/path/without/id"), HttpRequest(), gatherer.ref)
+      matcherActor3 ! TryMatch(uriParser.parse("/sample/path/without/id"), HttpRequest(), gatherer.ref)
       gatherer.expectMsgPF() { case MatchFound(_, RequestMatch(_, List(), List())) => () }
     }
 
@@ -56,7 +56,7 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val matcherActor = system.actorOf(MatcherActor.props(List("a", "{bparm}", "c"), ActorRef.noSender))
       val parsedUri = new ParsedUri("", Path("/a/b/c"), List())
 
-      matcherActor ! RespondIfMatched(parsedUri, HttpRequest(), gatherer.ref)
+      matcherActor ! TryMatch(parsedUri, HttpRequest(), gatherer.ref)
 
       gatherer.expectMsgPF() { case MatchFound(_, RequestMatch(_, List(("bparm", "b")), List())) => () }
     }
@@ -66,7 +66,7 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val matcherActor = system.actorOf(MatcherActor.props(List("a", "b", "$c"), ActorRef.noSender))
       val parsedUri = new ParsedUri("", Path("/a/b/cval"), List())
 
-      matcherActor ! RespondIfMatched(parsedUri, HttpRequest(), gatherer.ref)
+      matcherActor ! TryMatch(parsedUri, HttpRequest(), gatherer.ref)
 
       gatherer.expectMsgPF() { case MatchFound(_, RequestMatch(_, List(("c", "cval")), List())) => () }
     }
@@ -76,7 +76,7 @@ class MatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
       val matcherActor = system.actorOf(MatcherActor.props(List("a", "{bparm}", "$c"), ActorRef.noSender))
       val parsedUri = new ParsedUri("", Path("/a/b/cval"), List())
 
-      matcherActor ! RespondIfMatched(parsedUri, HttpRequest(), gatherer.ref)
+      matcherActor ! TryMatch(parsedUri, HttpRequest(), gatherer.ref)
 
       gatherer.expectMsgPF() { case MatchFound(_, RequestMatch(_, paramList, List()))
         if paramList.contains(("bparm", "b")) && paramList.contains(("c", "cval")) => ()

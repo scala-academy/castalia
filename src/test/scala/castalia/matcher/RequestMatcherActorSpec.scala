@@ -4,8 +4,8 @@ import akka.actor.{ActorContext, ActorRef, ActorSystem, Props}
 import akka.http.scaladsl.model.HttpRequest
 import akka.testkit.TestProbe
 import castalia.actors.ActorSpecBase
-import castalia.matcher.MatcherActor.RespondIfMatched
-import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatchAndForward}
+import castalia.matcher.MatcherActor.TryMatch
+import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatch}
 import castalia.matcher.types._
 import scala.concurrent.duration._
 
@@ -31,9 +31,9 @@ class RequestMatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_syste
       val handler = ActorRef.noSender
 
       requestMatcherActor ! AddMatcher(segments, handler)
-      requestMatcherActor ! FindMatchAndForward(HttpRequest(), origin)
+      requestMatcherActor ! FindMatch(HttpRequest(), origin)
 
-      probe.expectMsgClass(classOf[RespondIfMatched])
+      probe.expectMsgClass(classOf[TryMatch])
     }
     "forward requests to the registered matcher (multiple matchers)" in new TestCaseSetup {
       val origin = ActorRef.noSender
@@ -43,10 +43,10 @@ class RequestMatcherActorSpec(_system: ActorSystem) extends ActorSpecBase(_syste
 
       requestMatcherActor ! AddMatcher(segments1, handler)
       requestMatcherActor ! AddMatcher(segments2, handler)
-      requestMatcherActor ! FindMatchAndForward(HttpRequest(), origin)
+      requestMatcherActor ! FindMatch(HttpRequest(), origin)
 
-      probe.expectMsgClass(classOf[RespondIfMatched])
-      probe.expectMsgClass(classOf[RespondIfMatched])
+      probe.expectMsgClass(classOf[TryMatch])
+      probe.expectMsgClass(classOf[TryMatch])
       probe.expectNoMsg(50.millis)
     }
     "forward remove existing matchers for an endpoint if it is updated" in new TestCaseSetup {

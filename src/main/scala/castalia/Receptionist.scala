@@ -4,7 +4,7 @@ import akka.actor._
 import akka.http.scaladsl.model.HttpRequest
 import castalia.actors.{JsonEndpointActor, JsonResponseProviderEndpointActor, JsonResponsesEndpointActor}
 import castalia.matcher.RequestMatcherActor
-import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatchAndForward}
+import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatch}
 import castalia.metrics.MetricsCollectorActor
 import castalia.model.Messages.{Done, EndpointMetricsGet, UpsertEndpoint}
 import castalia.model.Model.StubConfig
@@ -43,7 +43,7 @@ class Receptionist extends Actor with ActorLogging {
     // Real request
     case request: HttpRequest =>
       log.info(s"receptionist received message [" + request.uri.toString() + "]")
-      requestMatcherActor ! FindMatchAndForward(request, sender)
+      requestMatcherActor ! FindMatch(request, sender)
 
     case EndpointMetricsGet =>
       log.info("fetching metrics for all endpoints")

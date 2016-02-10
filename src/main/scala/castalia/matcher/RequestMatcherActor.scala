@@ -2,13 +2,13 @@ package castalia.matcher
 
 import akka.actor._
 import akka.http.scaladsl.model.HttpRequest
-import castalia.matcher.MatcherActor.RespondIfMatched
-import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatchAndForward}
+import castalia.matcher.MatcherActor.TryMatch
+import castalia.matcher.RequestMatcherActor.{AddMatcher, FindMatch}
 import castalia.matcher.types._
 
 object RequestMatcherActor {
 
-  case class FindMatchAndForward(httpRequest: HttpRequest, origin: ActorRef)
+  case class FindMatch(httpRequest: HttpRequest, origin: ActorRef)
 
   case class AddMatcher(segments: Segments, handler: ActorRef)
 
@@ -31,18 +31,18 @@ class RequestMatcherActor extends Actor with ActorLogging {
       context.become(normal(newSetOfMatchers))
 
     // Foward match request to all registered matchers. Create result gatherer to gather and handle results
-    case FindMatchAndForward(httpRequest, origin) =>
+    case FindMatch(httpRequest, origin) =>
       val parsedUri = new ParsedUri(httpRequest.uri.toString().replace(';', '&'), httpRequest.uri.path, httpRequest.uri.query().toList)
       log.debug(s"RequestMatcherActor received http request $parsedUri from $sender")
       val gatherer = context.actorOf(MatchResultGatherer.props(matchers.size, origin))
       matchers.foreach{case (segments, matcher) => {
-        log.debug(s"sending to ${matcher} ${RespondIfMatched(parsedUri, httpRequest, gatherer)}")
-        matcher ! RespondIfMatched(parsedUri, httpRequest, gatherer)
+        log.debug(s"sending to ${matcher} ${TryMatch(parsedUri, httpRequest, gatherer)}")
+        matcher ! TryMatch(parsedUri, httpRequest, gatherer)
       }}
 
     // unexpected messages
     case x =>
-      log.info("Receptionist received unexpected message: " + x.toString)
+      log.info("RequestMatcherActor received unexpected message: " + x.toString)
   }
 }
 

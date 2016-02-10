@@ -3,14 +3,14 @@ package castalia.matcher
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.http.scaladsl.model.HttpRequest
 import castalia.matcher.MatchResultGatherer.{MatchFound, MatchNotFound}
-import castalia.matcher.MatcherActor.RespondIfMatched
+import castalia.matcher.MatcherActor.TryMatch
 import castalia.matcher.types.{Params, Segments}
 
 import scala.annotation.tailrec
 
 object MatcherActor {
 
-  case class RespondIfMatched(parsedUri: ParsedUri, httpRequest: HttpRequest, gatherer: ActorRef)
+  case class TryMatch(parsedUri: ParsedUri, httpRequest: HttpRequest, gatherer: ActorRef)
 
   def props(segments: Segments, handler: ActorRef): Props = Props(new MatcherActor(segments, handler))
 }
@@ -18,7 +18,7 @@ object MatcherActor {
 class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with ActorLogging {
 
   def receive: Receive = {
-    case RespondIfMatched(parsedUri, httpRequest, gatherer) =>
+    case TryMatch(parsedUri, httpRequest, gatherer) =>
       matchPath(parsedUri.pathList) match {
         case Some(params) =>
           log.debug(s"Match found for $segments and $parsedUri: $params to be handled by $handler")
@@ -28,9 +28,10 @@ class MatcherActor(segments: Segments, handler: ActorRef) extends Actor with Act
           log.debug(s"Match not found for $segments and $parsedUri")
           gatherer ! MatchNotFound
       }
+
     // unexpected messages
     case x =>
-      log.info("Receptionist received unexpected message: " + x.toString)
+      log.info("MatcherActor received unexpected message: " + x.toString)
   }
 
   /**

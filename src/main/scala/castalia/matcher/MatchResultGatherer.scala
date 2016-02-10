@@ -27,8 +27,13 @@ class MatchResultGatherer(nrOfMatchers: Int, origin: ActorRef) extends Actor wit
   def awaitResponses(responseSent: Boolean, responsesToGet: Int): Receive = {
     case MatchNotFound =>
       handleMatchNotFound(responseSent, responsesToGet)
+
     case MatchFound(handler, requestMatch) =>
       handleMatchFound(responseSent, responsesToGet, handler, requestMatch)
+    // unexpected messages
+
+    case x =>
+      log.info("MatchResultGatherer received unexpected message: " + x.toString)
   }
 
   def handleMatchNotFound(responseSent: Boolean, responsesToGet: Int): Unit = {
