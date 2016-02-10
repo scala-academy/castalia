@@ -21,6 +21,11 @@
         "1": "1",
         "2": "id2"
       },
+      "delay": {
+        "distribution": "gamma",
+        "p1": "200 ms",
+        "p2": "1000 ms"
+      },
       "httpStatusCode": 200,
       "response": {
         "id": "twee",

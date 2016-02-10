@@ -9,5 +9,5 @@ object Messages {
 
   case class EndpointCalled(endpoint: Endpoint)
   case class EndpointMetricsInit(endpoint: Endpoint)
-  case object EndpointMetricsGet
+  case class EndpointMetricsGet(endpoint: Option[Endpoint])
 }

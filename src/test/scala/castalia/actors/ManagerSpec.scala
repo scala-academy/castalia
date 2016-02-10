@@ -26,8 +26,8 @@ class ManagerSpec(_system: ActorSystem) extends ActorSpecBase(_system) {
     }
 
     "ask receptionist to get endpoint metrics" in {
-      manager ! EndpointMetricsGet
-      receptionistProbe.expectMsg(EndpointMetricsGet)
+      manager ! EndpointMetricsGet(None)
+      receptionistProbe.expectMsg(EndpointMetricsGet(None))
     }
   }
 }

@@ -17,8 +17,11 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 
 object Main extends App with Config with ManagerService {
-  //  protected val serviceName = "Main"
-  implicit val timeout = Timeout(2.seconds)
+
+
+  // The ask operation involves creating an internal actor for handling the reply,
+  // which needs to have a timeout after which it is destroyed in order not to leak resources.
+  implicit val timeout = Timeout(10.seconds) // needed for `?` below
   implicit val system: ActorSystem = ActorSystem()
   protected implicit val materializer: ActorMaterializer = ActorMaterializer()
 
