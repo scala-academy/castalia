@@ -1,6 +1,7 @@
-name          := """Castalia Stub Server"""
-organization  := "castalia"
-version       := "0.0.1"
+name          := "castalia"
+description   := "Castalia Stub Server"
+organization  := "com.github.scala-academy"
+version       := "0.0.1-SNAPSHOT"
 scalaVersion  := "2.11.7"
 scalacOptions := Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8")
 
