@@ -19,7 +19,7 @@ class MetricsCollectorActorSpec(_system: ActorSystem) extends ActorSpecBase(_sys
 
       metricsCollectorActor ! EndpointMetricsInit(endpoint)
 
-      metricsCollectorActor ! EndpointMetricsGet
+      metricsCollectorActor ! EndpointMetricsGet(None)
       expectMsg(EndpointMetrics(Map(endpoint -> Map(metricNumberOfCalls -> 0))))
     }
 
@@ -31,8 +31,26 @@ class MetricsCollectorActorSpec(_system: ActorSystem) extends ActorSpecBase(_sys
       metricsCollectorActor ! EndpointCalled(endpoint)
       metricsCollectorActor ! EndpointCalled(endpoint)
 
-      metricsCollectorActor ! EndpointMetricsGet
+      metricsCollectorActor ! EndpointMetricsGet(None)
       expectMsg(EndpointMetrics(Map(endpoint -> Map(metricNumberOfCalls -> 2))))
+    }
+
+    "get metrics for a single endpoint" in {
+      val metricsCollectorActor = system.actorOf(MetricsCollectorActor.props)
+
+      val endpoint1 = "my/endpoint/1"
+      val endpoint2 = "my/endpoint/2"
+
+      metricsCollectorActor ! EndpointCalled(endpoint1)
+      metricsCollectorActor ! EndpointCalled(endpoint2)
+      metricsCollectorActor ! EndpointCalled(endpoint2)
+
+      metricsCollectorActor ! EndpointMetricsGet(None)
+      expectMsg(EndpointMetrics(Map(endpoint1 -> Map(metricNumberOfCalls -> 1),
+        endpoint2 -> Map(metricNumberOfCalls -> 2))))
+
+      metricsCollectorActor ! EndpointMetricsGet(Some(endpoint2))
+      expectMsg(EndpointMetrics(Map(endpoint2 -> Map(metricNumberOfCalls -> 2))))
     }
   }
 

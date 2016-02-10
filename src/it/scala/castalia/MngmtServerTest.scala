@@ -5,6 +5,7 @@ import com.twitter.finagle.http._
 import com.twitter.io.Bufs._
 import com.twitter.util.Await
 import org.scalatest.DoNotDiscover
+import utils.JsonUtil.stripIndent
 
 @DoNotDiscover
 class MngmtServerTest extends IntegrationTestBase {
@@ -43,9 +44,7 @@ class MngmtServerTest extends IntegrationTestBase {
 
     responseMng.status shouldBe Status.Ok
     responseMng.contentType.get shouldBe "application/json"
-    responseMng.contentString.contains(""""my/endpoint/$1": {
-                                         |      "calls": 0
-                                         |    }""")
+    assert(stripIndent(responseMng.contentString).contains(""""my/endpoint/$1": {"calls": 0}"""))
 
     val request = Request(Method.Get, "/my/endpoint/0")
     request.host = serverAddress
@@ -59,9 +58,34 @@ class MngmtServerTest extends IntegrationTestBase {
 
     responseMng.status shouldBe Status.Ok
     responseMng.contentType.get shouldBe "application/json"
-    responseMng.contentString.contains(""""my/endpoint/$1": {
-                                         |      "calls": 1
-                                         |    }""")
+    assert(stripIndent(responseMng.contentString).contains(""""my/endpoint/$1": {"calls": 1}"""))
   }
 
+  it("should be possible to fetch metrics for a specific endpoint via manager") {
+    val url = s"/$mngmtPath/metrics/my/endpoint/$$1"
+    When(s"Getting endpoint metrics for one endpoint: $url")
+    val mngmtRequest = Request(Method.Get, url)
+    mngmtRequest.host = mngmtAddress
+
+    Then("the response should contain the metrics")
+    var responseMng: Response = Await.result(mngmtClient(mngmtRequest))
+
+    responseMng.status shouldBe Status.Ok
+    responseMng.contentType.get shouldBe "application/json"
+    stripIndent(responseMng.contentString) shouldBe """{"metrics": {"my/endpoint/$1": {"calls": 1}}}"""
+  }
+
+  it("should get empty metrics for an endpoint that is not configured") {
+    val url = s"/$mngmtPath/metrics/my/endpoint/that/does/not/exist"
+    When(s"Getting endpoint metrics for non existing endpoint: $url")
+    val mngmtRequest = Request(Method.Get, url)
+    mngmtRequest.host = mngmtAddress
+
+    Then("the response should not contain the metrics")
+    var responseMng: Response = Await.result(mngmtClient(mngmtRequest))
+
+    responseMng.status shouldBe Status.Ok
+    responseMng.contentType.get shouldBe "application/json"
+    stripIndent(responseMng.contentString) shouldBe """{"metrics": {"my/endpoint/that/does/not/exist": {}}}"""
+  }
 }
