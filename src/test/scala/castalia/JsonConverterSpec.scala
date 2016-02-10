@@ -2,9 +2,7 @@ package castalia
 
 import java.io.FileNotFoundException
 
-import castalia.model.Model.{DefaultResponseConfig, LatencyConfig, ResponseConfig, StubConfig}
-import castalia.model.Model.{ResponseProviderConfig, LatencyConfig, ResponseConfig, StubConfig}
-import org.scalatest.{Matchers, WordSpec}
+import castalia.model.Model.{DefaultResponseConfig, LatencyConfig, ResponseConfig, ResponseProviderConfig, StubConfig}
 
 class JsonConverterSpec extends UnitSpecBase {
 
@@ -19,7 +17,7 @@ class JsonConverterSpec extends UnitSpecBase {
           case Some(responses: List[ResponseConfig]) =>
             responses.size.shouldBe(4)
             responses(0).ids.shouldBe(Some(Map("1" -> "1", "2" -> "id1")))
-            responses(0).delay.shouldBe(Some(LatencyConfig("constant", "100 ms")))
+            responses(0).delay.shouldBe(Some(LatencyConfig("constant", Option("100 ms"), None, None)))
             responses(0).httpStatusCode.shouldBe(200)
           case None => assert(false, "has no response definition")
         }
@@ -61,7 +59,7 @@ class JsonConverterSpec extends UnitSpecBase {
       "return correctly parsed stubconfig" in {
         val stubconfig = JsonConverter.parseJson[StubConfig]("sharedproperties.json")
         stubconfig.endpoint.shouldBe("somestub/$parm")
-        stubconfig.default.shouldBe(Some(DefaultResponseConfig(Some(LatencyConfig("constant", "100 ms")), None, None)))
+        stubconfig.default.shouldBe(Some(DefaultResponseConfig(Some(LatencyConfig("constant", Option("100 ms"), None, None)), None, None)))
         stubconfig.responses match {
           case Some(responses: List[ResponseConfig]) =>
             responses.head.ids.shouldBe(Some(Map(("parm", "1"))))
