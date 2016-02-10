@@ -18,6 +18,9 @@ class MetricsRegistrySpec extends UnitSpecBase {
         mc.metricsByEndpoint.get("endpoint1") shouldBe Some(Map("metric1" -> 2, "metric2" -> 1))
         mc.metricsByEndpoint.get("endpoint2") shouldBe Some(Map("metric1" -> 1))
         mc.metricsByEndpoint.get("endpoint3") shouldBe None
+
+        mc.metrics("endpoint1") shouldBe Map("metric1" -> 2, "metric2" -> 1)
+        mc.metrics("endpoint3") shouldBe Map()
       }
     }
 

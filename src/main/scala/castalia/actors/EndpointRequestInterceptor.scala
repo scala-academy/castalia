@@ -21,8 +21,12 @@ trait EndpointRequestInterceptor {
   metricsCollector ! EndpointMetricsInit(endpoint)
 
   pipelineOuter {
-    case rm: RequestMatch => { metricsCollector ! EndpointCalled(endpoint) }
-    Inner(rm)
+    case rm: RequestMatch =>
+      // intercept request match request
+      metricsCollector ! EndpointCalled(endpoint)
+      // continue with actor receive
+      Inner(rm)
+    case other => Inner(other)
   }
 
 }

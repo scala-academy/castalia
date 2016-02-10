@@ -45,9 +45,9 @@ class Receptionist extends Actor with ActorLogging {
       log.info(s"receptionist received message [" + request.uri.toString() + "]")
       requestMatcherActor ! FindMatch(request, sender)
 
-    case EndpointMetricsGet =>
-      log.info("fetching metrics for all endpoints")
-      metricsCollector forward EndpointMetricsGet
+    case msg: EndpointMetricsGet =>
+      log.info(s"got message $msg")
+      metricsCollector forward msg
 
     // unexpected messages
     case x =>
