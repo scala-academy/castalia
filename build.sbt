@@ -23,7 +23,8 @@ libraryDependencies ++= {
     "org.jliszka"       %% "probability-monad" % "1.0.1",
     jDistLib,
     "org.scalatest"     %% "scalatest"                            % scalaTestV       % "test,it",
-    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test,it",
+    "com.typesafe.akka" %% "akka-http-testkit-experimental"       % akkaStreamV      % "test",
+    "com.typesafe.akka" %% "akka-testkit"                         % "2.4.1"          % "test",
     "com.miguno.akka"   %% "akka-mock-scheduler"                  % "0.4.0"          % "test",
     "com.twitter"       %% "finagle-http"                         % "6.31.0"         % "it"
   )

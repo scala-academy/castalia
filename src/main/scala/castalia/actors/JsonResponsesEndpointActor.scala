@@ -5,8 +5,8 @@ import akka.http.scaladsl.model.StatusCodes.Forbidden
 import akka.pattern.pipe
 import castalia.matcher.RequestMatch
 import castalia.matcher.types.Params
-import castalia.model.Model.{StubConfig, StubResponse, _}
-import castalia.{DelayedDistribution, Delay, EndpointIds}
+import castalia.model.Model.{StubResponse, _}
+import castalia.{Delay, DelayedDistribution, EndpointIds}
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -16,7 +16,7 @@ import scala.concurrent.duration._
   *
   * Created on 2016-01-23
   */
-class JsonResponsesEndpointActor(override val stubConfig: StubConfig, override val metricsCollector: ActorRef)
+class JsonResponsesEndpointActor(override val endpoint: String, val responses: List[ResponseConfig], override val metricsCollector: ActorRef)
   extends JsonEndpointActor
   with ActorLogging
   with Delay
@@ -61,14 +61,14 @@ class JsonResponsesEndpointActor(override val stubConfig: StubConfig, override v
       log.error("received unexpected message [" + msg + "]")
   }
 
-  def findResponse( pathParams: Params): Option[ResponseConfig] = {
-    def findResponseRecurse( pathParams: Params, responses: Option[List[ResponseConfig]]): Option[ResponseConfig] =
+  def findResponse(pathParams: Params): Option[ResponseConfig] = {
+    def findResponseRecurse(pathParams: Params, responses: List[ResponseConfig]): Option[ResponseConfig] =
       (pathParams, responses) match {
-        case (_, Some(Nil)) => None
-        case (params, Some(first :: rest)) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse(params, Some(rest))
+        case (_, Nil) => None
+        case (params, (first :: rest)) => if (paramMatch(params, first.ids)) Some(first) else findResponseRecurse(params, rest)
         case (_, _) => None
       }
-    findResponseRecurse(pathParams, stubConfig.responses)
+    findResponseRecurse(pathParams, responses)
   }
 
   def paramMatch( left: Params, right: EndpointIds): Boolean = {
