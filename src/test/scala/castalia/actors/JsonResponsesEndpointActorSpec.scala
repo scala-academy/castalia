@@ -24,18 +24,18 @@ class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase
         //RequestMatch(uri: String, path: Path, pathParams: Params, queryParams: Params, handler: String)
 
       within(1000.millis, 1200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "1")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "1")), Nil)
 
         expectMsg(StubResponse(200, """{"id":"een","someValue":"123123"}"""))
       }
 
       within(100.millis, 200.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "2")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "2")), Nil)
 
         expectMsg(StubResponse(200, """{"id":"twee","someValue":"2222"}"""))
       }
       within(50.millis) {
-        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "3")), Nil, jsonEndpoint)
+        jsonEndpoint ! new RequestMatch(httpRequest, List(("1", "3")), Nil)
 
         expectMsg(StubResponse(200, """{"id":"drie","someValue":"123123"}"""))
       }
@@ -47,7 +47,7 @@ class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase
       val endpoint = system.actorOf(Props(new JsonResponsesEndpointActor(jsonConfig.endpoint, jsonConfig.responses.get, metricsCollector.ref)))
 
       within(100.millis, 200.millis) {
-        endpoint ! new RequestMatch(httpRequest, List(("parm", "1")), Nil, endpoint)
+        endpoint ! new RequestMatch(httpRequest, List(("parm", "1")), Nil)
 
         expectMsg(StubResponse(200, """{"id":"een","someValue":"123123"}"""))
       }
@@ -59,7 +59,7 @@ class JsonResponsesEndpointActorSpec(_system: ActorSystem) extends ActorSpecBase
       val endpoint = system.actorOf(Props(new JsonResponsesEndpointActor(jsonConfig.endpoint, jsonConfig.responses.get, metricsCollector.ref)))
 
       within(2000.millis, 2100.millis) {
-        endpoint ! new RequestMatch(httpRequest, List(("parm", "0")), Nil, endpoint)
+        endpoint ! new RequestMatch(httpRequest, List(("parm", "0")), Nil)
 
         expectMsg(StubResponse(404, ""))
       }
