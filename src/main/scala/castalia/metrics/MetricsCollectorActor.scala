@@ -28,6 +28,8 @@ class MetricsCollectorActor extends Actor with ActorLogging {
     case EndpointMetricsGet(None) => sender ! EndpointMetrics(metricsRegistry.metricsByEndpoint)
     case EndpointMetricsGet(Some(endpoint)) =>
       sender ! EndpointMetrics(Map(endpoint -> metricsRegistry.metrics(endpoint)))
+
+    case x => log.info(s"Got an unexpected message ${x.toString}")
   }
 
 }

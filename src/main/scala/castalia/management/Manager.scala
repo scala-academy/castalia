@@ -26,5 +26,6 @@ class Manager(receptionist: ActorRef) extends Actor with ActorLogging {
     case msg:EndpointMetricsGet =>
       log.debug(s"received message to fetch metrics $msg")
       receptionist forward msg
+    case x => log.info(s"Got an unexpected message ${x.toString}")
   }
 }
