@@ -31,35 +31,4 @@ class MatcherModelSpec (_system: ActorSystem) extends ActorSpecBase(_system) {
       assert(parsedUri.pathList.equals(List()))
     }
   }
-
-  "MatcherModel Matcher class" should {
-
-    "support {} as path parameter indication" in {
-      val actRef = TestProbe().ref
-      val matcher = new Matcher(List("a", "{bparm}", "c"), actRef)
-
-      val result = matcher.matchPath(List("a", "b", "c"))
-
-      assert(result.get.contains(("bparm", "b")))
-    }
-
-    "support $ as path parameter indication" in {
-      val actRef = TestProbe().ref
-      val matcher = new Matcher(List("a", "b", "$c"), actRef)
-
-      val result = matcher.matchPath(List("a", "b", "cval"))
-
-      assert(result.get.contains(("c", "cval")))
-    }
-
-    "support mixing {} and $ as path parameter" in {
-      val actRef = TestProbe().ref
-      val matcher = new Matcher(List("a", "{bparm}", "$c"), actRef)
-
-      val result = matcher.matchPath(List("a", "b", "cval"))
-
-      assert(result.get.contains(("bparm", "b")))
-      assert(result.get.contains(("c", "cval")))
-    }
-  }
 }

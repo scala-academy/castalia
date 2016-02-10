@@ -24,7 +24,7 @@ class EndpointRequestInterceptorSpec(_system: ActorSystem) extends ActorSpecBase
       // send initial reset stats endpoint metrics
       metricsCollector.expectMsg(EndpointMetricsInit(endpoint))
 
-      actorWithInterceptor ! RequestMatch(new HttpRequest(), List(), List(), metricsCollector.ref)
+      actorWithInterceptor ! RequestMatch(new HttpRequest(), List(), List())
 
       // metrics provider will intercept RequestMatch message and add it's own behaviour on top of Done message back
       expectMsg(Done(endpoint))

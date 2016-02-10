@@ -23,7 +23,7 @@ class JsonResponseProviderEndpointActorSpec(_system: ActorSystem) extends ActorS
       val jsonEndpoint = system.actorOf(Props(
         new JsonResponseProviderEndpointActor(jsonConfig.endpoint, jsonConfig.responseprovider.get, metricsCollector.ref)))
 
-      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "1", "2" -> "2"), Nil, jsonEndpoint)
+      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "1", "2" -> "2"), Nil)
 
       expectMsg(StubResponse(200, """{"result":"1 with 2"}"""))
 
@@ -37,7 +37,7 @@ class JsonResponseProviderEndpointActorSpec(_system: ActorSystem) extends ActorS
       val jsonEndpoint = system.actorOf(Props(
         new JsonResponseProviderEndpointActor(jsonConfig.endpoint, jsonConfig.responseprovider.get, metricsCollector.ref)))
 
-      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "3", "2" -> "4"), Nil, jsonEndpoint)
+      jsonEndpoint ! new RequestMatch(httpRequest, List("1" -> "3", "2" -> "4"), Nil)
       expectMsgClass(classOf[Failure])
       //expectMsg(Failure(new Exception("some expected failure")))
     }
