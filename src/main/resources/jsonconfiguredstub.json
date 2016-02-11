@@ -1,8 +1,15 @@
 {
-  "endpoint": "jsonconfiguredstub",
+  "endpoint": "doublepathparam/$1/responsedata/$2",
   "responses": [
     {
-      "id": "1",
+      "ids": {
+        "1": "1",
+        "2": "id1"
+      },
+      "delay": {
+        "distribution": "constant",
+        "mean": "1500 ms"
+      },
       "httpStatusCode": 200,
       "response": {
         "id": "een",
@@ -10,7 +17,15 @@
       }
     },
     {
-      "id": "2",
+      "ids": {
+        "1": "1",
+        "2": "id2"
+      },
+      "delay": {
+        "distribution": "gamma",
+        "p1": "200 ms",
+        "p2": "1000 ms"
+      },
       "httpStatusCode": 200,
       "response": {
         "id": "twee",
@@ -19,8 +34,18 @@
       }
     },
     {
-      "id": "0",
+      "ids": {
+        "1": "0",
+        "2": "notfound"
+      },
       "httpStatusCode": 404
+    },
+    {
+      "ids": {
+        "1": "0",
+        "2": "internalerror"
+      },
+      "httpStatusCode": 503
     }
   ]
 }

@@ -1,43 +1,45 @@
 package castalia
 
-import castalia.model.StubConfig
+import castalia.model.Model.{ResponseConfig, DefaultResponseConfig, StubConfig}
 
 
-object StubConfigParser extends Protocol {
+object StubConfigParser {
 
   def parseStubConfig(jsonFile: String): StubConfig = {
-   JsonConverter.parseJson[StubConfig](jsonFile)
-  }
-
-  def parseConfigFile(configFile: String): JsonFilesConfig = {
-    JsonConverter.parseJson[JsonFilesConfig](configFile)
-  }
-
-  def readAndParseStubConfigFiles(args: Array[String]): Map[Endpoint, ResponsesByRequest] = {
-    // Get all json files from the config file
-    val stubConfigs: Array[StubConfig] = for (
-      stubs <- parseConfigFile(args(0)).stubs // iterate over all jsonFiles
-    ) yield parseStubConfig(stubs)
-
-    val stubsConfigsByEndpoint: Map[Endpoint, ResponsesByRequest] = stubConfigs.map({
-      // Create an outer map by endpoint
-      s => (
-        s.endpoint, // Endpoint is the outer key
-        s.responses.map({
-          // Create an inner map by repsonse id
-          r => (
-            r.id, // Id is the inner key
-            (r.httpStatusCode, r.response))
-        }).toMap // this is the outer map value (a map of id -> responses)
-        )
-    }).toMap // this is the map of all stubs (a map of endpoint -> (a map of id -> responses) )
-
-    if (stubConfigs.length == stubsConfigsByEndpoint.size) {
-      stubsConfigsByEndpoint
-    }
-    else {
-      throw new IllegalArgumentException("Duplicate endpoints have been defined")
+    val initialConfig = JsonConverter.parseJson[StubConfig](jsonFile)
+    (initialConfig.default) match {
+      case (Some(default)) =>
+        initialConfig.responses match {
+          case None =>
+            initialConfig
+          case Some(initialResponses) => StubConfig(
+            initialConfig.endpoint,
+            initialConfig.default,
+            Some(addDefaults(default, initialResponses)),
+            initialConfig.responseprovider)
+        }
+      case _ => initialConfig
     }
 
+  }
+
+  def parseStubConfigs(jsonFiles: List[String]): List[StubConfig] = {
+    jsonFiles.map(parseStubConfig(_))
+  }
+
+  private def addDefaults(default: DefaultResponseConfig, responses: List[ResponseConfig]): List[ResponseConfig] =
+    (responses) match {
+      case (Nil) => Nil
+      case (first :: rest) => mix(default, first) :: addDefaults(default, rest)
+    }
+
+  private def mix(default: DefaultResponseConfig, response: ResponseConfig) = {
+    val delayOption = (default.delay, response.delay) match {
+      case (_, Some(delay)) => Some(delay)
+      case (default, _) => default
+    }
+    // future extension: httpStatusCode and response in ResponseConfig become Option, and default can be mixed in
+
+    ResponseConfig(response.ids, delayOption, response.httpStatusCode, response.response)
   }
 }

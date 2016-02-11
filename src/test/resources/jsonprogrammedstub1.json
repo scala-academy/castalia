@@ -1,0 +1,7 @@
+{
+  "endpoint": "somepath/$1/with/$2",
+  "responseprovider" : {
+    "class": "castalia.plugins.ProgrammedStub",
+    "member": "process1"
+  }
+}
